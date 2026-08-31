@@ -1,0 +1,57 @@
+.eq-field select {
+  width: 100%;
+  border: 1px solid var(--eq-border);
+  border-radius: var(--eq-radius-control);
+  background: var(--eq-surface);
+  color: var(--eq-ink);
+  font-size: 13.5px;
+  font-family: var(--eq-font-sans);
+  height: 38px;
+  padding: 0 var(--eq-sp-3);
+  box-sizing: border-box;
+}
+
+.eq-field select:focus {
+  outline: none;
+  border-color: var(--eq-primary);
+  box-shadow: 0 0 0 3px var(--eq-primary-soft);
+}
+
+.eq-field select:disabled {
+  background: var(--eq-surface-alt);
+  color: var(--eq-ink-faint);
+  cursor: not-allowed;
+}
+
+.eq-invoice-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--eq-sp-3);
+  flex-wrap: wrap;
+}
+
+.eq-required {
+  color: var(--eq-red);
+  font-weight: 700;
+}
+
+.eq-loading-block {
+  padding: 32px 0;
+  text-align: center;
+  font-size: 13.5px;
+  color: var(--eq-ink-muted);
+}
+
+.eq-form-card {
+  min-width: 0;
+}
+
+.eq-line-table-scroll {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.eq-line-table {
+  min-width: 0;
+  table-layout: auto;
+}

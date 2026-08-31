@@ -1,0 +1,26 @@
+<div class="eq-profile" [class.is-open]="isOpen">
+  <button class="eq-profile-trigger" type="button" (click)="toggle($event)">
+    <span class="eq-avatar"><i class="icon-user"></i></span>
+    <span class="eq-profile-meta">
+      <span class="eq-profile-name">{{ userDetail.FirstName }} {{ userDetail.LastName }}</span>
+      <span class="eq-profile-role">{{ userDetail.RoleName }}</span>
+    </span>
+    <i class="fa fa-chevron-down eq-profile-caret"></i>
+  </button>
+
+  @if (isOpen) {
+    <div class="eq-profile-menu">
+      <div class="eq-profile-menu-header">
+        <span class="eq-avatar eq-avatar--lg"><i class="icon-user"></i></span>
+        <div>
+          <div class="eq-profile-name">{{ userDetail.FirstName }} {{ userDetail.LastName }}</div>
+          <div class="eq-profile-role">{{ userDetail.RoleName }}</div>
+        </div>
+      </div>
+
+      <a class="eq-profile-menu-item eq-profile-menu-item--danger" href="javascript:void(0)" (click)="logout()">
+        <i class="icon-logout"></i>Logout
+      </a>
+    </div>
+  }
+</div>

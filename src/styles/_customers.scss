@@ -1,0 +1,60 @@
+/*
+  EmQube Invoice — Customer-specific styles (type badge, modal)
+  Source: UIPrototype/css/customers.css (only the parts unique to customers)
+  Toolbar, table, skeleton, pagination shared from _table.scss
+*/
+
+/* ---------- type badge (Customer / Prospect) ---------- */
+.eq-badge-prospect { background: var(--eq-info-soft); color: var(--eq-info); }
+.eq-badge-customer { background: var(--eq-green-soft); color: var(--eq-green); }
+
+/* ---------- required-field asterisk ---------- */
+.eq-required { color: var(--eq-red); font-weight: 700; }
+
+/* ---------- section subtitle with toggle ---------- */
+.eq-form-subtitle-with-toggle {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--eq-sp-3);
+  flex-wrap: wrap;
+}
+
+/* ---------- modal form grid variants ---------- */
+.eq-modal-form-grid { margin-bottom: 0; }
+.eq-modal-form-grid-tight { align-items: end; }
+
+/* ---------- toggle switches ---------- */
+.eq-switch-toggle-row {
+  display: flex; align-items: center; gap: var(--eq-sp-4);
+  margin-bottom: var(--eq-sp-3);
+  padding-bottom: var(--eq-sp-3);
+  border-bottom: 1px dashed var(--eq-border);
+  flex-wrap: wrap;
+}
+.eq-switch-toggle {
+  display: inline-flex; align-items: center; gap: 8px;
+  cursor: pointer;
+}
+.eq-switch-toggle-text { font-size: 12.5px; font-weight: 600; color: var(--eq-ink); }
+.eq-switch-toggle-field { height: 33px; }
+.eq-switch-toggle-inline { gap: 8px; }
+.eq-switch-toggle-inline .eq-switch-toggle-text { font-size: 12px; font-weight: 600; color: var(--eq-ink-muted); text-transform: none; letter-spacing: 0; }
+
+.eq-switch { position: relative; display: inline-block; width: 38px; height: 21px; flex-shrink: 0; }
+.eq-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+.eq-switch .slider {
+  position: absolute; inset: 0;
+  background: var(--eq-border);
+  border-radius: 999px;
+  transition: background .15s ease;
+}
+.eq-switch .slider::before {
+  content: "";
+  position: absolute;
+  left: 3px; top: 3px;
+  width: 15px; height: 15px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform .15s ease;
+}
+.eq-switch input:checked + .slider { background: var(--eq-primary); }
+.eq-switch input:checked + .slider::before { transform: translateX(17px); }
+.eq-switch input:focus-visible + .slider { box-shadow: 0 0 0 3px var(--eq-primary-soft); }

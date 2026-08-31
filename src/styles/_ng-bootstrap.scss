@@ -1,0 +1,151 @@
+/*
+  EmQube Invoice — ng-bootstrap overrides
+  Aligns ng-bootstrap components with .eq-* design tokens.
+  Loaded after Bootstrap CSS (imported by ng-bootstrap).
+*/
+
+/* ---------- modals ---------- */
+.modal-content {
+  background: var(--eq-surface);
+  border: 1px solid var(--eq-border);
+  border-radius: var(--eq-radius-card);
+  box-shadow: 0 12px 40px -8px rgba(22,32,43,.35);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--eq-sp-3);
+  padding: var(--eq-sp-4) var(--eq-sp-5);
+  border-bottom: 1px solid var(--eq-border);
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 15.5px;
+  font-weight: 700;
+  color: var(--eq-ink);
+}
+
+.modal-body {
+  padding: var(--eq-sp-5);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--eq-sp-2);
+  padding: var(--eq-sp-4) var(--eq-sp-5);
+  border-top: 1px solid var(--eq-border);
+  background: var(--eq-bg);
+}
+
+/* ng-bootstrap uses btn-close class, not .close */
+.btn-close {
+  filter: none;
+  opacity: 1;
+}
+
+/* ---------- dropdowns ---------- */
+.dropdown-menu {
+  background: var(--eq-surface);
+  border: 1px solid var(--eq-border);
+  border-radius: var(--eq-radius-card);
+  box-shadow: var(--eq-shadow-card);
+  padding: var(--eq-sp-2);
+  margin-top: var(--eq-sp-2);
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: var(--eq-sp-3);
+  padding: var(--eq-sp-3);
+  border-radius: var(--eq-radius-control);
+  color: var(--eq-ink);
+  font-size: 13.5px;
+  text-decoration: none;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background: var(--eq-surface-alt);
+  color: var(--eq-ink);
+  text-decoration: none;
+}
+
+.dropdown-item.active,
+.dropdown-item:active {
+  background: var(--eq-primary-soft);
+  color: var(--eq-primary);
+}
+
+/* ---------- pagination ---------- */
+.page-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid var(--eq-border);
+  border-radius: var(--eq-radius-control);
+  background: var(--eq-surface);
+  color: var(--eq-ink-muted);
+  font-size: 12.5px;
+  font-family: var(--eq-font-mono);
+  line-height: 1;
+  text-decoration: none;
+}
+
+.page-link:hover {
+  background: var(--eq-surface-alt);
+  color: var(--eq-ink);
+  border-color: var(--eq-border);
+}
+
+.page-item.active .page-link,
+.page-item.active .page-link:hover {
+  background: var(--eq-primary);
+  border-color: var(--eq-primary);
+  color: #fff;
+}
+
+.page-item.disabled .page-link,
+.page-item.disabled .page-link:hover {
+  opacity: .4;
+  cursor: default !important;
+  background: var(--eq-surface);
+  color: var(--eq-ink-muted);
+}
+
+/* ---------- datepicker (ng-bootstrap) ---------- */
+.bs-datepicker-head {
+  background: var(--eq-primary) !important;
+  color: #fff !important;
+}
+
+.bs-datepicker-body table td span.bs-dow {
+  color: var(--eq-ink-muted) !important;
+}
+
+/* ---------- form controls ( Bootstrap form inputs/selects ) ---------- */
+.form-control,
+.form-select {
+  border-color: var(--eq-border);
+  border-radius: var(--eq-radius-control);
+  font-size: 13.5px;
+  color: var(--eq-ink);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--eq-primary);
+  box-shadow: 0 0 0 3px var(--eq-primary-soft);
+  color: var(--eq-ink);
+}
+
+.form-control::placeholder {
+  color: var(--eq-ink-faint);
+}

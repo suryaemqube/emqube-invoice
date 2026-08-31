@@ -1,0 +1,29 @@
+<header class="eq-header">
+  <button class="eq-header-toggle eq-header-toggle--desktop" type="button" (click)="toggleSidebar()">
+    <i class="fa fa-bars"></i>
+  </button>
+  <a class="navbar-brand" href="#"></a>
+
+  <div class="eq-header-spacer"></div>
+
+  <app-profile />
+</header>
+
+<div class="eq-app-body">
+  <aside class="eq-sidebar">
+    <app-sidebar
+      [salesMenus]="salesMenus"
+      [masterMenus]="masterMenus"
+      (menuClick)="onMenuClick($event)"
+    />
+
+  </aside>
+
+  <main class="eq-main">
+    <div class="eq-content">
+      <router-outlet />
+    </div>
+  </main>
+</div>
+
+<div class="eq-backdrop"></div>

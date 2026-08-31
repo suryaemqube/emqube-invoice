@@ -1,1 +1,34 @@
-/* You can add global styles to this file, and also import other style files */
+/*
+  EmQube Invoice — Master stylesheet
+  Imports design system partials + Bootstrap (for ng-bootstrap) + ng-bootstrap overrides
+*/
+
+/* 1. Bootstrap CSS (peer dep of @ng-bootstrap/ng-bootstrap) */
+@use 'bootstrap/scss/bootstrap';
+
+/* 2. Design tokens (must come before everything else) */
+@use 'styles/tokens';
+
+/* 3. Icon fonts */
+@use 'styles/icons';
+
+/* 4. Shell (header, sidebar, main, footer, buttons, cards, badges) */
+@use 'styles/shell';
+
+/* 5. Tables (toolbar, table, skeleton, pagination) */
+@use 'styles/table';
+
+/* 6. Forms (create/edit invoice, fields, line items, summary) */
+@use 'styles/forms';
+
+/* 7. Customer-specific (type badge, modal, toggle switch) */
+@use 'styles/customers';
+
+/* 8. Quote-specific (type selector, discount row, revisions) */
+@use 'styles/quotes';
+
+/* 9. ng-bootstrap overrides (modals, dropdowns, pagination, datepicker) */
+@use 'styles/ng-bootstrap';
+
+/* 10. Responsive breakpoints (must come last) */
+@use 'styles/responsive';

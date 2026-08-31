@@ -1,0 +1,112 @@
+/*
+  EmQube Invoice — Responsive breakpoints
+  Consolidated from all UIPrototype CSS responsive sections
+*/
+
+/* ---------- tablet / sidebar collapse (< 992px) ---------- */
+@media (max-width: 991px) {
+  .eq-sidebar { transform: translateX(-100%); box-shadow: var(--eq-shadow-card); }
+  body.eq-sidebar-mobile-show .eq-sidebar { transform: translateX(0); }
+  .eq-main, .eq-footer { margin-left: 0 !important; }
+  .eq-header-toggle--mobile { display: block; }
+  .eq-header-toggle--desktop { display: none; }
+  .eq-header .navbar-brand { width: 130px; background-size: 95px auto; }
+  .eq-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ---------- small tablet / phone (< 700px) ---------- */
+@media (max-width: 700px) {
+  .eq-header-title { display: none; }
+  .eq-profile-meta { display: none; }
+  .eq-content { padding: var(--eq-sp-5) var(--eq-sp-3) 0; }
+  .eq-kpi-grid { grid-template-columns: 1fr; }
+  .eq-page-header { flex-direction: column; }
+
+  /* toolbar: stack vertically */
+  .eq-toolbar { flex-direction: column; align-items: stretch; }
+  .eq-toolbar-field, .eq-toolbar-search { flex: none; min-width: 0; width: 100%; }
+  .eq-toolbar-clear { margin-left: 0; width: 100%; justify-content: center; }
+
+  /* table -> stacked cards */
+  .eq-table-scroll { overflow-x: visible; }
+  .eq-table { min-width: 0; }
+  .eq-table thead { display: none; }
+  .eq-table, .eq-table tbody { display: block; width: 100%; }
+  .eq-table tr {
+    display: block;
+    border: 1px solid var(--eq-border);
+    border-radius: var(--eq-radius-control);
+    margin: var(--eq-sp-3);
+    padding: var(--eq-sp-2) var(--eq-sp-3);
+  }
+  .eq-table tbody tr:hover { background: var(--eq-surface); }
+  .eq-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--eq-sp-3);
+    padding: 7px 0;
+    border-bottom: 1px dashed var(--eq-border);
+    text-align: right;
+  }
+  .eq-table td::before {
+    content: attr(data-label);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    font-weight: 700;
+    color: var(--eq-ink-faint);
+    text-align: left;
+  }
+  .eq-table td.actions { border-bottom: none; }
+  .eq-table td.actions::before { content: none; }
+  .eq-table tr td:last-child { border-bottom: none; }
+
+  .eq-table-footer { flex-direction: column; align-items: stretch; }
+  .eq-paginator { margin-left: 0; justify-content: center; }
+}
+
+/* ---------- invoice form responsive ---------- */
+@media (max-width: 1100px) {
+  .eq-invoice-layout { grid-template-columns: 1fr; }
+  .eq-summary-card { position: static; }
+  .eq-summary-actions { flex-direction: row; flex-wrap: wrap; }
+  .eq-summary-actions .eq-btn { flex: 1 1 auto; }
+}
+@media (max-width: 700px) {
+  .eq-form-grid, .eq-form-grid-3 { grid-template-columns: 1fr; }
+  .eq-summary-actions { flex-direction: column; }
+
+  .eq-line-table-scroll { border: none; overflow: visible; }
+  .eq-line-table { min-width: 0; }
+  .eq-line-table thead { display: none; }
+  .eq-line-table, .eq-line-table tbody { display: block; width: 100%; }
+  .eq-line-table tr {
+    display: block;
+    border: 1px solid var(--eq-border);
+    border-radius: var(--eq-radius-control);
+    margin-bottom: var(--eq-sp-3);
+    padding: var(--eq-sp-2) var(--eq-sp-3);
+  }
+  .eq-line-table tr:last-child { margin-bottom: 0; }
+  .eq-line-table td {
+    display: flex; justify-content: space-between; align-items: center; gap: var(--eq-sp-3);
+    padding: 7px 0; border-bottom: 1px dashed var(--eq-border); text-align: right;
+  }
+  .eq-line-table td::before {
+    content: attr(data-label); font-size: 11px; text-transform: uppercase; letter-spacing: .04em;
+    font-weight: 700; color: var(--eq-ink-faint); text-align: left; flex-shrink: 0;
+  }
+  .eq-line-table td.wrap { max-width: none; }
+  .eq-line-table td .eq-line-select,
+  .eq-line-table td .eq-line-input { width: auto; max-width: 62%; }
+  .eq-line-table td.eq-item-cell { display: block; }
+  .eq-line-table td.eq-item-cell::before { display: block; margin-bottom: 5px; }
+  .eq-line-table td.eq-item-cell .eq-line-select,
+  .eq-line-table td.eq-item-cell textarea { width: 100%; max-width: none; }
+  .eq-line-table td.actions { border-bottom: none; }
+  .eq-line-table td.actions::before { content: none; }
+  .eq-line-table tr td:last-child { border-bottom: none; }
+
+  .eq-line-summary table { max-width: none; }
+}

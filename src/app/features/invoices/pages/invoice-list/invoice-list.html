@@ -1,0 +1,196 @@
+<!-- Page Head -->
+<div class="eq-page-header">
+  <div>
+    <h1>Invoice List</h1>
+ 
+  </div>
+  <a class="eq-btn eq-btn-primary" routerLink="/createinvoice">
+    <i class="icon-plus"></i> New Invoice
+  </a>
+</div>
+
+<!-- KPI Cards -->
+<div class="eq-kpi-grid">
+  @for (kpi of kpis(); track kpi.label) {
+    <div class="eq-kpi">
+      <div class="eq-kpi-label">{{ kpi.label }}</div>
+      <div class="eq-kpi-value">{{ kpi.value }}</div>
+      @if (kpi.badge) {
+        <div class="eq-kpi-delta">
+          <eq-badge [tone]="kpi.badge.tone">{{ kpi.badge.text }}</eq-badge>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- Toolbar -->
+<eq-toolbar>
+  <div class="eq-toolbar-search">
+    <i class="icon-magnifier"></i>
+    <input
+      type="text"
+      placeholder="Invoice No., Date, Value, Tax, Product, Payment Date"
+      [(ngModel)]="filterQuery"
+      (ngModelChange)="onSearchChange()"
+    />
+  </div>
+
+  <div class="eq-toolbar-field">
+    <label>Year</label>
+    <select [(ngModel)]="filterYear" (ngModelChange)="onFilterChange()">
+      <option [ngValue]="0">All Years</option>
+      @for (year of yearList(); track year) {
+        <option [ngValue]="year">{{ year }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="eq-toolbar-field">
+    <label>Status</label>
+    <select [(ngModel)]="filterStatus" (ngModelChange)="onFilterChange()">
+      <option value="">All Statuses</option>
+      <option value="paid">Paid</option>
+      <option value="due">Due</option>
+      <option value="cancelled">Cancelled</option>
+    </select>
+  </div>
+
+  <div class="eq-toolbar-field">
+    <label>Division</label>
+    <select [(ngModel)]="filterDivision" (ngModelChange)="onFilterChange()">
+      <option value="">All Divisions</option>
+      @for (div of divisions(); track div.BusinessDivisionId) {
+        <option [value]="div.DivisionName">{{ div.DivisionName }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="eq-toolbar-field">
+    <label>Customer</label>
+    <select [(ngModel)]="filterCustomer" (ngModelChange)="onFilterChange()">
+      <option value="">All Customers</option>
+      @for (cust of customers(); track cust.CustomerId) {
+        <option [value]="cust.CustomerName">{{ cust.CustomerName }}</option>
+      }
+    </select>
+  </div>
+
+  <button class="eq-btn eq-btn-outline eq-toolbar-clear" (click)="clearFilters()">
+    <i class="icon-close"></i> Clear Filter
+  </button>
+</eq-toolbar>
+
+<!-- Table -->
+<eq-table [columns]="columns" [loading]="loading()">
+  <ng-container eqTableBody>
+    @for (row of pageSlice(); track row.TaxInvoiceId) {
+      <tr>
+        <td>
+          <span class="eq-mono">{{ row.InvoiceNumber }}</span>
+          @if (row.InvoiceTotal === 0 && row.TotalVAT === 0) {
+            <eq-badge tone="neutral" [compact]="true">Cancelled</eq-badge>
+          } @else if (row.PaymentRecdDateString) {
+            <eq-badge tone="success" [compact]="true">Paid</eq-badge>
+          } @else {
+            <eq-badge tone="warning" [compact]="true">Due</eq-badge>
+          }
+        </td>
+        <td>{{ row.InvoiceDateString }}</td>
+
+        <td class="name">
+          <a class="eq-link" [routerLink]="['/createinvoice', row.TaxInvoiceId]">{{ row.CustomerName }}</a>  
+        </td>
+
+        <td class="num">{{ row.CurrencySymbol }} {{ row.PreTaxTotal | number:'1.2-2' }}</td>
+        <td class="num">{{ row.CurrencySymbol }} {{ row.InvoiceTotal | number:'1.2-2' }}</td>
+        <td>
+          @if (divisionIcon(row.DivisionName)) {
+            <i [class]="divisionIconClass(row.DivisionName)" [title]="row.DivisionName"></i>
+          }
+          {{ row.ProductName }}
+        </td>
+        <td>{{ row.SExecutiveName }}</td>
+        <td>{{ row.PaymentRecdDateString }}</td>
+        <td class="eq-col-action">
+          <eq-dropdown
+            [items]="getRowActions(row)"
+            (itemClick)="onRowAction($event, row)"
+          />
+        </td>
+      </tr>
+    } @empty {
+      <tr>
+        <td [attr.colspan]="columns.length" class="eq-empty-row">
+          <div class="eq-empty">
+            <div class="eq-empty-icon"><i class="icon-doc"></i></div>
+            <h2>No invoices found</h2>
+            <p>Try adjusting your filters or search query.</p>
+            <button class="eq-btn eq-btn-outline" (click)="clearFilters()">Clear Filter</button>
+          </div>
+        </td>
+      </tr>
+    }
+  </ng-container>
+
+  <div eqTableFoot>
+    @if (!loading()) {
+      <eq-paginator
+        [totalItems]="filteredList().length"
+        [page]="page()"
+        [pageSize]="pageSize()"
+        (pageChange)="page.set($event)"
+        (pageSizeChange)="pageSize.set($event); page.set(1)"
+      />
+    }
+  </div>
+</eq-table>
+
+<!-- Record Payment Modal -->
+<ng-template #paymentModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Record Payment</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    @if (paymentRow) {
+      <div class="eq-modal-context">
+        <div class="eq-modal-context-row">
+          <span class="k">Invoice</span>
+          <span class="v">{{ paymentRow.InvoiceNumber }}</span>
+        </div>
+        <div class="eq-modal-context-row">
+          <span class="k">Customer</span>
+          <span class="v">{{ paymentRow.CustomerName }}</span>
+        </div>
+        <div class="eq-modal-context-row eq-modal-context-total">
+          <span class="k">Total</span>
+          <span class="v">{{ paymentRow.CurrencySymbol }} {{ paymentRow.InvoiceTotal | number:'1.2-2' }}</span>
+        </div>
+      </div>
+    }
+    <div class="eq-field">
+      <label>Payment Date</label>
+      <input
+        type="text"
+        class="form-control"
+        [ngModel]="paymentDate"
+        (ngModelChange)="paymentDate = $event"
+        placeholder="dd-mm-yyyy"
+        readonly
+        ngbDatepicker
+        [minDate]="paymentMinDate"
+        [maxDate]="paymentMaxDate"
+        #dp="ngbDatepicker"
+        (click)="dp.toggle()"
+      />
+      <p class="eq-field-hint">Must be on or after the invoice date and no later than today.</p>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="eq-btn eq-btn-outline" (click)="modal.dismiss()">Cancel</button>
+    <button type="button" class="eq-btn eq-btn-primary" [disabled]="!paymentDate" (click)="savePayment(modal)">
+      <i class="icon-check"></i> Save
+    </button>
+  </div>
+</ng-template>

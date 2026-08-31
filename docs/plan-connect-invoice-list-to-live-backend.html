@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plan: Connect Invoice List to Live Backend</title>
+  <style>
+    :root {
+      --primary: #0D9C4A;
+      --primary-hover: #0B7C3B;
+      --ink: #16202B;
+      --ink-muted: #57697C;
+      --ink-faint: #8496A8;
+      --surface: #FFFFFF;
+      --surface-alt: #EDF1F5;
+      --border: #DCE3EA;
+      --bg: #F5F7F9;
+      --red: #C23B3B;
+      --red-soft: #FBEAEA;
+      --amber: #B4700A;
+      --amber-soft: #FBF0DE;
+      --green-soft: #E4F5EA;
+      --info-soft: #E5EFF6;
+      --radius-card: 10px;
+      --radius-control: 6px;
+      --shadow-card: 0 1px 2px rgba(22,32,43,0.05), 0 6px 16px -8px rgba(22,32,43,0.12);
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: ui-monospace, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.6;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+
+    .subtitle {
+      color: var(--ink-muted);
+      font-size: 14px;
+      margin-bottom: 32px;
+    }
+
+    h2 {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 32px 0 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--primary);
+      display: inline-block;
+    }
+
+    h3 {
+      font-size: 15px;
+      font-weight: 700;
+      margin: 20px 0 10px;
+      color: var(--ink);
+    }
+
+    p {
+      margin-bottom: 12px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card);
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .card-header {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--ink-faint);
+      margin-bottom: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th {
+      text-align: left;
+      padding: 10px 12px;
+      background: var(--surface-alt);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 700;
+      color: var(--ink-muted);
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    .status-ok { color: var(--primary); font-weight: 600; }
+    .status-wrong { color: var(--red); font-weight: 600; }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      background: var(--surface-alt);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--ink);
+    }
+
+    pre {
+      background: var(--ink);
+      color: #E2E8F0;
+      padding: 16px;
+      border-radius: var(--radius-control);
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.5;
+      margin: 12px 0;
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+    }
+
+    .step {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 20px;
+      align-items: flex-start;
+    }
+
+    .step-number {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      background: var(--primary);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .step-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .step-title {
+      font-weight: 700;
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    .step-desc {
+      color: var(--ink-muted);
+      font-size: 14px;
+    }
+
+    .step-file {
+      margin-top: 6px;
+      font-size: 13px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+    }
+
+    .badge-success { background: var(--green-soft); color: var(--primary); }
+    .badge-warning { background: var(--amber-soft); color: var(--amber); }
+    .badge-danger { background: var(--red-soft); color: var(--red); }
+    .badge-info { background: var(--info-soft); color: #2C6E9E; }
+    .badge-neutral { background: var(--surface-alt); color: var(--ink-muted); border: 1px solid var(--border); }
+
+    .file-change {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-control);
+      padding: 12px 16px;
+      margin: 12px 0;
+      font-size: 14px;
+    }
+
+    .file-change .file {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .file-change .change {
+      margin-top: 4px;
+      color: var(--ink-muted);
+    }
+
+    .file-change .change code {
+      background: #fff;
+      padding: 1px 5px;
+      border: 1px solid var(--border);
+    }
+
+    .checklist {
+      list-style: none;
+      padding: 0;
+    }
+
+    .checklist li {
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    .checklist li:last-child { border-bottom: none; }
+
+    .checklist li::before {
+      content: "\25A2";
+      margin-right: 8px;
+      color: var(--ink-faint);
+    }
+
+    .risk-item {
+      display: flex;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: var(--radius-control);
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .risk-item--warning {
+      background: var(--amber-soft);
+      border: 1px solid #F0D9A8;
+    }
+
+    .risk-item--info {
+      background: var(--info-soft);
+      border: 1px solid #C4D9E8;
+    }
+
+    .risk-icon {
+      flex-shrink: 0;
+      font-size: 16px;
+      margin-top: 1px;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 24px;
+      color: var(--primary);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .back-link:hover { text-decoration: underline; }
+
+    @media (max-width: 640px) {
+      body { padding: 20px 12px; }
+      h1 { font-size: 22px; }
+      .step { gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a class="back-link" href="index.html">&larr; Back to Docs</a>
+
+    <h1>Connect Invoice List to Live Backend</h1>
+    <p class="subtitle">Plan for wiring the new Angular app to the existing .NET backend and real database &mdash; updated August 2026</p>
+
+    <!-- Problem Statement -->
+    <h2>Problem</h2>
+    <div class="card">
+      <p>The Angular app's API configuration doesn't match the real backend. The app currently points to the wrong protocol, wrong port, and the auth interceptor sends a Bearer token header that the backend doesn't expect.</p>
+
+      <div class="card-header" style="margin-top: 16px;">Configuration Mismatch</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Setting</th>
+            <th>Angular (environment.ts)</th>
+            <th>Actual Backend</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Protocol</td>
+            <td><code>https://</code></td>
+            <td><code>http://</code> (IIS Express)</td>
+            <td><span class="status-wrong">Wrong</span></td>
+          </tr>
+          <tr>
+            <td>Port</td>
+            <td><code>5001</code></td>
+            <td><code>41728</code></td>
+            <td><span class="status-wrong">Wrong</span></td>
+          </tr>
+          <tr>
+            <td>CORS Origin</td>
+            <td>&mdash;</td>
+            <td><code>http://localhost:4200</code> only</td>
+            <td><span class="status-ok">OK if Angular on 4200</span></td>
+          </tr>
+          <tr>
+            <td>Auth header</td>
+            <td>Sends <code>Bearer {token}</code> if present</td>
+            <td>No auth enforced</td>
+            <td><span class="status-wrong">Unnecessary header</span></td>
+          </tr>
+          <tr>
+            <td>Content-Type</td>
+            <td><code>application/json</code></td>
+            <td>Expects <code>application/json</code></td>
+            <td><span class="status-ok">OK</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Backend Architecture -->
+    <h2>Backend Architecture</h2>
+    <div class="card">
+      <p>The backend is a .NET Framework Web API project running on IIS Express. It uses Entity Framework 6 (database-first) to talk to a SQL Server database. There are two overlapping class libraries, but both point at the same physical database.</p>
+
+      <div class="card-header" style="margin-top: 16px;">Key Facts</div>
+      <table>
+        <thead>
+          <tr><th>Item</th><th>Value</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Backend project</td><td><code>EmqubeInvoice.API</code></td></tr>
+          <tr><td>Dev URL</td><td><code>http://localhost:41728/</code></td></tr>
+          <tr><td>Prod URL</td><td><code>http://invoice.emqube.net/api/</code></td></tr>
+          <tr><td>API pattern</td><td>POST <code>{controller}/{action}</code></td></tr>
+          <tr><td>Database</td><td><code>EmqubeInvoice_UAT</code> (SQL Server)</td></tr>
+          <tr><td>Auth</td><td>None &mdash; no <code>[Authorize]</code>, no middleware</td></tr>
+          <tr><td>CORS</td><td>Web.config + Global.asax OPTIONS handler</td></tr>
+          <tr><td>SSL</td><td>None locally (plain HTTP)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Implementation Steps -->
+    <h2>Implementation Steps</h2>
+
+    <div class="step">
+      <div class="step-number">1</div>
+      <div class="step-content">
+        <div class="step-title">Fix environment.ts &mdash; API URL</div>
+        <div class="step-desc">
+          Change the dev API URL to match the actual backend port and protocol. The backend runs on HTTP port 41728 via IIS Express, not HTTPS port 5001.
+        </div>
+        <div class="file-change">
+          <div class="file">src/environments/environment.ts</div>
+          <div class="change">
+            Before: <code>apiUrl: 'https://localhost:5001/api'</code><br>
+            After: <code>apiUrl: 'http://localhost:41728/api'</code>
+          </div>
+        </div>
+        <p style="margin-top: 8px;"><strong>Why:</strong> The old backend's <code>.csproj</code> sets <code>&lt;IISUrl&gt;http://localhost:41728/&lt;/IISUrl&gt;</code>. The old Angular app's <code>http.service.ts</code> confirms port 41728 as the dev URL.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">2</div>
+      <div class="step-content">
+        <div class="step-title">Auth interceptor &mdash; no action needed</div>
+        <div class="step-desc">
+          The existing <code>authInterceptor</code> sends <code>Authorization: Bearer {token}</code> only if a token exists in localStorage. Since there's no token, no header is sent. The interceptor is harmless and will be useful when real auth is added later.
+        </div>
+        <p><strong>Recommendation:</strong> Leave as-is. Don't remove it &mdash; it's future-proofing.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">3</div>
+      <div class="step-content">
+        <div class="step-title">Confirm Angular dev server on port 4200</div>
+        <div class="step-desc">
+          The backend's CORS is hardcoded to <code>http://localhost:4200</code> in Web.config. Angular CLI defaults to port 4200.
+        </div>
+        <p><strong>Verify:</strong> Run <code>ng serve</code> and check the output shows <code>Local: http://localhost:4200/</code>. If port 4200 is occupied, Angular picks 4201+ and CORS will block it.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">4</div>
+      <div class="step-content">
+        <div class="step-title">Start the backend</div>
+        <div class="step-desc">
+          Open the old solution in Visual Studio and run the API project.
+        </div>
+        <pre><code>1. Open: d:\projects\.net\01\emqubeinvoice2025\EmqubeInvoice\EmqubeInvoice.sln
+2. Set EmqubeInvoice.API as startup project
+3. Press F5 or Ctrl+F5
+4. IIS Express starts on http://localhost:41728/</code></pre>
+        <p><strong>Verify:</strong> Browse to <code>http://localhost:41728/api/Invoice/GetInvoiceList</code> (POST with empty body) &mdash; should return a JSON array.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">5</div>
+      <div class="step-content">
+        <div class="step-title">Handle CORS preflight</div>
+        <div class="step-desc">
+          Angular (port 4200) &rarr; Backend (port 41728) triggers an OPTIONS preflight because <code>Content-Type: application/json</code> is a non-simple header.
+        </div>
+        <p>The backend's <code>Global.asax.cs</code> handles OPTIONS requests and returns CORS headers. The headers returned are:</p>
+        <ul style="margin: 8px 0 8px 20px; font-size: 14px;">
+          <li><code>Access-Control-Allow-Origin: http://localhost:4200</code> (from Web.config)</li>
+          <li><code>Access-Control-Allow-Methods: GET, POST</code></li>
+          <li><code>Access-Control-Allow-Headers: Content-Type, Accept</code></li>
+          <li><code>Access-Control-Max-Age: 1728000</code></li>
+        </ul>
+        <p>This is sufficient for our POST calls with <code>Content-Type: application/json</code>.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">6</div>
+      <div class="step-content">
+        <div class="step-title">Test the connection</div>
+        <div class="step-desc">
+          Start both servers and verify end-to-end data flow.
+        </div>
+        <div class="card-header" style="margin-top: 12px;">Test Checklist</div>
+        <ul class="checklist">
+          <li>Both servers running: Angular on 4200, backend on 41728</li>
+          <li>Navigate to <code>http://localhost:4200/invoicelist</code></li>
+          <li>Open browser DevTools &rarr; Network tab</li>
+          <li>Verify: <code>POST http://localhost:41728/api/Invoice/GetInvoiceList</code> returns <span class="badge badge-success">200</span> with JSON array</li>
+          <li>Verify: Table populates with real invoice data</li>
+          <li>Verify: KPI cards show real outstanding/monthly totals</li>
+          <li>Verify: Year filter dropdown populated from <code>Invoice/getInvoiceYear</code></li>
+          <li>Verify: Division filter dropdown populated from <code>Invoice/GetBusinessDivisionList</code></li>
+          <li>Verify: Customer filter dropdown populated from <code>Invoice/GetCustomerList</code></li>
+          <li>Verify: Free-text search filters the table</li>
+          <li>Verify: Status filter (Paid/Due/Cancelled) works</li>
+          <li>Verify: Pagination works (next/prev, page size change)</li>
+          <li>Verify: Record Payment modal opens with datepicker, min/max dates correct</li>
+          <li>Verify: Print Invoice opens PDF in new tab</li>
+          <li>Verify: Filter state persists across page navigation (localStorage)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">7</div>
+      <div class="step-content">
+        <div class="step-title">Handle failures gracefully</div>
+        <div class="step-desc">
+          If the backend is unreachable or returns errors, the app should degrade gracefully.
+        </div>
+        <ul style="margin: 8px 0 8px 20px; font-size: 14px;">
+          <li><strong>Backend not running:</strong> API calls fail with network error &rarr; <code>InvoiceList</code> sets <code>loading = false</code>, table shows empty state</li>
+          <li><strong>Database unreachable:</strong> Backend returns 500 &rarr; same empty state behavior</li>
+          <li><strong>Empty database:</strong> API returns <code>[]</code> &rarr; table shows "No invoices found" with Clear Filter button</li>
+          <li><strong>CORS blocked:</strong> Browser blocks the request entirely &rarr; check console for CORS error, verify port and Web.config</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Files to Modify -->
+    <h2>Files to Modify</h2>
+    <div class="card">
+      <table>
+        <thead>
+          <tr><th>File</th><th>Change</th><th>Required?</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>src/environments/environment.ts</code></td>
+            <td><code>apiUrl</code> &rarr; <code>'http://localhost:41728/api'</code></td>
+            <td><span class="badge badge-danger">Yes</span></td>
+          </tr>
+          <tr>
+            <td><code>src/environments/environment.prod.ts</code></td>
+            <td>Already set to <code>'https://api.emqube.com/api'</code> &mdash; confirm production backend URL</td>
+            <td><span class="badge badge-warning">Verify</span></td>
+          </tr>
+          <tr>
+            <td><code>src/app/core/interceptors/auth-interceptor.ts</code></td>
+            <td>No change needed &mdash; harmless without a token</td>
+            <td><span class="badge badge-neutral">No</span></td>
+          </tr>
+          <tr>
+            <td><code>src/app/app.config.ts</code></td>
+            <td>No change needed</td>
+            <td><span class="badge badge-neutral">No</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Risks -->
+    <h2>Risks &amp; Unknowns</h2>
+
+    <div class="risk-item risk-item--warning">
+      <div class="risk-icon">&#9888;</div>
+      <div>
+        <strong>Is the backend running locally?</strong> &mdash; If not, you'll need to set it up in Visual Studio or point to a remote server. The backend requires IIS Express and .NET Framework 4.x.
+      </div>
+    </div>
+
+    <div class="risk-item risk-item--warning">
+      <div class="risk-icon">&#9888;</div>
+      <div>
+        <strong>IIS Express port 41728</strong> &mdash; This is set in the <code>.csproj</code> but <code>AutoAssignPort</code> is True. If you've opened the solution before on a different port, check the actual running port in IIS Express system tray or the Visual Studio output window.
+      </div>
+    </div>
+
+    <div class="risk-item risk-item--warning">
+      <div class="risk-icon">&#9888;</div>
+      <div>
+        <strong>Database connectivity</strong> &mdash; The backend needs a live connection to the <code>EmqubeInvoice_UAT</code> SQL Server. If the DB server is unreachable, all API calls will fail with 500 errors. Check the connection string in <code>Web.config</code>.
+      </div>
+    </div>
+
+    <div class="risk-item risk-item--info">
+      <div class="risk-icon">&#8505;</div>
+      <div>
+        <strong>Empty data</strong> &mdash; If the database has no invoices, the table will show the empty state. This is correct behavior &mdash; not a bug.
+      </div>
+    </div>
+
+    <div class="risk-item risk-item--info">
+      <div class="risk-icon">&#8505;</div>
+      <div>
+        <strong>Production URL</strong> &mdash; The old app uses <code>http://invoice.emqube.net/api/</code> in production. The new app's <code>environment.prod.ts</code> uses <code>https://api.emqube.com/api</code>. Confirm which is correct before deploying.
+      </div>
+    </div>
+
+    <!-- CORS Deep Dive -->
+    <h2>Appendix: CORS Configuration</h2>
+    <div class="card">
+      <p>The backend has CORS configured at three overlapping layers:</p>
+
+      <h3>Layer A: Web.config (IIS level)</h3>
+      <pre><code>&lt;customHeaders&gt;
+  &lt;add name="Access-Control-Allow-Origin" value="http://localhost:4200" /&gt;
+  &lt;add name="Access-Control-Allow-Methods" value="GET, POST, PUT, DELETE" /&gt;
+  &lt;add name="Access-Control-Allow-Headers" value="Origin, X-Requested-With, Content-Type, Accept" /&gt;
+&lt;/customHeaders&gt;</code></pre>
+
+      <h3>Layer B: Global.asax.cs (OPTIONS preflight handler)</h3>
+      <pre><code>if (HttpContext.Current.Request.HttpMethod == "OPTIONS")
+{
+    HttpContext.Current.Response.AddHeader("Cache-Control", "no-cache");
+    HttpContext.Current.Response.AddHeader("Access-Control-Allow-Methods", "GET, POST");
+    HttpContext.Current.Response.AddHeader("Access-Control-Allow-Headers", "Content-Type, Accept");
+    HttpContext.Current.Response.AddHeader("Access-Control-Max-Age", "1728000");
+    HttpContext.Current.Response.End();
+}</code></pre>
+      <p>Note: OPTIONS handler returns <code>GET, POST</code> only (not PUT/DELETE). This is sufficient for the Invoice List which only uses POST.</p>
+
+      <h3>Layer C: WebApiConfig.cs (NuGet CORS middleware)</h3>
+      <pre><code>config.EnableCors();  // Enabled globally
+// But [EnableCors] is commented out on controllers:
+// [EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*")]</code></pre>
+      <p>The NuGet CORS middleware is enabled but no controller applies the attribute, so it's effectively inactive. All CORS is handled by Layers A + B.</p>
+    </div>
+
+    <!-- API Endpoints Reference -->
+    <h2>Appendix: API Endpoints Used by Invoice List</h2>
+    <div class="card">
+      <table>
+        <thead>
+          <tr><th>Endpoint</th><th>Method</th><th>Body</th><th>Returns</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>Invoice/GetInvoiceList</code></td>
+            <td>POST</td>
+            <td>None</td>
+            <td><code>InvoiceListModel[]</code></td>
+          </tr>
+          <tr>
+            <td><code>Invoice/getInvoiceYear</code></td>
+            <td>POST</td>
+            <td>None</td>
+            <td><code>number[]</code></td>
+          </tr>
+          <tr>
+            <td><code>Invoice/GetBusinessDivisionList</code></td>
+            <td>POST</td>
+            <td><code>null</code></td>
+            <td><code>BusinessDivision[]</code></td>
+          </tr>
+          <tr>
+            <td><code>Invoice/GetSalesExecutiveList</code></td>
+            <td>POST</td>
+            <td><code>{SalesExecutiveId: null, ProfileId: null, ReportingTo: null}</code></td>
+            <td><code>SalesExecutive[]</code></td>
+          </tr>
+          <tr>
+            <td><code>Invoice/GetCustomerList</code></td>
+            <td>POST</td>
+            <td><code>null</code></td>
+            <td><code>CustomerOption[]</code></td>
+          </tr>
+          <tr>
+            <td><code>Invoice/AddPayment</code></td>
+            <td>POST</td>
+            <td><code>{TaxInvoiceId, PaymentRecdDate, PaymentRecdDateString}</code></td>
+            <td><code>InvoiceMessage</code></td>
+          </tr>
+          <tr>
+            <td><code>Invoice/GenerateInvoice</code></td>
+            <td>POST</td>
+            <td><code>taxInvoiceId</code> (number)</td>
+            <td><code>string</code> (filename)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

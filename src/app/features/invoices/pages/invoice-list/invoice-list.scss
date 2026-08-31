@@ -1,0 +1,30 @@
+:host {
+  display: block;
+}
+
+/* division icons in product column */
+:host ::ng-deep .icon-globe,
+:host ::ng-deep .icon-layers {
+  margin-right: 6px;
+  font-size: 13px;
+}
+
+:host ::ng-deep .eq-icon-division-web {
+  color: var(--eq-info);
+}
+
+:host ::ng-deep .eq-icon-division-software {
+  color: var(--eq-primary);
+}
+
+/* inline badge next to invoice number */
+:host ::ng-deep .eq-badge-sm {
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+/* empty state row */
+.eq-empty-row {
+  text-align: center;
+  padding: var(--eq-sp-7) var(--eq-sp-5) !important;
+}

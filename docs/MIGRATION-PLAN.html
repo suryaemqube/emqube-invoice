@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Legacy UI Migration Plan — EmQube Invoice</title>
+  <style>
+    :root {
+      --bg: #f5f7f9;
+      --surface: #ffffff;
+      --border: #dce3ea;
+      --ink: #16202b;
+      --ink-muted: #57697c;
+      --ink-faint: #8496a8;
+      --primary: #0d9c4a;
+      --primary-soft: #e4f5ea;
+      --amber: #b4700a;
+      --amber-soft: #fbf0de;
+      --red: #c23b3b;
+      --red-soft: #fbeaea;
+      --info: #2c6e9e;
+      --info-soft: #e5eff6;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: ui-monospace, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      padding: 32px;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 40px 48px;
+      box-shadow: 0 1px 2px rgba(22,32,43,0.05), 0 6px 16px -8px rgba(22,32,43,0.12);
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 4px;
+      color: var(--ink);
+    }
+
+    .subtitle {
+      color: var(--ink-muted);
+      font-size: 13.5px;
+      margin-bottom: 32px;
+    }
+
+    h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-top: 32px;
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-top: 24px;
+      margin-bottom: 8px;
+    }
+
+    p { margin-bottom: 12px; color: var(--ink); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+
+    th {
+      background: #edf1f5;
+      text-align: left;
+      padding: 8px 12px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 700;
+      color: var(--ink-muted);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--ink);
+      vertical-align: top;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #f5f7f9; }
+
+    code, .mono {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      background: #edf1f5;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    pre {
+      background: #16202b;
+      color: #e2e8f0;
+      padding: 16px 20px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 12.5px;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+    }
+
+    ul, ol {
+      margin-bottom: 12px;
+      padding-left: 24px;
+    }
+
+    li { margin-bottom: 4px; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+    }
+
+    .badge-green { background: var(--primary-soft); color: var(--primary); }
+    .badge-amber { background: var(--amber-soft); color: var(--amber); }
+    .badge-red { background: var(--red-soft); color: var(--red); }
+    .badge-info { background: var(--info-soft); color: var(--info); }
+    .badge-neutral { background: #edf1f5; color: var(--ink-muted); border: 1px solid var(--border); }
+
+    .callout {
+      background: var(--info-soft);
+      border-left: 3px solid var(--info);
+      padding: 12px 16px;
+      border-radius: 0 6px 6px 0;
+      margin-bottom: 16px;
+      font-size: 13px;
+      color: var(--ink);
+    }
+
+    .callout-warn {
+      background: var(--amber-soft);
+      border-left-color: var(--amber);
+    }
+
+    .callout-success {
+      background: var(--primary-soft);
+      border-left-color: var(--primary);
+    }
+
+    a { color: var(--info); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .file-tree {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      line-height: 1.8;
+      background: #f5f7f9;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 16px;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 32px 0;
+    }
+
+    .token-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .token-card {
+      background: #f5f7f9;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 12.5px;
+    }
+
+    .token-card .token-name {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .token-card .token-value {
+      font-family: var(--font-mono);
+      color: var(--ink-muted);
+      margin-top: 2px;
+    }
+
+    @media (max-width: 700px) {
+      body { padding: 16px; }
+      .container { padding: 24px; }
+      .token-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <h1>Legacy UI Migration Plan</h1>
+    <p class="subtitle">EmQube Invoice — Angular 22 clean rewrite &bull; Source: <code>/mnt/d/projects/.net/01/emqubeinvoice2025/EmqubeInvoice</code></p>
+
+    <!-- ============================================================ -->
+    <h2>1. Source Inventory</h2>
+    <!-- ============================================================ -->
+
+    <h3>1.1 UIPrototype — Static CSS/HTML Prototype</h3>
+    <p>The canonical design system. 6 CSS files + assets, no framework dependencies.</p>
+
+    <table>
+      <thead>
+        <tr><th>File</th><th>Lines</th><th>Purpose</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>css/tokens.css</code></td><td>67</td><td>All CSS custom properties — colors, spacing, radii, fonts, shadows, shell metrics</td></tr>
+        <tr><td><code>css/prototype.css</code></td><td>442</td><td>Shell: header, sidebar, nav, buttons, badges, KPI cards, empty states, responsive</td></tr>
+        <tr><td><code>css/invoices.css</code></td><td>392</td><td>Toolbar, table, pagination, skeleton loading, toast, record-payment modal</td></tr>
+        <tr><td><code>css/create-invoice.css</code></td><td>342</td><td>Form cards, field grid, line-item table, summary rail, disabled states</td></tr>
+        <tr><td><code>css/customers.css</code></td><td>422</td><td>Customer modal, toggle switches, type badges (reuses table/toolbar patterns)</td></tr>
+        <tr><td><code>css/create-quote.css</code></td><td>99</td><td>Quote type selector, "show total" switch, revisions panel</td></tr>
+      </tbody>
+    </table>
+
+    <h3>1.2 Production CSS (already ported once)</h3>
+    <p><code>WebInvoice/src/assets/css/emqube-ui.css</code> — 2,458 lines. The <code>.eq-ui</code>-scoped version that resolves GenesisUI/Bootstrap-3 specificity conflicts. Use this as the source of truth for how the prototype translates to production. The new app strips the <code>.eq-ui</code> prefix.</p>
+
+    <h3>1.3 Font Files</h3>
+    <table>
+      <thead>
+        <tr><th>Font</th><th>Files</th><th>Usage</th><th>Migrate?</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Simple Line Icons</strong></td>
+          <td><code>Simple-Line-Icons.{woff2,woff,ttf,eot,svg}</code></td>
+          <td>Primary icon set — <code>icon-plus</code>, <code>icon-pencil</code>, <code>icon-printer</code>, <code>icon-options-vertical</code>, <code>icon-trash</code>, <code>icon-docs</code>, <code>icon-arrow-left</code>, <code>icon-magnifier</code>, <code>icon-credit-card</code>, <code>icon-close</code>, <code>icon-refresh</code>, <code>icon-globe</code>, <code>icon-layers</code>, <code>icon-info</code>, <code>icon-user</code>, <code>icon-lock</code>, <code>icon-logout</code></td>
+          <td><span class="badge badge-green">Yes</span></td>
+        </tr>
+        <tr>
+          <td><strong>Font Awesome 4.6.3</strong></td>
+          <td><code>fontawesome-webfont.{woff2,woff,ttf,eot,svg}</code>, <code>FontAwesome.otf</code></td>
+          <td>Secondary — <code>fa fa-angle-down</code>, <code>fa fa-edit</code>, <code>fa fa-trash</code>, <code>fa fa-file-pdf-o</code>, <code>fa fa-cogs</code></td>
+          <td><span class="badge badge-green">Yes</span></td>
+        </tr>
+        <tr>
+          <td>Glyphicons Regular/Social/Filetypes</td>
+          <td>12 files</td>
+          <td>Only in old master-data screens, not in redesigned UI</td>
+          <td><span class="badge badge-neutral">Drop</span></td>
+        </tr>
+        <tr>
+          <td>Glyphicons Halflings</td>
+          <td>5 files</td>
+          <td>Bootstrap standard, only in ASP.NET backend</td>
+          <td><span class="badge badge-neutral">Drop</span></td>
+        </tr>
+        <tr>
+          <td>TinyMCE skin fonts</td>
+          <td>7 files</td>
+          <td>Editor-specific, loaded into editor iframe</td>
+          <td><span class="badge badge-neutral">Drop</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>1.4 Brand Images</h3>
+    <table>
+      <thead>
+        <tr><th>File</th><th>Purpose</th><th>Migrate?</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>emqube-logo-black.svg</code></td><td>SVG logo (header, login)</td><td><span class="badge badge-green">Yes</span></td></tr>
+        <tr><td><code>logo.png</code></td><td>PNG fallback logo</td><td><span class="badge badge-green">Yes</span></td></tr>
+        <tr><td><code>favicon.png</code></td><td>Favicon</td><td><span class="badge badge-green">Yes</span></td></tr>
+        <tr><td><code>select*.png</code>, <code>sprite-skin-modern.png</code>, <code>sort_*.png</code>, <code>ui_loading_spinner_sm.gif</code></td><td>jQuery widget images</td><td><span class="badge badge-neutral">Drop</span></td></tr>
+        <tr><td><code>flags/</code> (243 PNGs)</td><td>Country flags for phone selector</td><td><span class="badge badge-neutral">Drop</span> — use <code>flag-icons</code> npm package</td></tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider">
+
+    <!-- ============================================================ -->
+    <h2>2. Design Tokens</h2>
+    <!-- ============================================================ -->
+
+    <p>Exact values from <code>UIPrototype/css/tokens.css</code> — must be preserved exactly:</p>
+
+    <h3>Brand Colors</h3>
+    <div class="token-grid">
+      <div class="token-card"><div class="token-name">--eq-primary</div><div class="token-value">#0D9C4A (green)</div></div>
+      <div class="token-card"><div class="token-name">--eq-primary-hover</div><div class="token-value">#0B7C3B</div></div>
+      <div class="token-card"><div class="token-name">--eq-primary-soft</div><div class="token-value">#E4F5EA</div></div>
+      <div class="token-card"><div class="token-name">--eq-blue</div><div class="token-value">#0E4194</div></div>
+      <div class="token-card"><div class="token-name">--eq-amber</div><div class="token-value">#B4700A</div></div>
+      <div class="token-card"><div class="token-name">--eq-amber-soft</div><div class="token-value">#FBF0DE</div></div>
+      <div class="token-card"><div class="token-name">--eq-red</div><div class="token-value">#C23B3B</div></div>
+      <div class="token-card"><div class="token-name">--eq-red-soft</div><div class="token-value">#FBEAEA</div></div>
+      <div class="token-card"><div class="token-name">--eq-info</div><div class="token-value">#2C6E9E</div></div>
+      <div class="token-card"><div class="token-name">--eq-info-soft</div><div class="token-value">#E5EFF6</div></div>
+    </div>
+
+    <h3>Neutrals</h3>
+    <div class="token-grid">
+      <div class="token-card"><div class="token-name">--eq-bg</div><div class="token-value">#F5F7F9</div></div>
+      <div class="token-card"><div class="token-name">--eq-surface</div><div class="token-value">#FFFFFF</div></div>
+      <div class="token-card"><div class="token-name">--eq-surface-alt</div><div class="token-value">#EDF1F5</div></div>
+      <div class="token-card"><div class="token-name">--eq-border</div><div class="token-value">#DCE3EA</div></div>
+      <div class="token-card"><div class="token-name">--eq-ink</div><div class="token-value">#16202B</div></div>
+      <div class="token-card"><div class="token-name">--eq-ink-muted</div><div class="token-value">#57697C</div></div>
+      <div class="token-card"><div class="token-name">--eq-ink-faint</div><div class="token-value">#8496A8</div></div>
+    </div>
+
+    <h3>Type</h3>
+    <div class="token-grid">
+      <div class="token-card"><div class="token-name">--eq-font-sans</div><div class="token-value">-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, …</div></div>
+      <div class="token-card"><div class="token-name">--eq-font-mono</div><div class="token-value">ui-monospace, "SF Mono", Consolas, …</div></div>
+    </div>
+
+    <h3>Spacing (4px base)</h3>
+    <div class="token-grid">
+      <div class="token-card"><div class="token-name">--eq-sp-1</div><div class="token-value">4px</div></div>
+      <div class="token-card"><div class="token-name">--eq-sp-2</div><div class="token-value">8px</div></div>
+      <div class="token-card"><div class="token-name">--eq-sp-3</div><div class="token-value">12px</div></div>
+      <div class="token-card"><div class="token-name">--eq-sp-4</div><div class="token-value">16px</div></div>
+      <div class="token-card"><div class="token-name">--eq-sp-5</div><div class="token-value">24px</div></div>
+      <div class="token-card"><div class="token-name">--eq-sp-6</div><div class="token-value">32px</div></div>
+      <div class="token-card"><div class="token-name">--eq-sp-7</div><div class="token-value">48px</div></div>
+    </div>
+
+    <h3>Radius &amp; Shell</h3>
+    <div class="token-grid">
+      <div class="token-card"><div class="token-name">--eq-radius-control</div><div class="token-value">6px</div></div>
+      <div class="token-card"><div class="token-name">--eq-radius-card</div><div class="token-value">10px</div></div>
+      <div class="token-card"><div class="token-name">--eq-header-height</div><div class="token-value">60px</div></div>
+      <div class="token-card"><div class="token-name">--eq-sidebar-width</div><div class="token-value">240px</div></div>
+      <div class="token-card"><div class="token-name">--eq-sidebar-width-compact</div><div class="token-value">56px</div></div>
+      <div class="token-card"><div class="token-name">--eq-shadow-card</div><div class="token-value">0 1px 2px rgba(22,32,43,.05), 0 6px 16px -8px rgba(22,32,43,.12)</div></div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- ============================================================ -->
+    <h2>3. CSS Partials Structure</h2>
+    <!-- ============================================================ -->
+
+    <p>Instead of a single merged file, keep the design system as SCSS partials:</p>
+
+    <div class="file-tree">
+src/styles/<br>
+├── _tokens.scss &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;← from UIPrototype/css/tokens.css (67 lines)<br>
+├── _shell.scss &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;← from UIPrototype/css/prototype.css (442 lines) — header, sidebar, nav, buttons, badges, KPI cards, empty states<br>
+├── _table.scss &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;← from UIPrototype/css/invoices.css (392 lines) — toolbar, table, pagination, skeleton, toast<br>
+├── _forms.scss &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;← from UIPrototype/css/create-invoice.css (342 lines) — form cards, field grid, line-item table, summary rail<br>
+├── _customers.scss &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;← from UIPrototype/css/customers.css (422 lines) — customer modal, toggle switches, type badges<br>
+├── _quotes.scss &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;← from UIPrototype/css/create-quote.css (99 lines) — quote type selector, revisions panel<br>
+├── _ng-bootstrap.scss &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;← overrides for ng-bootstrap components to match .eq-* design tokens<br>
+├── _icons.scss &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;← @font-face declarations for Simple Line Icons + Font Awesome<br>
+└── _responsive.scss &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;← extracted responsive rules from all above files
+    </div>
+
+    <h3>Import Order in <code>src/styles.scss</code></h3>
+    <pre><code>@use 'styles/tokens';
+@use 'styles/shell';
+@use 'styles/table';
+@use 'styles/forms';
+@use 'styles/customers';
+@use 'styles/quotes';
+@use 'styles/ng-bootstrap';
+@use 'styles/icons';
+@use 'styles/responsive';</code></pre>
+
+    <div class="callout callout-success">
+      <strong>Key change from old app:</strong> Strip all <code>.eq-ui</code> scoping prefixes and all GenesisUI/Bootstrap-3 specificity workarounds. The new app is a clean build — no vendor CSS to fight. Keep only the <code>.modal-header::after { content: none; display: none; }</code> fix (Bootstrap 5 still has this clearfix pseudo-element).
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- ============================================================ -->
+    <h2>4. Dependencies</h2>
+    <!-- ============================================================ -->
+
+    <h3>Add</h3>
+    <table>
+      <thead>
+        <tr><th>Package</th><th>Version</th><th>Purpose</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>@ng-bootstrap/ng-bootstrap</code></td><td><code>^21.0.0</code></td><td>Modal, Datepicker, Dropdown, Pagination — Angular 22 compatible (released June 22, 2026)</td></tr>
+        <tr><td><code>bootstrap</code></td><td><code>^5.3.0</code></td><td>CSS only — peer dependency of ng-bootstrap</td></tr>
+        <tr><td><code>@tinymce/tinymce-angular</code></td><td><code>^8.0.0</code></td><td>First-party Angular wrapper for TinyMCE</td></tr>
+        <tr><td><code>tinymce</code></td><td><code>^7.0.0</code></td><td>Self-hosted TinyMCE (no cloud API key needed)</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Remove</h3>
+    <table>
+      <thead>
+        <tr><th>Package</th><th>Reason</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>@angular/material</code></td><td>Not used — project decision: no Angular Material</td></tr>
+        <tr><td><code>@angular/cdk</code></td><td>Only installed as Material dependency</td></tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider">
+
+    <!-- ============================================================ -->
+    <h2>5. ng-bootstrap Component Mapping</h2>
+    <!-- ============================================================ -->
+
+    <table>
+      <thead>
+        <tr><th>Old (ng2-bootstrap)</th><th>New (ng-bootstrap v21)</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>bsModal</code> directive</td>
+          <td><code>NgbModal</code> service</td>
+          <td>Inject and call <code>.open()</code> — no directive in template</td>
+        </tr>
+        <tr>
+          <td><code>bsDatepicker</code> directive</td>
+          <td><code>NgbDatepicker</code> or <code>NgbDatepickerInline</code></td>
+          <td>Can also use <code>NgbDatepickerInput</code> for input-backed variant</td>
+        </tr>
+        <tr>
+          <td><code>dropdown</code> / <code>dropdownToggle</code> / <code>*dropdownMenu</code></td>
+          <td><code>NgbDropdown</code> directive</td>
+          <td><code>container="body"</code> still available via config</td>
+        </tr>
+        <tr>
+          <td><code>mfBootstrapPaginator</code></td>
+          <td><code>NgbPagination</code> component</td>
+          <td>Or keep custom pagination in <code>_table.scss</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider">
+
+    <!-- ============================================================ -->
+    <h2>6. TinyMCE Integration</h2>
+    <!-- ============================================================ -->
+
+    <p>The old app uses TinyMCE for Terms &amp; Conditions editing in invoice/quote create screens. Keep TinyMCE — same editor, same output, least disruption.</p>
+
+    <h3>Old Plugins Used</h3>
+    <p><code>link</code>, <code>paste</code>, <code>table</code>, <code>autoresize</code>, <code>charmap</code>, <code>searchreplace</code>, <code>lists</code>, <code>advlist</code>, <code>textcolor</code>, <code>colorpicker</code>, <code>code</code></p>
+
+    <h3>New App Setup</h3>
+    <ul>
+      <li>Use <code>@tinymce/tinymce-angular</code> (<code>&lt;editor&gt;</code> component) — first-party Angular wrapper</li>
+      <li>Self-host via npm package (no cloud API key needed)</li>
+      <li>Same <code>content_style</code> from the old app to match the <code>.eq-*</code> design system font/colors</li>
+      <li>Used only for Terms &amp; Conditions in invoice/quote create screens</li>
+    </ul>
+
+    <h3>Content Style (from old app)</h3>
+    <pre><code>body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #16202B;
+  margin: 12px;
+}
+p { margin: 0 0 10px; }
+p:last-child { margin-bottom: 0; }</code></pre>
+
+    <hr class="section-divider">
+
+    <!-- ============================================================ -->
+    <h2>7. Angular Component Logic Reference</h2>
+    <!-- ============================================================ -->
+
+    <p>Old Angular 4 components are not copied — they use NgModules, <code>@angular/http</code>, <code>ng2-bootstrap</code>, and <code>angular2-datatable</code>. But their logic and template patterns inform the new components:</p>
+
+    <table>
+      <thead>
+        <tr><th>Old Component</th><th>Template Lines</th><th>Logic to Reference</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>invoicelist/invoicelist.component.ts</code></td>
+          <td>313</td>
+          <td>Status derivation, KPI calculations, filter logic, row-action menu, record-payment modal, year/division/status filters, <code>invoicefreeSearch</code> pipe</td>
+        </tr>
+        <tr>
+          <td><code>create-invoice/create-invoice.component.ts</code></td>
+          <td>803</td>
+          <td>Line-item CRUD, VAT mode switching, currency conversion, PDF generation, copy-invoice flow, terms &amp; conditions editor</td>
+        </tr>
+        <tr>
+          <td><code>quotelist/quotelist.component.ts</code></td>
+          <td>130</td>
+          <td>Quote list (mirrors invoice list), payment modal</td>
+        </tr>
+        <tr>
+          <td><code>create-quote/create-quote.component.html</code></td>
+          <td>760</td>
+          <td>Quote type selector (Local/Export/Export-IS), revisions panel, "show total" toggle</td>
+        </tr>
+        <tr>
+          <td><code>customer/customer.component.ts</code></td>
+          <td>284</td>
+          <td>Customer list + add/edit modal, Individual/Org toggle, Prospect/Customer toggle, billing/shipping address, VAT eligibility</td>
+        </tr>
+        <tr>
+          <td><code>layouts/full-layout.component.ts</code></td>
+          <td>133</td>
+          <td>App shell: header, sidebar menu rendering (<code>*ngFor</code> over <code>menuList</code>), profile dropdown, mobile toggle, breadcrumb</td>
+        </tr>
+        <tr>
+          <td><code>services/http.service.ts</code></td>
+          <td>—</td>
+          <td><code>ajaxPost</code> wrapper — informs <code>ApiService</code> design</td>
+        </tr>
+        <tr>
+          <td><code>common/invoicesearch.pipe.ts</code></td>
+          <td>—</td>
+          <td>Client-side search filter logic</td>
+        </tr>
+        <tr>
+          <td><code>common/datex.pipe.ts</code></td>
+          <td>—</td>
+          <td>Date formatting pipe</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider">
+
+    <!-- ============================================================ -->
+    <h2>8. API Calling Convention</h2>
+    <!-- ============================================================ -->
+
+    <p>Every API call follows (from <code>http.service.ts</code>):</p>
+    <pre><code>POST {baseURL}api/{controller}/{action}
+Content-Type: application/json
+Body: JSON.stringify(value)  // often null, a primitive, or a small object</code></pre>
+
+    <p>No Authorization header. Role/user context passed in POST body. The new <code>ApiService</code> should match this convention, not REST.</p>
+
+    <hr class="section-divider">
+
+    <!-- ============================================================ -->
+    <h2>9. What NOT to Migrate</h2>
+    <!-- ============================================================ -->
+
+    <table>
+      <thead>
+        <tr><th>Item</th><th>Reason</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>WebInvoice/src/scss/</code> (108 files)</td><td>GenesisUI/CoreUI theme — replaced by <code>.eq-*</code> classes</td></tr>
+        <tr><td><code>WebInvoice/src/assets/css/style.css</code></td><td>Compiled GenesisUI — ~400KB, not needed</td></tr>
+        <tr><td><code>WebInvoice/src/assets/css/custom.css</code></td><td>Ad-hoc overrides, already absorbed into <code>emqube-ui.css</code></td></tr>
+        <tr><td><code>WebInvoice/src/assets/css/glyphicons*.css</code></td><td>Not used in redesigned UI</td></tr>
+        <tr><td><code>WebInvoice/src/assets/skins/</code></td><td>TinyMCE skin — editor-specific, loaded into iframe</td></tr>
+        <tr><td><code>EmqubeInvoice.API/Scripts/</code></td><td>jQuery, Bootstrap JS — not needed</td></tr>
+        <tr><td><code>EmqubeInvoice.API/Content/</code></td><td>Server-side Bootstrap CSS</td></tr>
+        <tr><td><code>UIPrototype/js/</code></td><td>Static prototype JavaScript</td></tr>
+        <tr><td><code>UIPrototype/*.html</code></td><td>Static prototype pages (reference only)</td></tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider">
+
+    <!-- ============================================================ -->
+    <h2>10. Angular TypeScript Interfaces (from Entity Layer)</h2>
+    <!-- ============================================================ -->
+
+    <p>Each C# entity class maps to a TypeScript interface. <strong>All types are <code>number</code> or <code>string</code></strong> — the backend uses <code>object</code> for every column type; the SP handles parsing. Dates arrive as JSON date strings or <code>null</code>; booleans arrive as <code>0</code>/<code>1</code> (not <code>true</code>/<code>false</code>).</p>
+
+    <table>
+      <thead>
+        <tr><th>C# Entity</th><th>Angular Interface</th><th>File</th><th>Used By</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>InvoiceListModel</code></td><td><code>InvoiceListItem</code></td><td><code>models/invoice.model.ts</code></td><td>Invoice List, Dashboard</td></tr>
+        <tr><td><code>InvoiceModel</code></td><td><code>Invoice</code></td><td><code>models/invoice.model.ts</code></td><td>Invoice CRUD</td></tr>
+        <tr><td><code>InvoiceLineItemModel</code></td><td><code>InvoiceLineItem</code></td><td><code>models/invoice.model.ts</code></td><td>Invoice Detail</td></tr>
+        <tr><td><code>QuoteListModel</code></td><td><code>QuoteListItem</code></td><td><code>models/quote.model.ts</code></td><td>Quote List</td></tr>
+        <tr><td><code>QuoteModel</code></td><td><code>Quote</code></td><td><code>models/quote.model.ts</code></td><td>Quote CRUD</td></tr>
+        <tr><td><code>QuoteLineItemModel</code></td><td><code>QuoteLineItem</code></td><td><code>models/quote.model.ts</code></td><td>Quote Detail</td></tr>
+        <tr><td><code>CustomerModel</code></td><td><code>Customer</code></td><td><code>models/customer.model.ts</code></td><td>Customer CRUD</td></tr>
+        <tr><td><code>CustomerListModel</code></td><td><code>CustomerListItem</code></td><td><code>models/customer.model.ts</code></td><td>Customer dropdowns</td></tr>
+        <tr><td><code>BusinessDivisionModel</code></td><td><code>BusinessDivision</code></td><td><code>models/common.model.ts</code></td><td>Division dropdown</td></tr>
+        <tr><td><code>CurrencyModel</code></td><td><code>Currency</code></td><td><code>models/common.model.ts</code></td><td>Currency dropdown</td></tr>
+        <tr><td><code>SalesExecutiveModel</code></td><td><code>SalesExecutive</code></td><td><code>models/common.model.ts</code></td><td>Sales Exec dropdown</td></tr>
+        <tr><td><code>UOMModel</code></td><td><code>UnitOfMeasure</code></td><td><code>models/common.model.ts</code></td><td>UOM dropdown</td></tr>
+        <tr><td><code>VATCodeModel</code></td><td><code>VatCode</code></td><td><code>models/common.model.ts</code></td><td>VAT dropdown</td></tr>
+        <tr><td><code>ProductModel</code></td><td><code>Product</code></td><td><code>models/product.model.ts</code></td><td>Line item product lookup</td></tr>
+        <tr><td><code>EmployeeModel</code></td><td><code>Employee</code></td><td><code>models/common.model.ts</code></td><td>Sales exec / approver</td></tr>
+        <tr><td><code>PaymentModel</code></td><td><code>Payment</code></td><td><code>models/payment.model.ts</code></td><td>Payment recording</td></tr>
+        <tr><td><code>ImageModel</code></td><td><code>Image</code></td><td><code>models/common.model.ts</code></td><td>Invoice logo</td></tr>
+        <tr><td><code>ApprovalSettingModel</code></td><td><code>ApprovalSetting</code></td><td><code>models/settings.model.ts</code></td><td>Settings</td></tr>
+        <tr><td><code>InvoiceReminderModel</code></td><td><code>InvoiceReminder</code></td><td><code>models/settings.model.ts</code></td><td>Settings</td></tr>
+        <tr><td><code>InvoiceEmailTemplateModel</code></td><td><code>InvoiceEmailTemplate</code></td><td><code>models/settings.model.ts</code></td><td>Settings</td></tr>
+        <tr><td><code>MenuModel</code></td><td><code>MenuItem</code></td><td><code>models/menu.model.ts</code></td><td>Side bar</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Key Mapping Notes</h3>
+    <ul>
+      <li>All C# <code>object</code> columns → TypeScript <code>number | string</code> (e.g. <code>InvoiceId: number | string</code>)</li>
+      <li>C# <code>DateTime</code> → <code>string | null</code> (JSON serialised)</li>
+      <li>C# <code>bool</code> → <code>number | string</code> (0/1, not true/false)</li>
+      <li>SP result columns not on the model are silently ignored by EF — same applies in TS</li>
+    </ul>
+
+    <hr class="section-divider">
+
+    <!-- ============================================================ -->
+    <h2>11. Client-Side Business Logic (from BL Layer)</h2>
+    <!-- ============================================================ -->
+
+    <p>The following logic currently lives in C# <code>BL/</code> and should be migrated to Angular services. It is all <strong>pure computation with no database access</strong>.</p>
+
+    <table>
+      <thead>
+        <tr><th>Logic</th><th>C# Source</th><th>Angular Destination</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Invoice status derivation</td>
+          <td><code>CommonService.GetStatus()</code></td>
+          <td><code>invoice-utils.ts</code> (pure function)</td>
+          <td><code>isCancelled = (Total == 0 &amp;&amp; Vat == 0) ? 1 : 0</code>; <code>isPaid = PaymentRecdDateString != null</code>; status string: Cancelled / Paid / Due</td>
+        </tr>
+        <tr>
+          <td>Payment totals computation</td>
+          <td><code>InvoiceService.PaymentTotals()</code></td>
+          <td><code>invoice-utils.ts</code></td>
+          <td><code>LineItemTotal</code> = sum of line item totals; <code>InvoiceTotal</code> = sum of (rate × qty × (1-VATDisc) × (1-Disc) × ConversionRate)</td>
+        </tr>
+        <tr>
+          <td>Due dates computation</td>
+          <td><code>InvoiceService.DueDates()</code></td>
+          <td><code>invoice-utils.ts</code></td>
+          <td>DueDate = PaymentTermsDays + IssueDate; PayDueDate = DueDate + DueDateGracePeriod</td>
+        </tr>
+        <tr>
+          <td>Multi-currency conversion</td>
+          <td><code>InvoiceService.InvoiceMultiCurrencyConvertion()</code></td>
+          <td><code>invoice-utils.ts</code></td>
+          <td>Converts line item rate from base to selected currency using <code>ConversionRate</code></td>
+        </tr>
+        <tr>
+          <td>Invoice line item defaults</td>
+          <td><code>InvoiceService.InvoiceLineItemDefault()</code></td>
+          <td><code>invoice-utils.ts</code></td>
+          <td>Sets default line item values for new invoices (qty=1, VATCode from settings, currency from division)</td>
+        </tr>
+        <tr>
+          <td>Invoice defaults (new)</td>
+          <td><code>InvoiceService.InvoiceDefault()</code></td>
+          <td><code>invoice.service.ts</code></td>
+          <td>Calls API <code>GetInvoiceDefaults</code> — returns last-used division, currency, terms, image</td>
+        </tr>
+        <tr>
+          <td>Menu for current user</td>
+          <td><code>CommonService.GetMenu()</code></td>
+          <td><code>menu.service.ts</code></td>
+          <td>Calls API <code>GetSiteUserMenu</code> with role IDs from <code>GetLoginSessionInfo</code></td>
+        </tr>
+        <tr>
+          <td>User session info</td>
+          <td><code>CommonService.GetLoginSessionInfo()</code></td>
+          <td><code>auth.service.ts</code></td>
+          <td>Calls API — returns <code>UserId</code>, <code>CurrentRoleId</code>, <code>CurrentRoleName</code>, all role IDs</td>
+        </tr>
+        <tr>
+          <td>Invoice print model assembly</td>
+          <td><code>InvoiceService.GetInvoicePrint()</code></td>
+          <td>Server-side only (keep)</td>
+          <td>Complex assembly with image base64, T&amp;C HTML — print is server-rendered, not a client concern</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Invoice Status Derivation — Detailed</h3>
+    <pre><code>// Pure function — no API call, no state
+export function deriveInvoiceStatus(inv: InvoiceListItem): InvoiceStatus {
+  const isCancelled = inv.InvoiceTotal == 0 &amp;&amp; inv.TotalVAT == 0;
+  const isPaid = inv.PaymentRecdDateString != null
+                 &amp;&amp; inv.PaymentRecdDateString.trim() !== '';
+  if (isCancelled) return 'Cancelled';
+  if (isPaid)      return 'Paid';
+  return 'Due';
+}</code></pre>
+
+    <h3>Pure Functions — No API Call Required</h3>
+    <p>These are entirely client-side and should live in a <code>utils/</code> or <code>helpers/</code> directory, not a service:</p>
+    <ul>
+      <li><code>deriveInvoiceStatus(inv) → 'Cancelled' | 'Paid' | 'Due'</code></li>
+      <li><code>computeLineItemTotal(item) → number</code></li>
+      <li><code>computeInvoiceSubTotal(lineItems) → number</code></li>
+      <li><code>computeVatAmount(subTotal, vatPercentage) → number</code></li>
+      <li><code>computeGrandTotal(subTotal, vatAmount) → number</code></li>
+      <li><code>computeConvertedAmount(baseAmount, conversionRate) → number</code></li>
+      <li><code>computeDueDate(issueDate, paymentTermsDays) → Date</code></li>
+      <li><code>computePayDueDate(dueDate, gracePeriodDays) → Date</code></li>
+    </ul>
+
+    <hr class="section-divider">
+
+    <!-- ============================================================ -->
+    <h2>12. API Contract Reference (All Endpoints)</h2>
+    <!-- ============================================================ -->
+
+    <p>Every endpoint is <code>POST /api/{controller}/{action}</code>. Body is JSON. No headers required. All data arrives in the response body under a key matching the action name (e.g. response.InvoiceList returns array).</p>
+
+    <h3>Common Controller</h3>
+    <table>
+      <thead>
+        <tr><th>Action</th><th>Request Body</th><th>Returns</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>GetSiteUserMenu</code></td><td><code>{ CurrentRoleId: number }</code></td><td><code>MenuItem[]</code></td><td>Menu for current role</td></tr>
+        <tr><td><code>GetBusinessDivisionList</code></td><td><code>null</code></td><td><code>BusinessDivision[]</code></td><td>All active divisions</td></tr>
+        <tr><td><code>GetAllCurrencyList</code></td><td><code>null</code></td><td><code>Currency[]</code></td><td>All active currencies</td></tr>
+        <tr><td><code>GetSalesExecutiveList</code></td><td><code>null</code></td><td><code>SalesExecutive[]</code></td><td>All active sales execs</td></tr>
+        <tr><td><code>GetUOMList</code></td><td><code>null</code></td><td><code>UnitOfMeasure[]</code></td><td>All active UOMs</td></tr>
+        <tr><td><code>GetVATCodeList</code></td><td><code>null</code></td><td><code>VatCode[]</code></td><td>All active VAT codes</td></tr>
+        <tr><td><code>GetImage</code></td><td><code>null</code></td><td><code>Image[]</code></td><td>All company logos</td></tr>
+        <tr><td><code>GetLoginSessionInfo</code></td><td><code>null</code></td><td><code>LoginSessionInfo</code></td><td>UserId, CurrentRoleId, all role IDs</td></tr>
+        <tr><td><code>SaveImage</code></td><td><code>FormData</code></td><td><code>boolean</code></td><td>Upload new logo (multipart)</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Invoice Controller</h3>
+    <table>
+      <thead>
+        <tr><th>Action</th><th>Request Body</th><th>Returns</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>GetInvoiceList</code></td><td><code>InvoiceListRequest</code></td><td><code>InvoiceListItem[]</code></td><td>Main list — filter by DivisionId, DateFrom, DateTo, SearchText, Status, UserId</td></tr>
+        <tr><td><code>GetInvoiceKPI</code></td><td><code>InvoiceListRequest</code></td><td><code>InvoiceKPI</code></td><td>TotalInvoice, TotalSales, TotalOverdue, InvoiceCount</td></tr>
+        <tr><td><code>GetInvoiceDefaults</code></td><td><code>null</code></td><td><code>InvoiceDefaults</code></td><td>Default division, currency, terms, image, VAT code for new invoices</td></tr>
+        <tr><td><code>GetInvoiceById</code></td><td><code>{ InvoiceId: number }</code></td><td><code>Invoice</code></td><td>Full invoice with line items</td></tr>
+        <tr><td><code>SaveInvoice</code></td><td><code>Invoice</code></td><td><code>{ InvoiceId: number }</code></td><td>Create or update — InvoiceId=0 means create</td></tr>
+        <tr><td><code>UpdateInvoiceStatus</code></td><td><code>UpdateInvoiceStatus</code></td><td><code>boolean</code></td><td>Update status reason text</td></tr>
+        <tr><td><code>UpdateInvoiceApprovedStatus</code></td><td><code>UpdateInvoiceApprovedStatus</code></td><td><code>boolean</code></td><td>Approve/reject; sends email</td></tr>
+        <tr><td><code>GetInvoiceEmailSettings</code></td><td><code>{ InvoiceId: number }</code></td><td><code>InvoiceEmailSettings</code></td><td>Email template for invoice</td></tr>
+        <tr><td><code>SendInvoiceToCustomer</code></td><td><code>InvoiceEmailSettings</code></td><td><code>boolean</code></td><td>Sends email via MailKit</td></tr>
+        <tr><td><code>UpdateInvoicePaymentRecdStatus</code></td><td><code>UpdateInvoicePaymentRecdStatus</code></td><td><code>boolean</code></td><td>Mark payment received</td></tr>
+        <tr><td><code>UpdateInvoiceVoid</code></td><td><code>UpdateInvoiceVoid</code></td><td><code>boolean</code></td><td>Cancel invoice</td></tr>
+        <tr><td><code>UpdateInvoicePaymentTerms</code></td><td><code>UpdateInvoicePaymentTerms</code></td><td><code>boolean</code></td><td>Update payment terms and due dates</td></tr>
+        <tr><td><code>GetPaymentDetailsById</code></td><td><code>{ InvoiceId: number }</code></td><td><code>Payment[]</code></td><td>Payment history</td></tr>
+        <tr><td><code>SavePaymentDetails</code></td><td><code>Payment</code></td><td><code>boolean</code></td><td>Record new payment</td></tr>
+        <tr><td><code>GetInvoicePDFById</code></td><td><code>{ InvoiceId: number }</code></td><td><code>byte[]</code></td><td>PDF download (base64)</td></tr>
+        <tr><td><code>GetInvoicePrintById</code></td><td><code>{ InvoiceId: number }</code></td><td><code>InvoicePrintModel</code></td><td>Print preview data</td></tr>
+        <tr><td><code>GetInvoiceActivityLogById</code></td><td><code>{ InvoiceId: number }</code></td><td><code>InvoiceActivityLog[]</code></td><td>Audit trail</td></tr>
+        <tr><td><code>GetCustomerList</code></td><td><code>null</code></td><td><code>CustomerListItem[]</code></td><td><strong>Note:</strong> this is <code>GetCustomerList</code>, not <code>GetCustomers</code> (known bug in interface naming)</td></tr>
+        <tr><td><code>GetSalesExecutiveList</code></td><td><code>null</code></td><td><code>SalesExecutive[]</code></td><td>Duplicate of Common endpoint — prefer Common version</td></tr>
+        <tr><td><code>GetInvoiceSetting</code></td><td><code>null</code></td><td><code>InvoiceSetting</code></td><td>Invoice number prefix, next number, VAT code, terms</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Common Request Shapes</h3>
+    <pre><code>interface InvoiceListRequest {
+  DivisionId:    number | null;
+  DateFrom:      string | null;   // "YYYY-MM-DD"
+  DateTo:        string | null;
+  SearchText:    string | null;
+  Status:        string | null;   // "All" | "Paid" | "Due" | "Overdue"
+  UserId:        number | null;   // filter by sales exec
+}
+
+interface LoginSessionInfo {
+  UserId:          number;
+  CurrentRoleId:   number;
+  CurrentRoleName: string;
+  AccountId:       number;
+  CustomerId:      number;
+  IsMainAdminUser: boolean;
+  UserRoleIds:     string;  // comma-separated
+  UserSalesExecutiveIds: string;
+}</code></pre>
+
+    <hr class="section-divider">
+
+    <!-- ============================================================ -->
+    <h2>13. Angular Service Layer Design</h2>
+    <!-- ============================================================ -->
+
+    <table>
+      <thead>
+        <tr><th>Angular Service</th><th>C# Source</th><th>Responsibility</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>ApiService</code></td><td><code>http.service.ts</code></td><td>Single POST helper — <code>post&lt;T&gt;(controller, action, body)</code></td></tr>
+        <tr><td><code>AuthSessionService</code></td><td><code>CommonService.GetLoginSessionInfo()</code></td><td>Stores current user session in a BehaviourSubject; called once at app init</td></tr>
+        <tr><td><code>MenuService</code></td><td><code>CommonService.GetMenu()</code></td><td>Fetches and caches sidebar menu for current role</td></tr>
+        <tr><td><code>InvoiceService</code></td><td><code>InvoiceService</code></td><td>All Invoice API calls: list, KPI, get, save, email, payment, void, PDF, print</td></tr>
+        <tr><td><code>QuoteService</code></td><td><code>QuoteService</code></td><td>All Quote API calls (parallel to Invoice)</td></tr>
+        <tr><td><code>CustomerService</code></td><td><code>CommonService</code></td><td>Customer lookups: <code>GetCustomerList</code>, <code>GetCustomersForDropdown</code></td></tr>
+        <tr><td><code>CommonDataService</code></td><td><code>CommonService</code></td><td>Dropdown data: divisions, currencies, sales execs, UOM, VAT codes, images</td></tr>
+        <tr><td><code>InvoiceUtils</code></td><td><code>InvoiceService</code> (BL)</td><td>Pure functions: status derivation, totals computation, due dates</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Service Pattern</h3>
+    <pre><code>@Injectable({ providedIn: 'root' })
+export class InvoiceService {
+  private api = inject(ApiService);
+
+  getList(req: InvoiceListRequest): Observable&lt;InvoiceListItem[]&gt; {
+    return this.api.post&lt;InvoiceListItem[]&gt;('Invoice', 'GetInvoiceList', req);
+  }
+
+  getKPI(req: InvoiceListRequest): Observable&lt;InvoiceKPI&gt; {
+    return this.api.post&lt;InvoiceKPI&gt;('Invoice', 'GetInvoiceKPI', req);
+  }
+
+  getById(id: number): Observable&lt;Invoice&gt; {
+    return this.api.post&lt;Invoice&gt;('Invoice', 'GetInvoiceById', { InvoiceId: id });
+  }
+
+  save(invoice: Invoice): Observable&lt;{ InvoiceId: number }&gt; {
+    return this.api.post&lt;{ InvoiceId: number }&gt;('Invoice', 'SaveInvoice', invoice);
+  }
+}</code></pre>
+
+    <hr class="section-divider">
+
+    <!-- ============================================================ -->
+    <h2>14. Server-Side Only (DAL Layer — Do Not Migrate)</h2>
+    <!-- ============================================================ -->
+
+    <p>The DAL layer contains Entity Framework 6 code, 17+ stored procedures, PDF generation, image handling, and email sending. All of this stays server-side. The Angular app communicates with it exclusively through the API endpoints above.</p>
+
+    <table>
+      <thead>
+        <tr><th>Feature</th><th>C# Source</th><th>Why Server-Side Only</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>EF6 DbContext + EDMX</td><td><code>DAL/InvoiceDbEntities.Context.cs</code></td><td>Database ORM — Angular cannot use EF</td></tr>
+        <tr><td>17+ Stored Procedures</td><td><code>DAL/*.cs</code></td><td>All CRUD operations — accessed via EF, not REST</td></tr>
+        <tr><td>PDF Generation</td><td><code>InvoiceService.GetInvoicePDF()</code></td><td>Requires iTextSharp + Razor template rendering</td></tr>
+        <tr><td>Print Template Rendering</td><td><code>InvoiceService.GetInvoicePrint()</code></td><td>Razor template engine — server-only</td></tr>
+        <tr><td>Email Sending (MailKit)</td><td><code>CommonService.SendEmail()</code></td><td>SMTP, file attachments — server-only</td></tr>
+        <tr><td>File Upload (SaveInvoiceFiles)</td><td><code>InvoiceService.SaveInvoiceFiles()</code></td><td>Writes to <code>~/InvoiceAttachements/</code> — server filesystem</td></tr>
+        <tr><td>Image Upload</td><td><code>CommonService.SaveImage()</code></td><td>Writes to <code>~/images/</code> — server filesystem</td></tr>
+        <tr><td>Error Logging</td><td><code>ErrorLoging.WriteLog()</code></td><td>Writes to <code>~/logs/</code> — server-only</td></tr>
+        <tr><td>Domain Name Resolution</td><td><code>CommonService.GetDomainName()</code></td><td>Uses <code>Request.RequestUri.Host</code> — HTTP context, not client</td></tr>
+        <tr><td>Duplicate Number Check</td><td><code>InvoiceService.IsInvoiceNumberDuplicate()</code></td><td>Database query — must stay server-side</td></tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider">
+
+    <!-- ============================================================ -->
+    <h2>15. Migration Order (Revised)</h2>
+    <!-- ============================================================ -->
+
+    <h3>Phase 0 — Cleanup</h3>
+    <ol>
+      <li>Delete <code>features/customers/</code> scaffold and <code>src/app/src/app/</code> stray duplicate</li>
+      <li>Remove <code>@angular/material</code> and <code>@angular/cdk</code> from <code>package.json</code></li>
+      <li>Fix <code>api.spec.ts</code> (duplicate class) and <code>app.spec.ts</code> (failing test)</li>
+    </ol>
+
+    <h3>Phase 1 — Dependencies + Design System</h3>
+    <ol start="4">
+      <li>Install <code>@ng-bootstrap/ng-bootstrap</code>, <code>bootstrap</code>, <code>@tinymce/tinymce-angular</code>, <code>tinymce</code></li>
+      <li>Copy icon font files → <code>src/assets/fonts/</code></li>
+      <li>Copy brand images → <code>src/assets/img/</code></li>
+      <li>Create SCSS partials from UIPrototype CSS (stripped of <code>.eq-ui</code> prefix)</li>
+      <li>Create <code>_ng-bootstrap.scss</code> overrides to match <code>.eq-*</code> tokens</li>
+      <li>Update <code>src/styles.scss</code> to import all partials</li>
+      <li>Update <code>index.html</code> to remove Material Icons font (if present)</li>
+      <li>Verify: <code>ng serve</code> renders with correct fonts, colors, spacing</li>
+    </ol>
+
+    <h3>Phase 2 — App Shell</h3>
+    <ol start="12">
+      <li>Build <code>MainLayout</code> component (header, sidebar, content area)</li>
+      <li>Build sidebar menu component (renders menu from API)</li>
+      <li>Build profile dropdown component</li>
+      <li>Wire up routes under <code>MainLayout</code></li>
+    </ol>
+
+    <h3>Phase 3 — Shared Components</h3>
+    <ol start="16">
+      <li><code>EqTable</code> — table shell with sorting, pagination</li>
+      <li><code>EqBadge</code> — status badges</li>
+      <li><code>EqKpi</code> — KPI cards</li>
+      <li><code>EqToolbar</code> — filter toolbar</li>
+      <li><code>EqSwitch</code> — toggle switch</li>
+      <li><code>EqDatepicker</code> — ng-bootstrap datepicker wrapper</li>
+    </ol>
+
+    <h3>Phase 4 — Service Layer + Models</h3>
+    <ol start="22">
+      <li>Create all TypeScript interfaces (Section 10) in <code>models/</code></li>
+      <li>Create <code>ApiService</code> — single POST helper, matching backend convention</li>
+      <li>Create <code>AuthSessionService</code> — fetches and stores <code>LoginSessionInfo</code> on init</li>
+      <li>Create <code>CommonDataService</code> — dropdown lookups (divisions, currencies, execs, UOM, VAT)</li>
+      <li>Create <code>MenuService</code> — sidebar menu fetch</li>
+      <li>Create <code>InvoiceService</code> — all invoice API calls</li>
+      <li>Create <code>invoice-utils.ts</code> — status derivation, totals, due dates (Section 11)</li>
+    </ol>
+
+    <h3>Phase 5 — Invoice List (First Real Screen)</h3>
+    <ol start="29">
+      <li>Invoice List page: page head, toolbar/filters, KPI cards, table, row-action menu</li>
+      <li>Wire up <code>InvoiceService.getList()</code> and <code>InvoiceService.getKPI()</code></li>
+      <li>Implement status badge rendering using <code>deriveInvoiceStatus()</code></li>
+      <li>Add pagination with <code>ngb-pagination</code></li>
+    </ol>
+
+    <h3>Phase 6 — Invoice CRUD</h3>
+    <ol start="33">
+      <li>Invoice create/edit page (line items, customer select, division, currency)</li>
+      <li>Invoice detail/read-only page</li>
+      <li>Payment recording modal</li>
+      <li>Invoice email modal</li>
+      <li>Invoice PDF download</li>
+      <li>Invoice void/cancel flow</li>
+    </ol>
+
+    <h3>Phase 7 — Quote List + CRUD</h3>
+    <ol start="39">
+      <li>Quote list page (mirror of invoice list)</li>
+      <li>Quote create/edit page</li>
+      <li>Quote detail page</li>
+      <li>Quote to Invoice conversion</li>
+    </ol>
+
+    <h3>Phase 8 — Remaining Screens</h3>
+    <ol start="43">
+      <li>Customer list + CRUD</li>
+      <li>Settings page</li>
+      <li>Dashboard</li>
+    </ol>
+
+    <hr class="section-divider">
+
+    <!-- ============================================================ -->
+    <h2>16. Existing Project Issues to Fix First</h2>
+    <!-- ============================================================ -->
+
+    <table>
+      <thead>
+        <tr><th>#</th><th>Item</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td><code>features/customers/</code> scaffold (Material-based, mock data)</td><td><span class="badge badge-amber">Delete</span></td></tr>
+        <tr><td>2</td><td><code>src/app/src/app/</code> stray duplicate directory</td><td><span class="badge badge-amber">Delete</span></td></tr>
+        <tr><td>3</td><td><code>app.routes.ts</code> redirects to deleted customers route</td><td><span class="badge badge-amber">Fix</span></td></tr>
+        <tr><td>4</td><td><code>api.spec.ts</code> is a copy of <code>api.ts</code> (not a real test)</td><td><span class="badge badge-red">Bug</span></td></tr>
+        <tr><td>5</td><td><code>app.spec.ts</code> second test expects <code>&lt;h1&gt;</code> that doesn't exist</td><td><span class="badge badge-red">Will fail</span></td></tr>
+        <tr><td>6</td><td><code>styles.scss</code> is fully Material-themed</td><td><span class="badge badge-amber">Replace</span></td></tr>
+        <tr><td>7</td><td><code>authInterceptor</code> sends Bearer token (backend doesn't use it)</td><td><span class="badge badge-neutral">Placeholder</span></td></tr>
+        <tr><td>8</td><td><code>ApiService</code> has <code>get</code>/<code>put</code>/<code>delete</code> (backend is POST-only)</td><td><span class="badge badge-neutral">Unused</span></td></tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider">
+
+    <p style="color: var(--ink-faint); font-size: 12px; text-align: center;">
+      Last updated: August 2026 &bull; EmQube Invoice Angular 22 Rewrite
+    </p>
+
+  </div>
+</body>
+</html>
