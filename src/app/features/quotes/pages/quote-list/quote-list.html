@@ -89,11 +89,18 @@
         <td>{{ row.DivisionName }}</td>
         <td>{{ row.ProductName }}</td>
         <td>{{ row.SExecutiveName }}</td>
-        <td class="eq-col-action">
-          <eq-dropdown
-            [items]="getRowActions()"
-            (itemClick)="onRowAction($event, row)"
-          />
+        <td>
+          <div class="eq-row-actions">
+            <!-- <button type="button" class="eq-icon-btn" title="Edit Quote" (click)="editQuote(row)">
+              <i class="icon-pencil"></i>
+            </button> -->
+            <button type="button" class="eq-icon-btn" title="Copy Quote" (click)="copyQuote(row)">
+              <i class="icon-docs"></i>
+            </button>
+            <button type="button" class="eq-icon-btn" title="Print" (click)="printQuote(row.TaxInvoiceId)">
+              <i class="icon-printer"></i>
+            </button>
+          </div>
         </td>
       </tr>
     } @empty {

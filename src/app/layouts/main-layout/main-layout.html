@@ -1,10 +1,13 @@
 <header class="eq-header">
   @if (hasMenus) {
-    <button class="eq-header-toggle eq-header-toggle--desktop" type="button" (click)="toggleSidebar()">
+    <button class="eq-header-toggle eq-header-toggle--desktop" type="button" (click)="toggleSidebar()" aria-label="Toggle sidebar">
+      <i class="fa fa-bars"></i>
+    </button>
+    <button class="eq-header-toggle eq-header-toggle--mobile" type="button" (click)="toggleMobileSidebar()" aria-label="Toggle navigation">
       <i class="fa fa-bars"></i>
     </button>
   }
-  <a class="navbar-brand" href="#"></a>
+  <a class="navbar-brand" routerLink="/dashboard" (click)="closeMobileSidebar()"></a>
 
   <div class="eq-header-spacer"></div>
 
@@ -30,5 +33,5 @@
 </div>
 
 @if (hasMenus) {
-  <div class="eq-backdrop"></div>
+  <div class="eq-backdrop" (click)="closeMobileSidebar()"></div>
 }

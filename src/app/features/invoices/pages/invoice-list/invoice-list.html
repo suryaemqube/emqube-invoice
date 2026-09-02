@@ -114,11 +114,22 @@
         </td>
         <td>{{ row.SExecutiveName }}</td>
         <td>{{ row.PaymentRecdDateString }}</td>
-        <td class="eq-col-action">
-          <eq-dropdown
-            [items]="getRowActions(row)"
-            (itemClick)="onRowAction($event, row)"
-          />
+        <td>
+          <div class="eq-row-actions">
+            <!-- <button type="button" class="eq-icon-btn" title="Edit Invoice" (click)="editInvoice(row)">
+              <i class="icon-pencil"></i>
+            </button> -->
+            @if (showRecordPayment(row)) {
+              <button type="button" class="eq-icon-btn" title="Record Payment" (click)="recordPayment(row)">
+                <i class="icon-credit-card"></i>
+              </button>
+            }
+            @if (showPrint(row)) {
+              <button type="button" class="eq-icon-btn" title="Print" (click)="print(row)">
+                <i class="icon-printer"></i>
+              </button>
+            }
+          </div>
         </td>
       </tr>
     } @empty {

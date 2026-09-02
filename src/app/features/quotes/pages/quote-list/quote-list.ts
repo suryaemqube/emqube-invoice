@@ -7,7 +7,6 @@ import { InvoiceService } from '../../../invoices/services/invoice.service';
 import { QuoteListModel } from '../../../invoices/models/invoice.model';
 import { EqTable, EqColumn } from '../../../../shared/components/eq-table/eq-table';
 import { EqPaginator } from '../../../../shared/components/eq-paginator/eq-paginator';
-import { EqDropdown, EqDropdownItem } from '../../../../shared/components/eq-dropdown/eq-dropdown';
 import { EqToolbar } from '../../../../shared/components/eq-toolbar/eq-toolbar';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { ConfigService } from '../../../../core/services/config.service';
@@ -21,7 +20,6 @@ const STORAGE_KEY = 'QuoteFilters';
     FormsModule,
     EqTable,
     EqPaginator,
-    EqDropdown,
     EqToolbar,
     RouterLink,
     EqBadge,
@@ -68,7 +66,7 @@ export class QuoteList implements OnInit {
     { key: 'DivisionName', header: 'Division' },
     { key: 'ProductName', header: 'Product', width: '150px' },
     { key: 'SExecutiveName', header: 'Sales Executive' },
-    { key: 'actions', header: '', align: 'right', width: '50px' },
+    { key: 'actions', header: '', align: 'right', width: '100px' },
   ];
 
   filteredList = computed(() => {
@@ -177,29 +175,15 @@ export class QuoteList implements OnInit {
     }
   }
 
-  getRowActions(): EqDropdownItem[] {
-    return [
-      { icon: 'icon-pencil', label: 'Edit Quote' },
-      { icon: 'icon-printer', label: 'Print Quote' },
-      { icon: 'icon-docs', label: 'Copy Quote' },
-    ];
+  editQuote(row: QuoteListModel): void {
+    this.router.navigate(['/createquote', row.TaxInvoiceId]);
   }
 
-  onRowAction(item: EqDropdownItem, row: QuoteListModel): void {
-    switch (item.label) {
-      case 'Edit Quote':
-        this.router.navigate(['/createquote', row.TaxInvoiceId]);
-        break;
-      case 'Copy Quote':
-        this.router.navigate(['/createquote', row.TaxInvoiceId], { queryParams: { copy: '1' } });
-        break;
-      case 'Print Quote':
-        this.printQuote(row.TaxInvoiceId);
-        break;
-    }
+  copyQuote(row: QuoteListModel): void {
+    this.router.navigate(['/createquote', row.TaxInvoiceId], { queryParams: { copy: '1' } });
   }
 
-  private printQuote(taxInvoiceId: number): void {
+  printQuote(taxInvoiceId: number): void {
     this.api.generateQuote(taxInvoiceId).subscribe({
       next: (fileName) => {
         if (fileName) {

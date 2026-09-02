@@ -16,7 +16,6 @@ import {
 } from '../../models/invoice.model';
 import { EqTable, EqColumn } from '../../../../shared/components/eq-table/eq-table';
 import { EqPaginator } from '../../../../shared/components/eq-paginator/eq-paginator';
-import { EqDropdown, EqDropdownItem } from '../../../../shared/components/eq-dropdown/eq-dropdown';
 import { EqBadge } from '../../../../shared/components/eq-badge/eq-badge';
 import { EqToolbar } from '../../../../shared/components/eq-toolbar/eq-toolbar';
 import { ToastService } from '../../../../shared/services/toast.service';
@@ -32,7 +31,6 @@ const STORAGE_KEY = 'InvoiceFilters';
     NgbInputDatepicker,
     EqTable,
     EqPaginator,
-    EqDropdown,
     EqBadge,
     EqToolbar,
     RouterLink,
@@ -86,7 +84,7 @@ export class InvoiceList implements OnInit {
     { key: 'ProductName', header: 'Product', width: '150px' },
     { key: 'SExecutiveName', header: 'Sales Exec.' },
     { key: 'PaymentRecdDateString', header: 'Payment Date' },
-    { key: 'actions', header: '', align: 'right', width: '50px' },
+    { key: 'actions', header: '', align: 'right', width: '100px' },
   ];
 
   // filtered + searched list
@@ -271,39 +269,28 @@ export class InvoiceList implements OnInit {
 
   // --- row actions ---
 
-  getRowActions(row: InvoiceListModel): EqDropdownItem[] {
-    const isCancelled = row.InvoiceTotal === 0 && row.TotalVAT === 0;
-    const isPaid = !!row.PaymentRecdDateString;
-
-    return [
-      { icon: 'icon-pencil', label: 'Edit Invoice' },
-      {
-        icon: 'icon-credit-card',
-        label: 'Record Payment',
-        disabled: isCancelled || isPaid,
-      },
-      {
-        icon: 'icon-printer',
-        label: 'Print Invoice',
-        disabled: isCancelled,
-      },
-    ];
+  editInvoice(row: InvoiceListModel): void {
+    this.router.navigate(['/createinvoice', row.TaxInvoiceId], {
+      queryParams: { editable: row.IsEditable === 1 ? 1 : 0 },
+    });
   }
 
-  onRowAction(item: EqDropdownItem, row: InvoiceListModel): void {
-    switch (item.label) {
-      case 'Edit Invoice':
-        this.router.navigate(['/createinvoice', row.TaxInvoiceId], {
-          queryParams: { editable: row.IsEditable === 1 ? 1 : 0 },
-        });
-        break;
-      case 'Record Payment':
-        this.openPaymentModal(row);
-        break;
-      case 'Print Invoice':
-        this.printInvoice(row.TaxInvoiceId);
-        break;
-    }
+  recordPayment(row: InvoiceListModel): void {
+    this.openPaymentModal(row);
+  }
+
+  print(row: InvoiceListModel): void {
+    this.printInvoice(row.TaxInvoiceId);
+  }
+
+  showRecordPayment(row: InvoiceListModel): boolean {
+    const isCancelled = row.InvoiceTotal === 0 && row.TotalVAT === 0;
+    const isPaid = !!row.PaymentRecdDateString;
+    return !isCancelled && !isPaid;
+  }
+
+  showPrint(row: InvoiceListModel): boolean {
+    return !(row.InvoiceTotal === 0 && row.TotalVAT === 0);
   }
 
   // --- payment modal ---

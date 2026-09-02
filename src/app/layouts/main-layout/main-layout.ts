@@ -1,5 +1,5 @@
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
+import { Component, inject, OnInit, OnDestroy, HostListener } from '@angular/core';
+import { Router, RouterOutlet, RouterLink } from '@angular/router';
 import { ApiService } from '../../core/services/api';
 import { UserService } from '../../core/services/user.service';
 import { MenuListItem } from '../../core/models/menu.model';
@@ -8,7 +8,7 @@ import { Profile } from './profile/profile';
 
 @Component({
   selector: 'app-main-layout',
-  imports: [RouterOutlet, Sidebar, Profile],
+  imports: [RouterOutlet, RouterLink, Sidebar, Profile],
   templateUrl: './main-layout.html',
   styleUrl: './main-layout.scss',
 })
@@ -27,7 +27,6 @@ export class MainLayout implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    document.body.classList.add('eq-sidebar-compact');
     this.loadMenu();
   }
 
@@ -35,8 +34,23 @@ export class MainLayout implements OnInit, OnDestroy {
     document.body.classList.remove('eq-sidebar-compact');
   }
 
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    if (window.innerWidth >= 992) {
+      this.closeMobileSidebar();
+    }
+  }
+
   toggleSidebar(): void {
     document.body.classList.toggle('eq-sidebar-compact');
+  }
+
+  toggleMobileSidebar(): void {
+    document.body.classList.toggle('eq-sidebar-mobile-show');
+  }
+
+  closeMobileSidebar(): void {
+    document.body.classList.remove('eq-sidebar-mobile-show');
   }
 
   private loadMenu(): void {
@@ -84,6 +98,7 @@ export class MainLayout implements OnInit, OnDestroy {
   }
 
   onMenuClick(pageUrl: string): void {
+    this.closeMobileSidebar();
     if (pageUrl.includes(',')) {
       const parts = pageUrl.split(',');
       this.router.navigate([parts[0], { id: parts[1], name: parts[2] }]);
