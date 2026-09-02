@@ -34,3 +34,64 @@
   gap: var(--eq-sp-2);
   min-height: 38px;
 }
+
+/* ---------- compact group-boxed modal layout ---------- */
+.eq-customer-form .eq-form-grid {
+  gap: var(--eq-sp-3);
+}
+.eq-customer-form .eq-form-grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* header row: switches inline with customer name */
+.eq-customer-head {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--eq-sp-4);
+  margin-bottom: var(--eq-sp-3);
+  flex-wrap: wrap;
+}
+.eq-customer-head .eq-switch-toggle-row {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+  flex: none;
+}
+.eq-switch-toggle-row--compact {
+  display: flex;
+  align-items: center;
+  gap: var(--eq-sp-4);
+  flex-wrap: wrap;
+}
+.eq-customer-head .eq-field-grow {
+  flex: 1 1 280px;
+  min-width: 220px;
+}
+
+/* group box */
+.eq-form-group {
+  border: 1px solid var(--eq-border);
+  border-radius: var(--eq-radius-card);
+  padding: var(--eq-sp-3) var(--eq-sp-4) var(--eq-sp-4);
+  margin-bottom: var(--eq-sp-3);
+  background: var(--eq-surface);
+}
+.eq-form-group-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--eq-sp-3);
+  flex-wrap: wrap;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  font-weight: 700;
+  color: var(--eq-ink-faint);
+  margin-bottom: var(--eq-sp-3);
+}
+.eq-form-group-title .eq-switch-pair {
+  min-height: 0;
+}
+.eq-switch-pair--inline .eq-switch-toggle-text {
+  min-width: 30px;
+}

@@ -84,157 +84,62 @@
 <!-- Add / Edit Customer Modal -->
 <ng-template #customerModal let-modal>
   <div class="modal-header">
-    <h4 class="modal-title">{{ modalData.CustomerId ? 'Edit' : 'Add' }} Customer/Prospect</h4>
+    <h4 class="modal-title">{{ modalData.CustomerId ? 'Edit' : 'Add' }} Customer</h4>
     <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
   </div>
   <div class="modal-body">
     <div class="eq-customer-form">
 
-      <!-- Is Individual / Prospect -->
-      <div class="eq-switch-toggle-row">
-        <span class="eq-switch-pair">
-          <label class="eq-switch"><input type="checkbox" [(ngModel)]="modalData.IsIndividual"><span class="slider round"></span></label>
-          <span class="eq-switch-toggle-text">Is Individual</span>
-        </span>
-        <span class="eq-switch-pair">
-          <label class="eq-switch"><input type="checkbox" [(ngModel)]="modalData.IsProspect"><span class="slider round"></span></label>
-          <span class="eq-switch-toggle-text">Prospect</span>
-        </span>
-      </div>
+      <!-- Header row: switches + customer name -->
+      <div class="eq-customer-head">
 
-      <div class="eq-form-grid">
-        <div class="eq-field eq-field-wide">
+                <div class="eq-field eq-field-grow">
           <label>Customer Name <span class="eq-required">*</span></label>
           <input type="text" [(ngModel)]="modalData.CustomerName" />
         </div>
-      </div>
 
-      <div class="eq-form-subtitle">Billing Address</div>
-      <div class="eq-form-grid">
-        <div class="eq-field eq-field-wide">
-          <label>Address <span class="eq-required">*</span></label>
-          <input type="text" [(ngModel)]="modalData.BillingAddress.Address" />
-        </div>
-        <div class="eq-field">
-          <label>City</label>
-          <input type="text" [(ngModel)]="modalData.BillingAddress.CityName" />
-        </div>
-        <div class="eq-field">
-          <label>Zip</label>
-          <input type="text" [(ngModel)]="modalData.BillingAddress.Zipcode" />
-        </div>
-        <div class="eq-field">
-          <label>Country <span class="eq-required">*</span></label>
-          <select [(ngModel)]="modalData.BillingAddress.CountryId" (ngModelChange)="onBillingCountryChange()">
-            <option [ngValue]="0">Select Country</option>
-            @for (c of countryList; track c.CountryId) {
-              <option [ngValue]="c.CountryId">{{ c.CountryName }}</option>
-            }
-          </select>
-        </div>
-        <div class="eq-field">
-          <label>State</label>
-          <select [(ngModel)]="modalData.BillingAddress.StateId">
-            <option [ngValue]="0">Select State</option>
-            @for (s of billingStates; track s.StateId) {
-              <option [ngValue]="s.StateId">{{ s.StateName }}</option>
-            }
-          </select>
-        </div>
-        <div class="eq-field eq-field-wide">
-          <label>Currency <span class="eq-required">*</span></label>
-          <select [(ngModel)]="modalData.CurrencyId">
-            <option [ngValue]="null">Select Currency</option>
-            @for (c of currencyList; track c.CurrencyId) {
-              <option [ngValue]="c.CurrencyId">{{ c.CurrencyName }}</option>
-            }
-          </select>
-        </div>
-      </div>
-
-      <div class="eq-form-subtitle">Contact Person</div>
-      <div class="eq-form-grid">
-        <div class="eq-field">
-          <label>Name <span class="eq-required">*</span></label>
-          <input type="text" [(ngModel)]="modalData.FirstName" />
-        </div>
-        <div class="eq-field">
-          <label>Last Name</label>
-          <input type="text" [(ngModel)]="modalData.LastName" />
-        </div>
-        <div class="eq-field">
-          <label>Designation</label>
-          <input type="text" [(ngModel)]="modalData.Designation" />
-        </div>
-        <div class="eq-field">
-          <label>Phone</label>
-          <input type="text" [(ngModel)]="modalData.Phone" />
-        </div>
-        <div class="eq-field">
-          <label>Email</label>
-          <input type="email" [(ngModel)]="modalData.Email" />
-        </div>
-        <div class="eq-field">
-          <label>Web</label>
-          <input type="text" [(ngModel)]="modalData.Website" />
-        </div>
-      </div>
-
-      <div class="eq-form-subtitle">Status</div>
-      <div class="eq-form-grid">
-        <div class="eq-field">
-          <label>Status</label>
-          <select [(ngModel)]="modalData.IsActive">
-            <option [ngValue]="false">Inactive</option>
-            <option [ngValue]="true">Active</option>
-          </select>
-        </div>
-        <div class="eq-field">
-          <label>Registered</label>
+        
+        <div class="eq-switch-toggle-row eq-switch-toggle-row--compact">
           <span class="eq-switch-pair">
-            <label class="eq-switch"><input type="checkbox" [(ngModel)]="modalData.VATEligible"><span class="slider round"></span></label>
-            <span class="eq-switch-toggle-text">VAT registered</span>
+            <label class="eq-switch"><input type="checkbox" [(ngModel)]="modalData.IsIndividual"><span class="slider round"></span></label>
+            <span class="eq-switch-toggle-text">Is Individual</span>
+          </span>
+          <span class="eq-switch-pair">
+            <label class="eq-switch"><input type="checkbox" [(ngModel)]="modalData.IsProspect"><span class="slider round"></span></label>
+            <span class="eq-switch-toggle-text">Prospect</span>
           </span>
         </div>
-        @if (!modalData.IsIndividual) {
-          <div class="eq-field eq-field-wide">
-            <label>Customer Code <span class="eq-required">*</span></label>
-            <input type="text" [(ngModel)]="modalData.CustomerCode" />
-          </div>
-        }
-        @if (modalData.VATEligible) {
-          <div class="eq-field eq-field-wide">
-            <label>Tax No. <span class="eq-required">*</span></label>
-            <input type="text" [(ngModel)]="modalData.VATNo" />
-          </div>
-        }
+
       </div>
 
-      <div class="eq-form-subtitle-with-toggle">
-        <div class="eq-form-subtitle" style="margin: 0">Shipping Address</div>
-        <span class="eq-switch-pair">
-          <label class="eq-switch"><input type="checkbox" [(ngModel)]="shippingAddressSame" (ngModelChange)="onShippingSameToggle()"><span class="slider round"></span></label>
-          <span class="eq-switch-toggle-text">Same as billing address</span>
-        </span>
-      </div>
-
-      @if (!shippingAddressSame) {
-        <div class="eq-form-grid">
+      <!-- Billing Address -->
+      <div class="eq-form-group">
+        <div class="eq-form-group-title">Billing Address</div>
+        <div class="eq-form-grid eq-form-grid-3">
           <div class="eq-field eq-field-wide">
             <label>Address <span class="eq-required">*</span></label>
-            <input type="text" [(ngModel)]="modalData.ShippingAddress.Address" />
+            <input type="text" [(ngModel)]="modalData.BillingAddress.Address" />
           </div>
           <div class="eq-field">
             <label>City</label>
-            <input type="text" [(ngModel)]="modalData.ShippingAddress.CityName" />
+            <input type="text" [(ngModel)]="modalData.BillingAddress.CityName" />
           </div>
           <div class="eq-field">
-            <label>Zip</label>
-            <input type="text" [(ngModel)]="modalData.ShippingAddress.Zipcode" />
+            <label>State</label>
+            <select [(ngModel)]="modalData.BillingAddress.StateId">
+              <option [ngValue]="0">Select State</option>
+              @for (s of billingStates; track s.StateId) {
+                <option [ngValue]="s.StateId">{{ s.StateName }}</option>
+              }
+            </select>
           </div>
           <div class="eq-field">
-            <label>Country</label>
-            <select [(ngModel)]="modalData.ShippingAddress.CountryId" (ngModelChange)="onShippingCountryChange()">
+            <label>ZIP</label>
+            <input type="text" [(ngModel)]="modalData.BillingAddress.Zipcode" />
+          </div>
+          <div class="eq-field">
+            <label>Country <span class="eq-required">*</span></label>
+            <select [(ngModel)]="modalData.BillingAddress.CountryId" (ngModelChange)="onBillingCountryChange()">
               <option [ngValue]="0">Select Country</option>
               @for (c of countryList; track c.CountryId) {
                 <option [ngValue]="c.CountryId">{{ c.CountryName }}</option>
@@ -242,16 +147,126 @@
             </select>
           </div>
           <div class="eq-field">
-            <label>State</label>
-            <select [(ngModel)]="modalData.ShippingAddress.StateId">
-              <option [ngValue]="0">Select State</option>
-              @for (s of shippingStates; track s.StateId) {
-                <option [ngValue]="s.StateId">{{ s.StateName }}</option>
+            <label>Currency <span class="eq-required">*</span></label>
+            <select [(ngModel)]="modalData.CurrencyId">
+              <option [ngValue]="null">Select Currency</option>
+              @for (c of currencyList; track c.CurrencyId) {
+                <option [ngValue]="c.CurrencyId">{{ c.CurrencyName }}</option>
               }
             </select>
           </div>
         </div>
-      }
+      </div>
+
+      <!-- Contact Person -->
+      <div class="eq-form-group">
+        <div class="eq-form-group-title">Contact Person</div>
+        <div class="eq-form-grid eq-form-grid-3">
+          <div class="eq-field">
+            <label>Name <span class="eq-required">*</span></label>
+            <input type="text" [(ngModel)]="modalData.FirstName" />
+          </div>
+          <div class="eq-field">
+            <label>Last Name</label>
+            <input type="text" [(ngModel)]="modalData.LastName" />
+          </div>
+          <div class="eq-field">
+            <label>Phone</label>
+            <input type="text" [(ngModel)]="modalData.Phone" />
+          </div>
+          <div class="eq-field">
+            <label>Email</label>
+            <input type="email" [(ngModel)]="modalData.Email" />
+          </div>
+          <div class="eq-field">
+            <label>Designation</label>
+            <input type="text" [(ngModel)]="modalData.Designation" />
+          </div>
+          <div class="eq-field">
+            <label>Web</label>
+            <input type="text" [(ngModel)]="modalData.Website" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Tax & Status -->
+      <div class="eq-form-group">
+        <div class="eq-form-group-title">Tax &amp; Status</div>
+        <div class="eq-form-grid eq-form-grid-3">
+          <div class="eq-field">
+            <label>Status</label>
+            <select [(ngModel)]="modalData.IsActive">
+              <option [ngValue]="false">Inactive</option>
+              <option [ngValue]="true">Active</option>
+            </select>
+          </div>
+          <div class="eq-field">
+            <label>VAT Registered</label>
+            <span class="eq-switch-pair eq-switch-pair--inline">
+              <label class="eq-switch"><input type="checkbox" [(ngModel)]="modalData.VATEligible"><span class="slider round"></span></label>
+              <span class="eq-switch-toggle-text">{{ modalData.VATEligible ? 'Yes' : 'No' }}</span>
+            </span>
+          </div>
+          @if (!modalData.IsIndividual) {
+            <div class="eq-field">
+              <label>Customer Code <span class="eq-required">*</span></label>
+              <input type="text" [(ngModel)]="modalData.CustomerCode" />
+            </div>
+          }
+          @if (modalData.VATEligible) {
+            <div class="eq-field">
+              <label>Tax No. <span class="eq-required">*</span></label>
+              <input type="text" [(ngModel)]="modalData.VATNo" />
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Shipping Address -->
+      <div class="eq-form-group">
+        <div class="eq-form-group-title">
+          <span>Shipping Address</span>
+          <span class="eq-switch-pair">
+            <label class="eq-switch"><input type="checkbox" [(ngModel)]="shippingAddressSame" (ngModelChange)="onShippingSameToggle()"><span class="slider round"></span></label>
+            <span class="eq-switch-toggle-text">Same as billing address</span>
+          </span>
+        </div>
+        @if (!shippingAddressSame) {
+          <div class="eq-form-grid eq-form-grid-3">
+            <div class="eq-field eq-field-wide">
+              <label>Address <span class="eq-required">*</span></label>
+              <input type="text" [(ngModel)]="modalData.ShippingAddress.Address" />
+            </div>
+            <div class="eq-field">
+              <label>City</label>
+              <input type="text" [(ngModel)]="modalData.ShippingAddress.CityName" />
+            </div>
+            <div class="eq-field">
+              <label>State</label>
+              <select [(ngModel)]="modalData.ShippingAddress.StateId">
+                <option [ngValue]="0">Select State</option>
+                @for (s of shippingStates; track s.StateId) {
+                  <option [ngValue]="s.StateId">{{ s.StateName }}</option>
+                }
+              </select>
+            </div>
+            <div class="eq-field">
+              <label>ZIP</label>
+              <input type="text" [(ngModel)]="modalData.ShippingAddress.Zipcode" />
+            </div>
+            <div class="eq-field">
+              <label>Country</label>
+              <select [(ngModel)]="modalData.ShippingAddress.CountryId" (ngModelChange)="onShippingCountryChange()">
+                <option [ngValue]="0">Select Country</option>
+                @for (c of countryList; track c.CountryId) {
+                  <option [ngValue]="c.CountryId">{{ c.CountryName }}</option>
+                }
+              </select>
+            </div>
+          </div>
+        }
+      </div>
+
     </div>
   </div>
   <div class="modal-footer">
