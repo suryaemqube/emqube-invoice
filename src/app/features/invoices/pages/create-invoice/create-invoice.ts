@@ -27,6 +27,7 @@ import {
 import { EqBadge } from '../../../../shared/components/eq-badge/eq-badge';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { ConfigService } from '../../../../core/services/config.service';
+import { UserService } from '../../../../core/services/user.service';
 
 interface TaxSummary {
   VatCodeId: number;
@@ -51,6 +52,7 @@ export class CreateInvoice implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private modalService = inject(NgbModal);
   private config = inject(ConfigService);
+  private user = inject(UserService);
 
   form: InvoiceFormModel = emptyInvoiceForm();
   lines: InvoiceLineItem[] = this.form.ProductList;
@@ -120,14 +122,17 @@ export class CreateInvoice implements OnInit {
   invoiceEditable = 0;
 
   // The form is editable only while the invoice itself is editable (or it's a
-  // brand-new/copy draft). Editing a saved invoice is a read-only view: the
-  // Copy/Print buttons stay available, but the fields stay locked. This matches
-  // the old app, where a locked invoice (IsEditable != 1) shows a read-only form
-  // regardless of the logged-in user's role.
+  // brand-new/copy draft), OR the logged-in user is role 4 (SuperAdmin). This
+  // mirrors the old app's exact gate — create-invoice.component.html:64:
+  //   `[ngClass]="{'disabled': (IsEditable != 1 && roleId !=4)}"`
+  // i.e. the form is locked only when BOTH the invoice is non-editable AND the
+  // user is not SuperAdmin. `RightView/RightCreate/RightEdit/RightDelete` from
+  // the menu are NOT consulted by the old edit screen — it is purely per-invoice
+  // `IsEditable` plus the roleId==4 super-admin override.
   get canEdit(): boolean {
     if (!this.isEdit) return true;
     if (this.isCopy) return true;
-    return this.invoiceEditable === 1;
+    return this.invoiceEditable === 1 || this.user.roleId === 4;
   }
 
   get isPaid(): boolean {

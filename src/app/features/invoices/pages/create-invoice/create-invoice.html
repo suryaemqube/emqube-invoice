@@ -24,7 +24,7 @@
         <span class="eq-invoice-meta-dot">·</span>
         <span>Invoiced {{ invoiceDateLabel }}</span>
         <span class="eq-invoice-meta-dot">·</span>
-        <eq-badge tone="neutral">Read-only</eq-badge>
+        <eq-badge tone="neutral">{{ canEdit ? 'Edit Mode' : 'Read-only' }}</eq-badge>
       }
     </div>
   </div>
