@@ -1,0 +1,178 @@
+<!-- Page Head -->
+<div class="eq-page-header">
+  <div>
+    <h1>{{ title }}</h1>
+  </div>
+  <button type="button" class="eq-btn eq-btn-primary" (click)="openAdd(masterModal)">
+    <i class="icon-plus"></i> Add {{ title }}
+  </button>
+</div>
+
+<!-- Toolbar -->
+<eq-toolbar>
+  <div class="eq-toolbar-search">
+    <i class="icon-magnifier"></i>
+    <input
+      type="text"
+      placeholder="Search {{ title }}"
+      [(ngModel)]="filterQuery"
+      (ngModelChange)="onSearchChange()"
+    />
+  </div>
+  <button class="eq-btn eq-btn-outline eq-toolbar-clear" (click)="clearSearch()">
+    <i class="icon-close"></i> Clear
+  </button>
+</eq-toolbar>
+
+<!-- Table -->
+<eq-table [columns]="columns" [loading]="loading()">
+  <ng-container eqTableBody>
+    @for (row of pageSlice(); track row['Id'] ?? row['id'] ?? $index) {
+      <tr>
+        @for (col of columns; track col.key) {
+          @if (col.key !== 'actions') {
+            <td>
+              @if (isBitColumn(col.key)) {
+                <eq-badge [tone]="row[col.key] ? 'success' : 'neutral'">
+                  {{ row[col.key] ? 'Active' : 'Inactive' }}
+                </eq-badge>
+              } @else {
+                {{ cellValue(row, col.key) }}
+              }
+            </td>
+          }
+        }
+        @if (columns.length > 0) {
+          <td class="eq-col-action">
+            <div class="eq-row-actions">
+              <button
+                type="button"
+                class="eq-icon-btn eq-icon-btn-danger"
+                title="Delete"
+                (click)="askDelete(row, confirmModal)"
+              >
+                <i class="icon-trash"></i>
+              </button>
+              <button
+                type="button"
+                class="eq-icon-btn"
+                title="Edit"
+                (click)="openEdit(row, masterModal)"
+              >
+                <i class="icon-pencil"></i>
+              </button>
+            </div>
+          </td>
+        }
+      </tr>
+    } @empty {
+      <tr>
+        <td [attr.colspan]="columns.length || 1" class="eq-empty-row">
+          <div class="eq-empty">
+            <div class="eq-empty-icon"><i class="icon-list"></i></div>
+            <h2>No {{ title }} found</h2>
+            <p>
+              @if (filterQuery()) {
+                Try adjusting your search query.
+              } @else {
+                No records yet — click “Add {{ title }}” to create the first one.
+              }
+            </p>
+            @if (filterQuery()) {
+              <button class="eq-btn eq-btn-outline" (click)="clearSearch()">Clear</button>
+            }
+          </div>
+        </td>
+      </tr>
+    }
+  </ng-container>
+
+  <div eqTableFoot>
+    @if (!loading()) {
+      <eq-paginator
+        [totalItems]="filteredList().length"
+        [page]="page()"
+        [pageSize]="pageSize()"
+        [pageSizeOptions]="[50, 100, 150]"
+        (pageChange)="page.set($event)"
+        (pageSizeChange)="pageSize.set($event); page.set(1)"
+      />
+    }
+  </div>
+</eq-table>
+
+<!-- Add / Edit Modal -->
+<ng-template #masterModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">{{ isEditMode ? 'Edit' : 'Add' }} {{ title }}</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <form name="masterForm" class="eq-master-form">
+      <div class="eq-form-grid">
+        @for (field of formFields; track field.FieldName) {
+          <div class="eq-field">
+            <label>
+              {{ field.DisplayName }}
+              @if (field.IsMandatory) {
+                <span class="eq-required">*</span>
+              }
+            </label>
+
+            @if (field.IsForiegnkey && field.DataType === 'int') {
+              <select [ngModel]="field.FieldValue" [ngModelOptions]="{ standalone: true }" (ngModelChange)="field.FieldValue = $event">
+                <option [ngValue]="null">Select</option>
+                @for (opt of field.DropDownList ?? []; track opt.Id) {
+                  <option [value]="opt.Id">{{ opt.Name }}</option>
+                }
+              </select>
+            } @else if (field.DataType === 'bit') {
+              <span class="eq-switch-pair">
+                <label class="eq-switch">
+                  <input type="checkbox" [checked]="isChecked(field)" (change)="toggleBit(field)" />
+                  <span class="slider round"></span>
+                </label>
+                <span class="eq-switch-toggle-text">{{ isChecked(field) ? 'Yes' : 'No' }}</span>
+              </span>
+            } @else {
+              <input
+                type="text"
+                [disabled]="!field.UpdateField"
+                [attr.pattern]="field.Regex"
+                [(ngModel)]="field.FieldValue"
+                [ngModelOptions]="{ standalone: true }"
+              />
+            }
+          </div>
+        }
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="eq-btn eq-btn-outline" (click)="modal.dismiss()">Close</button>
+    <button type="button" class="eq-btn eq-btn-primary" (click)="save(modal)">
+      <i class="icon-check"></i> Save
+    </button>
+  </div>
+</ng-template>
+
+<!-- Delete Confirm Modal -->
+<ng-template #confirmModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Delete {{ title }}</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <p class="eq-confirm-text">
+      Are you sure you want to delete
+      <strong>{{ pendingDeleteRow ? deleteLabel(pendingDeleteRow) : '' }}</strong>
+      from {{ title }}? This action cannot be undone.
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="eq-btn eq-btn-outline" (click)="modal.dismiss()">Cancel</button>
+    <button type="button" class="eq-btn eq-btn-danger" (click)="confirmDelete(modal)">
+      <i class="icon-trash"></i> Delete
+    </button>
+  </div>
+</ng-template>

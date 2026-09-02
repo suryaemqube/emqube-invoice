@@ -262,6 +262,7 @@
       <li><a href="#quote-list">Quote List</a></li>
       <li><a href="#create-quote">Create / Edit Quote</a></li>
       <li><a href="#customer-list">Customer List</a></li>
+      <li><a href="#master-data">Master Data</a></li>
       <li><a href="#shared">Shared building blocks</a></li>
       <li><a href="#cross-cutting">Cross-cutting cleanup</a></li>
       <li><a href="#urls">URLs &amp; navigation (how edit/copy links work)</a></li>
@@ -950,8 +951,121 @@
 
   <hr class="section-divider">
 
+  <!-- ================= MASTER DATA ================= -->
+  <h2 id="master-data"><span class="section-num">14.</span>Master Data</h2>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-green">New screen</span> Generic master-data page (port)</div>
+    <div class="what"><span class="tag">What</span><p>
+      Replaced the <code>/master</code> placeholder with one component
+      (<code>features/master/pages/master-data/</code>) that serves any <code>MetaData</code> table, driven by
+      the menu's matrix params <code>{id, name}</code> — the sidebar's three master items all land on it:
+      Product (<code>/master,1,Products</code>), Product Category (<code>/master,2,Product Category</code>),
+      Payment Terms (<code>/master,3,Payment Terms</code>). New <code>features/master/</code> folder with
+      <code>services/master-data.service.ts</code> (GetMetaDataList / GetMetaData / AddUpdateMetaData /
+      DeleteMetaData) and models mirroring <code>MetaDataModel</code> / <code>RMetaDataList</code> /
+      <code>DropDownData</code>. The route re-subscribes to <code>route.paramMap</code>, so switching master
+      screens reloads in place without remounting the page.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      Completes the menu tree (Sales screens were done; "Master Data" still pointed at a placeholder). One generic
+      page is the right shape because the schema is configuration-driven: the DB
+      <code>MetaData</code>/<code>MetaDataDetail</code> tables decide the table, columns, form fields and FK
+      dropdowns for each master — no screen-specific code per master needed.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-red">Bug fix (avoided)</span> Empty table crashed the old grid</div>
+    <div class="what"><span class="tag">What</span><p>
+      The old template derived the <code>&lt;thead&gt;</code> from <code>metaData[0] | keyvalue</code>, so an
+      empty master table rendered no headers and no action column (and the code read
+      <code>metaData[0]</code> unguarded). The new page builds columns from the first row's keys, but guards an
+      empty result set (empty-action list + full-width friendly empty state). Search keys are the same column
+      keys, so filtering continues to work on an empty search.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      Not a live problem today (all three tables have rows), but the fine print of
+      “data-driven grid” means any future <code>MetaData</code> row with no data must not kill the screen.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-green">Improvement</span> Bit columns rendered as Active/Inactive badges</div>
+    <div class="what"><span class="tag">What</span><p>
+      A column is auto-detected as boolean when every value it holds is JSON <code>true</code>/<code>false</code>
+      (bit columns serialise that way from the <code>DataTable</code>) and is rendered via
+      <code>EqBadge</code> as <b>Active</b> (success) / <b>Inactive</b> (neutral) instead of the raw
+      <code>true</code>/<code>false</code> the old app printed. Hits all three existing tables: Product.IsActive,
+      ProductCategory.IsActive, PaymentTerm.Visibility.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      Raw boolean scan noise; the government/ERP-style “Is Active” signal reads much cleaner as a badge.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-green">Improvement</span> Search + pagination on the master grid</div>
+    <div class="what"><span class="tag">What</span><p>
+      The old master screen had neither — the search box was commented out and the table rendered every row.
+      The new page reuses <code>EqToolbar</code> (client-side search across all stringified cells, wired to the
+      page's filter + empty state) and <code>EqPaginator</code> (default 50, sizes 50/100/150).
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      Consistency with the invoice/quote/customer lists; cheap and purely client-side, so no backend change.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-green">Improvement</span> Delete requires a confirmation</div>
+    <div class="what"><span class="tag">What</span><p>
+      The old app's trash button posted <code>DeleteMetaData</code> immediately with no confirmation. The new
+      page opens a small “Delete {title}?” confirm modal showing the row's primary text value, then posts. On
+      response it toasts the backend message — including <b>MessageTypeValue 3</b>, where the backend already
+      translates the FK REFERENCE-constraint exception to “the item is used in another table” — and refreshes on
+      both success (1) and in-use (3), exactly like the old handler. The in-use blocking message is surfaced as a
+      clear <b>error</b> toast (e.g. “Cannot delete “{label}” — it is used in another record.”) rather than a
+      soft warning.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      One-click deletes without confirmation are the classic data-loss foot-gun; the in-use case now surfaces the
+      backend's message instead of a mystery failure. Keeping it as a toast (not a popup) matches the app's other
+      delete-blocked flows (§7/§11) and the backend already returns a human-readable <code>Text</code>.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-red">Bug fix (avoided)</span> FK dropdown string/number &ldquo;Select&rdquo; trap</div>
+    <div class="what"><span class="tag">What</span><p>
+      Backend <code>GetMetaData</code> returns <code>FieldValue</code> as a <b>string</b> (e.g.
+      <code>"8"</code>) while the dropdown option ids are numbers. Binding options with <code>[value]</code>
+      (string-coerced) keeps the model a string end-to-end, so an edited record re-selects its FK correctly and
+      the Add path's placeholder uses a real <code>[ngValue]="null"</code>. The old template's
+      <code>value="null"</code> literal-string placeholder was avoided (same “null” string trap as the currency
+      select, see §13).
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      A number/string mismatch would silently render the dropdown “unselected” when opening an existing record
+      (the edit case matters most — the saved FK must re-appear).
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-red">Bug fix (avoided)</span> Empty grid column set on error / no params</div>
+    <div class="what"><span class="tag">What</span><p>
+      The page resets <code>columns</code> and rows on load error and drops out of skeleton loading when reached
+      with no <code>id</code> matrix param (direct <code>/master</code> navigation), rather than hanging forever
+      on the shimmer.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      Graceful degradation: a dead endpoint or a hand-typed URL must never leave a permanently-loading screen.
+    </p></div>
+  </div>
+
+  <hr class="section-divider">
+
   <!-- ================= SHARED ================= -->
-  <h2 id="shared"><span class="section-num">14.</span>Shared building blocks</h2>
+  <h2 id="shared"><span class="section-num">15.</span>Shared building blocks</h2>
 
   <div class="item">
     <div class="item-title"><span class="badge badge-info">Design</span> Thin <code>.eq-*</code> wrappers instead of Angular Material</div>
@@ -970,7 +1084,7 @@
   <hr class="section-divider">
 
   <!-- ================= CROSS-CUTTING ================= -->
-  <h2 id="cross-cutting"><span class="section-num">15.</span>Cross-cutting cleanup</h2>
+  <h2 id="cross-cutting"><span class="section-num">16.</span>Cross-cutting cleanup</h2>
 
   <div class="item">
     <div class="item-title"><span class="badge badge-red">Bug fix</span> Icon glyphs were missing after the port</div>
@@ -1014,7 +1128,7 @@
   <hr class="section-divider">
 
   <!-- ================= URLS & NAVIGATION ================= -->
-  <h2 id="urls"><span class="section-num">16.</span>URLs &amp; navigation — how edit/copy links work</h2>
+  <h2 id="urls"><span class="section-num">17.</span>URLs &amp; navigation — how edit/copy links work</h2>
 
   <p>
     The number in <code>/createinvoice/31284?editable=0</code> or <code>/createquote/313</code> is not random —

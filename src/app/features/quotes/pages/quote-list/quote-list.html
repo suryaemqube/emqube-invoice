@@ -71,7 +71,13 @@
     @for (row of pageSlice(); track row.TaxInvoiceId) {
       <tr>
         <td>
-          <span class="eq-mono">{{ row.QuoteNumber }}<small> - {{ row.QuotetypeText }}</small></span>
+          <span class="eq-mono">{{ row.QuoteNumber }}
+            @if ( row.QuotetypeText == 'Proforma') {
+          <eq-badge tone="success" [compact]="true">{{ row.QuotetypeText }}</eq-badge>
+           } @else {
+          <eq-badge tone="warning" [compact]="true">{{ row.QuotetypeText }}</eq-badge>
+           }
+          </span>
         </td>
         <td class="eq-nowrap">{{ row.QuoteDateString }}</td>
         <td class="name">

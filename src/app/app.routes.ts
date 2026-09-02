@@ -89,9 +89,8 @@ export const routes: Routes = [
       {
         path: 'master',
         loadComponent: () =>
-          import('./shared/components/page-placeholder/page-placeholder')
-            .then(m => m.PagePlaceholder),
-        data: { title: 'Master Data', icon: 'icon-list' },
+          import('./features/master/pages/master-data/master-data')
+            .then(m => m.MasterData),
       },
       {
         path: 'changepassword',

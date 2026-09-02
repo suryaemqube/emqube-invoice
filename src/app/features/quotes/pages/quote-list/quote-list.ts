@@ -11,7 +11,7 @@ import { EqDropdown, EqDropdownItem } from '../../../../shared/components/eq-dro
 import { EqToolbar } from '../../../../shared/components/eq-toolbar/eq-toolbar';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { ConfigService } from '../../../../core/services/config.service';
-
+import { EqBadge } from '../../../../shared/components/eq-badge/eq-badge';
 const STORAGE_KEY = 'QuoteFilters';
 
 @Component({
@@ -24,6 +24,7 @@ const STORAGE_KEY = 'QuoteFilters';
     EqDropdown,
     EqToolbar,
     RouterLink,
+    EqBadge,
   ],
   templateUrl: './quote-list.html',
   styleUrl: './quote-list.scss',

@@ -1,0 +1,107 @@
+:host {
+  display: block;
+}
+
+/* let the table shrink to fit narrow sets (Payment Terms = 4 cols);
+   the global 920px min-width is for invoice/quote lists, not for
+   dynamically-columned master screens. */
+.eq-table {
+  min-width: auto;
+}
+
+/* keep all data cells compact — prevents column spread on narrow tables */
+.eq-table td {
+  white-space: nowrap;
+}
+
+/* action column: pinned tight to the right, never wraps its flex children */
+.eq-col-action {
+  white-space: nowrap;
+  width: 1%;
+  text-align: right;
+  vertical-align: middle;
+}
+
+.eq-row-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 2px;
+}
+
+.eq-empty-row {
+  text-align: center;
+  padding: var(--eq-sp-7) var(--eq-sp-5) !important;
+}
+
+.eq-icon-btn-danger {
+  color: var(--eq-red);
+}
+
+.eq-icon-btn-danger:hover {
+  background: var(--eq-red-soft);
+  color: var(--eq-red);
+}
+
+.eq-btn-danger {
+  background: var(--eq-red);
+  border-color: var(--eq-red);
+  color: #fff;
+}
+
+.eq-btn-danger:hover {
+  background: var(--eq-red);
+  border-color: var(--eq-red);
+  color: #fff;
+  filter: brightness(0.94);
+}
+
+.eq-confirm-text {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--eq-ink);
+  line-height: 1.55;
+}
+
+/* dynamic master form */
+.eq-master-form .eq-field select {
+  width: 100%;
+  border: 1px solid var(--eq-border);
+  border-radius: var(--eq-radius-control);
+  background: var(--eq-surface);
+  color: var(--eq-ink);
+  font-size: 13.5px;
+  font-family: var(--eq-font-sans);
+  height: 38px;
+  padding: 0 var(--eq-sp-3);
+  box-sizing: border-box;
+}
+
+.eq-master-form .eq-field select:focus {
+  outline: none;
+  border-color: var(--eq-primary);
+  box-shadow: 0 0 0 3px var(--eq-primary-soft);
+}
+
+.eq-master-form .eq-field select:disabled,
+.eq-master-form .eq-field input:disabled {
+  background: var(--eq-surface-alt);
+  color: var(--eq-ink-faint);
+  cursor: not-allowed;
+}
+
+.eq-master-form .eq-field input[type='text']:disabled {
+  opacity: 1;
+}
+
+.eq-switch-pair {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--eq-sp-2);
+  min-height: 38px;
+}
+
+.eq-switch-toggle-text {
+  font-size: 13px;
+  color: var(--eq-ink-muted);
+  white-space: nowrap;
+}

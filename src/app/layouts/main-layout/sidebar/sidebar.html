@@ -23,9 +23,8 @@
       @for (item of masterMenus(); track item.ParentMenu.MenuName) {
         <li class="nav-item">
           <a class="eq-nav-link"
+             [class.active]="isActive(item.ParentMenu.PageUrl)"
              [title]="item.ParentMenu.MenuName"
-             routerLinkActive="active"
-             [routerLink]="item.ParentMenu.PageUrl"
              (click)="onMenuClick(item.ParentMenu.PageUrl)">
             <i [class]="cssClassFor(item.ParentMenu.CssClass)"></i>
             <span>{{ item.ParentMenu.MenuName }}</span>
