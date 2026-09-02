@@ -1,0 +1,15 @@
+.eq-employee-status-filter {
+  margin-bottom: 12px;
+  max-width: 240px;
+
+  select {
+    width: 100%;
+    height: 40px;
+    padding: 8px 10px;
+    border: 1px solid var(--eq-border, #dce3ea);
+    border-radius: 4px;
+    background: var(--eq-surface, #fff);
+    color: var(--eq-ink, #16202b);
+    font-size: 14px;
+  }
+}

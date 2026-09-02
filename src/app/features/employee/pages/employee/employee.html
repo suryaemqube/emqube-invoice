@@ -1,0 +1,176 @@
+<!-- Page Head -->
+<div class="eq-page-header">
+  <div>
+    <h1>Employees</h1>
+  </div>
+  <button type="button" class="eq-btn eq-btn-primary" (click)="openAdd(employeeModal)">
+    <i class="icon-plus"></i> Add Employee
+  </button>
+</div>
+
+<!-- Status filter -->
+<div class="eq-employee-status-filter">
+  <select [(ngModel)]="statusFilter" (ngModelChange)="onStatusChange()">
+    <option value="active">Active</option>
+    <option value="inactive">Inactive</option>
+  </select>
+</div>
+
+<!-- Toolbar -->
+<eq-toolbar>
+  <div class="eq-toolbar-search">
+    <i class="icon-magnifier"></i>
+    <input
+      type="text"
+      placeholder="Search name, email or username"
+      [(ngModel)]="filterQuery"
+      (ngModelChange)="onSearchChange()"
+    />
+  </div>
+  <button class="eq-btn eq-btn-outline eq-toolbar-clear" (click)="clearSearch()">
+    <i class="icon-close"></i> Clear
+  </button>
+</eq-toolbar>
+
+<!-- Table -->
+<eq-table [columns]="columns" [loading]="loading()">
+  <ng-container eqTableBody>
+    @for (row of pageSlice(); track row.EmployeeId) {
+      <tr>
+        <td>{{ fullName(row) }}</td>
+        <td>{{ row.DepartmentText }}</td>
+        <td>{{ row.Email }}</td>
+        <td>{{ row.UserName }}</td>
+        <td>
+          @if (row.IsActive) {
+            <eq-badge tone="success">Active</eq-badge>
+          } @else {
+            <eq-badge tone="neutral">Inactive</eq-badge>
+          }
+        </td>
+        <td class="eq-col-action">
+          <button type="button" class="eq-icon-btn" (click)="openEdit(row, employeeModal)" title="Edit Employee">
+            <i class="icon-pencil"></i>
+          </button>
+        </td>
+      </tr>
+    } @empty {
+      <tr>
+        <td [attr.colspan]="columns.length" class="eq-empty-row">
+          <div class="eq-empty">
+            <div class="eq-empty-icon"><i class="icon-user"></i></div>
+            <h2>No employees found</h2>
+            <p>Try adjusting your search or status filter.</p>
+            <button class="eq-btn eq-btn-outline" (click)="clearSearch()">Clear</button>
+          </div>
+        </td>
+      </tr>
+    }
+  </ng-container>
+
+  <div eqTableFoot>
+    @if (!loading()) {
+      <eq-paginator
+        [totalItems]="filteredList().length"
+        [page]="page()"
+        [pageSize]="pageSize()"
+        [pageSizeOptions]="[5, 10, 15]"
+        (pageChange)="page.set($event)"
+        (pageSizeChange)="pageSize.set($event); page.set(1)"
+      />
+    }
+  </div>
+</eq-table>
+
+<!-- Add / Edit Employee Modal -->
+<ng-template #employeeModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">{{ isEditMode() ? 'Edit' : 'Add' }} Employee</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <div class="eq-employee-form">
+
+      <div class="eq-form-grid">
+        <div class="eq-field">
+          <label>Name <span class="eq-required">*</span></label>
+          <input type="text" [(ngModel)]="modalData.FirstName" />
+        </div>
+        <div class="eq-field">
+          <label>Last Name <span class="eq-required">*</span></label>
+          <input type="text" [(ngModel)]="modalData.LastName" />
+        </div>
+        <div class="eq-field">
+          <label>Designation</label>
+          <input type="text" [(ngModel)]="modalData.Designation" />
+        </div>
+        <div class="eq-field eq-field-wide">
+          <label>Email <span class="eq-required">*</span></label>
+          <input type="email" [(ngModel)]="modalData.Email" />
+        </div>
+        <div class="eq-field">
+          <label>User Type <span class="eq-required">*</span></label>
+          <select [(ngModel)]="modalData.UserTypeValue">
+            <option [ngValue]="null">Select</option>
+            @for (item of userTypeList; track item.ParameterValue) {
+              <option [ngValue]="item.ParameterValue">{{ item.Text }}</option>
+            }
+          </select>
+        </div>
+        <div class="eq-field">
+          <label>Department</label>
+          <select [(ngModel)]="modalData.DepartmentValue">
+            <option [ngValue]="null">Select</option>
+            @for (item of departmentList; track item.ParameterValue) {
+              <option [ngValue]="item.ParameterValue">{{ item.Text }}</option>
+            }
+          </select>
+        </div>
+        <div class="eq-field">
+          <label>Site Access</label>
+          <span class="eq-switch-pair">
+            <label class="eq-switch"><input type="checkbox" [(ngModel)]="modalData.SiteAccess"><span class="slider round"></span></label>
+            <span class="eq-switch-toggle-text">{{ modalData.SiteAccess ? 'Enabled' : 'Disabled' }}</span>
+          </span>
+        </div>
+      </div>
+
+      @if (modalData.SiteAccess) {
+        <div class="eq-form-subtitle">Site Access Credentials</div>
+        <div class="eq-form-grid">
+          <div class="eq-field">
+            <label>Username <span class="eq-required">*</span></label>
+            <input type="text" [(ngModel)]="modalData.UserName" />
+          </div>
+          <div class="eq-field">
+            <label>Password <span class="eq-required">*</span></label>
+            <input type="password" [(ngModel)]="modalData.Password" />
+          </div>
+          <div class="eq-field">
+            <label>Role <span class="eq-required">*</span></label>
+            <select [(ngModel)]="modalData.RoleId">
+              <option [ngValue]="null">Select</option>
+              @for (item of roleList; track item.RoleId) {
+                <option [ngValue]="item.RoleId">{{ item.RoleName }}</option>
+              }
+            </select>
+          </div>
+          <div class="eq-field">
+            <label>Status <span class="eq-required">*</span></label>
+            <select [(ngModel)]="modalData.IsActive">
+              <option [ngValue]="null">Select</option>
+              <option [ngValue]="false">Inactive</option>
+              <option [ngValue]="true">Active</option>
+            </select>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="eq-btn eq-btn-outline" (click)="modal.dismiss()">Close</button>
+    <button type="button" class="eq-btn eq-btn-primary" (click)="saveEmployee(modal)">
+      <i class="icon-check"></i> Save
+    </button>
+  </div>
+</ng-template>

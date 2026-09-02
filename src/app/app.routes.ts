@@ -82,9 +82,8 @@ export const routes: Routes = [
       {
         path: 'employee',
         loadComponent: () =>
-          import('./shared/components/page-placeholder/page-placeholder')
-            .then(m => m.PagePlaceholder),
-        data: { title: 'Employee', icon: 'icon-user' },
+          import('./features/employee/pages/employee/employee')
+            .then(m => m.Employee),
       },
       {
         path: 'master',
