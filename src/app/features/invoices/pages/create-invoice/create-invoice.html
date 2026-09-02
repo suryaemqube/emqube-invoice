@@ -43,7 +43,7 @@
 @if (loading) {
   <div class="eq-loading-block">{{ loadingStatus }}</div>
 } @else {
-  <div class="eq-invoice-layout">
+  <div class="eq-invoice-layout" [class.eq-readonly]="isEdit && !canEdit">
     <div class="eq-invoice-form">
       <!-- Customer -->
       <section class="eq-form-card">
@@ -340,7 +340,7 @@
                       (ngModelChange)="onVatCodeChange(line, $event)"
                     >
                       @for (v of vatCodes; track v.VatCodeId) {
-                        <option [ngValue]="v.VatCodeId">{{ v.VATCodeName }} {{ v.VATRate }}%</option>
+                        <option [ngValue]="v.VatCodeId">{{ v.VATCodeName }}</option>
                       }
                     </select>
                   </td>
@@ -445,16 +445,20 @@
           <span class="eq-mono">{{ aggTotalUAE | number: '1.2-2' }}</span>
         </div>
         <div class="eq-summary-actions">
-          <button class="eq-btn eq-btn-primary eq-btn-block" [disabled]="saving" (click)="save()">
-            <i class="icon-check"></i>
-            {{ saving ? 'Saving…' : isCopy ? 'Save Invoice' : isEdit ? 'Update Invoice' : 'Save Invoice' }}
-          </button>
-          @if (isEdit && !isCopy) {
-            <button class="eq-btn eq-btn-outline eq-btn-block" (click)="printInvoice()">
-              <i class="icon-printer"></i> Print Invoice
+          @if (!isEdit || canEdit) {
+            <button class="eq-btn eq-btn-primary eq-btn-block" [disabled]="saving" (click)="save()">
+              <i class="icon-check"></i>
+              {{ saving ? 'Saving…' : isCopy ? 'Save Invoice' : isEdit ? 'Update Invoice' : 'Save Invoice' }}
             </button>
+          }
+          @if (isEdit && canEdit && !isCopy) {
             <button class="eq-btn eq-btn-outline-danger eq-btn-block" [disabled]="isCancelled" (click)="cancelInvoice()">
               <i class="icon-close"></i> Cancel Invoice
+            </button>
+          }
+          @if (isEdit && !isCancelled && !isCopy) {
+            <button class="eq-btn eq-btn-outline eq-btn-block" (click)="printInvoice()">
+              <i class="icon-printer"></i> Print Invoice
             </button>
           }
         </div>

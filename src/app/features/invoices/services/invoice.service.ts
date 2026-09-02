@@ -18,10 +18,12 @@ import {
   CustomerDetail,
   QuoteOption,
   QuoteModel,
+  QuoteRevisionModel,
   InvoiceFormModel,
   RPaymentTermList,
   RParameterList,
   RStateList,
+  QuoteListModel,
 } from '../models/invoice.model';
 
 @Injectable({ providedIn: 'root' })
@@ -105,6 +107,14 @@ export class InvoiceService {
     return this.api.post<QuoteModel[]>('Invoice', 'GetQuotesList', quoteId);
   }
 
+  getQuoteRevisions(taxInvoiceId: number) {
+    return this.api.post<QuoteRevisionModel[]>('Invoice', 'getQuoteRevisions', taxInvoiceId);
+  }
+
+  addUpdateQuote(model: QuoteModel) {
+    return this.api.post<InvoiceMessage>('Invoice', 'AddUpdateQuote', model);
+  }
+
   addUpdateInvoice(model: InvoiceFormModel) {
     return this.api.post<InvoiceMessage>('Invoice', 'AddUpdateInvoive', model);
   }
@@ -115,5 +125,13 @@ export class InvoiceService {
 
   addPayment(model: PaymentModel) {
     return this.api.post<InvoiceMessage>('Invoice', 'AddPayment', model);
+  }
+
+  getQuoteList() {
+    return this.api.post<QuoteListModel[]>('Invoice', 'GetQuoteList');
+  }
+
+  generateQuote(taxInvoiceId: number) {
+    return this.api.post<string>('Invoice', 'GenerateQuote', taxInvoiceId);
   }
 }

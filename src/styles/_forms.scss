@@ -66,6 +66,8 @@
 .eq-field-label-row label:first-child { margin: 0; }
 
 .eq-field input[type="text"],
+.eq-field input[type="password"],
+.eq-field input[type="email"],
 .eq-field input[type="number"],
 .eq-field textarea {
   width: 100%;
@@ -86,6 +88,30 @@
 .eq-field .eq-field-muted { color: var(--eq-ink-faint); font-style: italic; }
 .eq-field input.eq-field-muted { color: var(--eq-ink-faint); font-style: italic; }
 .eq-field input.eq-mono { font-family: var(--eq-font-mono); }
+
+/* Password field with show/hide toggle */
+.eq-password-wrap { position: relative; display: flex; align-items: center; }
+.eq-password-wrap input { padding-right: 38px; }
+.eq-password-toggle {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--eq-ink-faint);
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: var(--eq-radius-control);
+}
+.eq-password-toggle:hover { color: var(--eq-ink); }
+.eq-password-toggle:focus-visible { outline: 2px solid var(--eq-primary); outline-offset: 1px; }
 
 .eq-field .eq-field-select {
   height: 38px;

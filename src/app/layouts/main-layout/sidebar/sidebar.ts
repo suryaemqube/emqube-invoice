@@ -13,24 +13,8 @@ export class Sidebar {
   masterMenus = input<MenuListItem[]>([]);
   menuClick = output<string>();
 
-  private menuIcons: Record<string, string> = {
-    'Dashboard': 'icon-speedometer',
-    'Invoice': 'icon-doc',
-    'Quote / Proforma': 'icon-note',
-    'Customer': 'icon-people',
-    'Employee': 'icon-user',
-    'Executives': 'icon-star',
-    'Product': 'icon-basket',
-    'ProductCategory': 'icon-tag',
-    'PaymentTerm': 'icon-wallet',
-    'Create Quotation': 'icon-plus',
-    'Quotation List': 'icon-list',
-    'Invoice Report': 'icon-chart',
-  };
-
-  iconFor(menuName: string | undefined): string {
-    if (!menuName) return 'icon-doc';
-    return this.menuIcons[menuName.trim()] || 'icon-doc';
+  cssClassFor(cssClass: string | undefined): string {
+    return cssClass?.trim() || 'icon-doc';
   }
 
   onMenuClick(pageUrl: string): void {

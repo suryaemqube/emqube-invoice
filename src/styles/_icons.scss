@@ -56,6 +56,8 @@
 .icon-magnifier::before { content: "\e090"; }
 .icon-star::before { content: "\e09b"; }
 .icon-credit-card::before { content: "\e025"; }
+.icon-lock::before { content: "\e08e"; }
+
 
 /* ---------- FontAwesome 4.6.3 ---------- */
 @font-face {
@@ -95,6 +97,8 @@
 .fa-close::before { content: "\f00d"; }
 .fa-download::before { content: "\f019"; }
 .fa-edit::before { content: "\f044"; }
+.fa-eye::before { content: "\f06e"; }
+.fa-eye-slash::before { content: "\f070"; }
 .fa-envelope::before { content: "\f0e0"; }
 .fa-exclamation-triangle::before { content: "\f071"; }
 .fa-home::before { content: "\f015"; }

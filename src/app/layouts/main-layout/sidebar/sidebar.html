@@ -1,33 +1,37 @@
 <nav class="eq-sidebar-nav">
   <ul class="eq-nav-list">
-    <!-- SALES section -->
-    <li class="nav-item eq-nav-group-title">SALES</li>
-    @for (item of salesMenus(); track item.ParentMenu.MenuName) {
-      <li class="nav-item">
-        <a class="eq-nav-link"
-           [title]="item.ParentMenu.MenuName"
-           routerLinkActive="active"
-           [routerLink]="item.ParentMenu.PageUrl"
-           (click)="onMenuClick(item.ParentMenu.PageUrl)">
-          <i [class]="iconFor(item.ParentMenu.MenuName)"></i>
-          <span>{{ item.ParentMenu.MenuName }}</span>
-        </a>
-      </li>
+    @if (salesMenus().length > 0) {
+      <!-- SALES section -->
+      <li class="nav-item eq-nav-group-title">SALES</li>
+      @for (item of salesMenus(); track item.ParentMenu.MenuName) {
+        <li class="nav-item">
+          <a class="eq-nav-link"
+             [title]="item.ParentMenu.MenuName"
+             routerLinkActive="active"
+             [routerLink]="item.ParentMenu.PageUrl"
+             (click)="onMenuClick(item.ParentMenu.PageUrl)">
+            <i [class]="cssClassFor(item.ParentMenu.CssClass)"></i>
+            <span>{{ item.ParentMenu.MenuName }}</span>
+          </a>
+        </li>
+      }
     }
 
-    <!-- MASTER DATA section -->
-    <li class="nav-item eq-nav-group-title">MASTER DATA</li>
-    @for (item of masterMenus(); track item.ParentMenu.MenuName) {
-      <li class="nav-item">
-        <a class="eq-nav-link"
-           [title]="item.ParentMenu.MenuName"
-           routerLinkActive="active"
-           [routerLink]="item.ParentMenu.PageUrl"
-           (click)="onMenuClick(item.ParentMenu.PageUrl)">
-          <i [class]="iconFor(item.ParentMenu.MenuName)"></i>
-          <span>{{ item.ParentMenu.MenuName }}</span>
-        </a>
-      </li>
+    @if (masterMenus().length > 0) {
+      <!-- MASTER DATA section -->
+      <li class="nav-item eq-nav-group-title">MASTER DATA</li>
+      @for (item of masterMenus(); track item.ParentMenu.MenuName) {
+        <li class="nav-item">
+          <a class="eq-nav-link"
+             [title]="item.ParentMenu.MenuName"
+             routerLinkActive="active"
+             [routerLink]="item.ParentMenu.PageUrl"
+             (click)="onMenuClick(item.ParentMenu.PageUrl)">
+            <i [class]="cssClassFor(item.ParentMenu.CssClass)"></i>
+            <span>{{ item.ParentMenu.MenuName }}</span>
+          </a>
+        </li>
+      }
     }
   </ul>
 </nav>

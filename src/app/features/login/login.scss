@@ -1,0 +1,49 @@
+.eq-login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--eq-sp-5);
+  background: var(--eq-surface);
+  background: linear-gradient(180deg, var(--eq-surface-alt) 0%, var(--eq-surface-alt) 100%);
+}
+
+.eq-login-card {
+  width: 100%;
+  max-width: 380px;
+  padding: var(--eq-sp-6);
+  background: var(--eq-surface);
+  border-radius: var(--eq-radius-card);
+  box-shadow: var(--eq-shadow-card);
+}
+
+.eq-login-logo {
+  display: block;
+  width: auto;
+  height: 50px;
+  margin: 0 auto var(--eq-sp-4);
+}
+
+.eq-login-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--eq-ink);
+  text-align: center;
+  margin: 0 0 var(--eq-sp-5);
+}
+
+.eq-login-loading {
+  margin-bottom: var(--eq-sp-4);
+  color: var(--eq-ink-muted);
+  font-size: 14px;
+}
+
+.eq-login-submit {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--eq-sp-4);
+}
+
+.eq-field {
+  margin-bottom: 20px;
+}

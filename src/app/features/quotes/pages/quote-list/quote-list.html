@@ -1,0 +1,118 @@
+<!-- Page Head -->
+<div class="eq-page-header">
+  <div>
+    <h1>Quote / Proforma</h1>
+  </div>
+  <a class="eq-btn eq-btn-primary" routerLink="/createquote">
+    <i class="icon-plus"></i> Add Quote/Proforma
+  </a>
+</div>
+
+<!-- Toolbar -->
+<eq-toolbar>
+  <div class="eq-toolbar-search">
+    <i class="icon-magnifier"></i>
+    <input
+      type="text"
+      placeholder="Quote Number, Quote Date, Type, Customer Name, Value, Tax, Division, Product, Sales Executive"
+      [(ngModel)]="filterQuery"
+      (ngModelChange)="onSearchChange()"
+    />
+  </div>
+
+  <div class="eq-toolbar-field">
+    <label>Year</label>
+    <select [(ngModel)]="filterYear" (ngModelChange)="onFilterChange()">
+      <option [ngValue]="0">All Years</option>
+      @for (year of yearList(); track year) {
+        <option [ngValue]="year">{{ year }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="eq-toolbar-field">
+    <label>Division</label>
+    <select [(ngModel)]="filterDivision" (ngModelChange)="onFilterChange()">
+      <option [ngValue]="''">All Divisions</option>
+      @for (d of divisionOptions(); track d) {
+        <option [ngValue]="d">{{ d }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="eq-toolbar-field">
+    <label>Customer</label>
+    <select [(ngModel)]="filterCustomer" (ngModelChange)="onFilterChange()">
+      <option [ngValue]="''">All Customers</option>
+      @for (c of customerOptions(); track c) {
+        <option [ngValue]="c">{{ c }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="eq-toolbar-field">
+    <label>Type</label>
+    <select [(ngModel)]="filterType" (ngModelChange)="onFilterChange()">
+      <option [ngValue]="''">All Types</option>
+      @for (t of typeOptions(); track t) {
+        <option [ngValue]="t">{{ t }}</option>
+      }
+    </select>
+  </div>
+
+  <button class="eq-btn eq-btn-outline eq-toolbar-clear" (click)="clearFilters()">
+    <i class="icon-close"></i> Clear Filter
+  </button>
+</eq-toolbar>
+
+<!-- Table -->
+<eq-table [columns]="columns" [loading]="loading()">
+  <ng-container eqTableBody>
+    @for (row of pageSlice(); track row.TaxInvoiceId) {
+      <tr>
+        <td>
+          <span class="eq-mono">{{ row.QuoteNumber }}<small> - {{ row.QuotetypeText }}</small></span>
+        </td>
+        <td class="eq-nowrap">{{ row.QuoteDateString }}</td>
+        <td class="name">
+          <a class="eq-link"
+             [routerLink]="['/createquote', row.TaxInvoiceId]">{{ row.CustomerName }}</a>
+        </td>
+        <td class="num">{{ row.CurrencySymbol }} {{ row.InvoiceTotal | number:'1.2-2' }}</td>
+        <td class="num">{{ row.CurrencySymbol }} {{ row.TotalVAT | number:'1.2-2' }}</td>
+        <td>{{ row.DivisionName }}</td>
+        <td>{{ row.ProductName }}</td>
+        <td>{{ row.SExecutiveName }}</td>
+        <td class="eq-col-action">
+          <eq-dropdown
+            [items]="getRowActions()"
+            (itemClick)="onRowAction($event, row)"
+          />
+        </td>
+      </tr>
+    } @empty {
+      <tr>
+        <td [attr.colspan]="columns.length" class="eq-empty-row">
+          <div class="eq-empty">
+            <div class="eq-empty-icon"><i class="icon-note"></i></div>
+            <h2>No quotes found</h2>
+            <p>Try adjusting your search query or filters.</p>
+            <button class="eq-btn eq-btn-outline" (click)="clearFilters()">Clear Filter</button>
+          </div>
+        </td>
+      </tr>
+    }
+  </ng-container>
+
+  <div eqTableFoot>
+    @if (!loading()) {
+      <eq-paginator
+        [totalItems]="filteredList().length"
+        [page]="page()"
+        [pageSize]="pageSize()"
+        (pageChange)="page.set($event)"
+        (pageSizeChange)="pageSize.set($event); page.set(1)"
+      />
+    }
+  </div>
+</eq-table>

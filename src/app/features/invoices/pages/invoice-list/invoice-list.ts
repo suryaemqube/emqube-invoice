@@ -20,7 +20,7 @@ import { EqDropdown, EqDropdownItem } from '../../../../shared/components/eq-dro
 import { EqBadge } from '../../../../shared/components/eq-badge/eq-badge';
 import { EqToolbar } from '../../../../shared/components/eq-toolbar/eq-toolbar';
 import { ToastService } from '../../../../shared/services/toast.service';
-import { environment } from '../../../../../environments/environment';
+import { ConfigService } from '../../../../core/services/config.service';
 
 const STORAGE_KEY = 'InvoiceFilters';
 
@@ -45,6 +45,7 @@ export class InvoiceList implements OnInit {
   private router = inject(Router);
   private modalService = inject(NgbModal);
   private toast = inject(ToastService);
+  private config = inject(ConfigService);
 
   @ViewChild('paymentModal') paymentModalRef!: TemplateRef<unknown>;
 
@@ -292,7 +293,9 @@ export class InvoiceList implements OnInit {
   onRowAction(item: EqDropdownItem, row: InvoiceListModel): void {
     switch (item.label) {
       case 'Edit Invoice':
-        this.router.navigate(['/createinvoice', row.TaxInvoiceId]);
+        this.router.navigate(['/createinvoice', row.TaxInvoiceId], {
+          queryParams: { editable: row.IsEditable === 1 ? 1 : 0 },
+        });
         break;
       case 'Record Payment':
         this.openPaymentModal(row);
@@ -344,7 +347,7 @@ export class InvoiceList implements OnInit {
     this.api.generateInvoice(taxInvoiceId).subscribe({
       next: (fileName) => {
         if (fileName) {
-          const baseUrl = environment.apiUrl.replace(/\/api$/, '');
+          const baseUrl = this.config.fileBaseUrl;
           window.open(`${baseUrl}/Documents/Invoice/${fileName}`, '_blank');
         }
       },

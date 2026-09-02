@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Improvements, Bug Fixes &amp; Cleanup — EmQube Invoice</title>
+  <style>
+    :root {
+      --bg: #f5f7f9;
+      --surface: #ffffff;
+      --border: #dce3ea;
+      --ink: #16202b;
+      --ink-muted: #57697c;
+      --ink-faint: #8496a8;
+      --primary: #0d9c4a;
+      --primary-soft: #e4f5ea;
+      --amber: #b4700a;
+      --amber-soft: #fbf0de;
+      --red: #c23b3b;
+      --red-soft: #fbeaea;
+      --info: #2c6e9e;
+      --info-soft: #e5eff6;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: ui-monospace, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      padding: 32px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 40px 48px;
+      box-shadow: 0 1px 2px rgba(22,32,43,0.05), 0 6px 16px -8px rgba(22,32,43,0.12);
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 4px;
+      color: var(--ink);
+    }
+
+    .subtitle {
+      color: var(--ink-muted);
+      font-size: 13.5px;
+      margin-bottom: 8px;
+    }
+
+    .status-line {
+      margin-bottom: 28px;
+    }
+
+    h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-top: 36px;
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+      scroll-margin-top: 16px;
+    }
+
+    h2 .section-num {
+      color: var(--ink-faint);
+      font-weight: 600;
+      margin-right: 6px;
+    }
+
+    h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-top: 20px;
+      margin-bottom: 8px;
+    }
+
+    p { margin-bottom: 12px; color: var(--ink); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+
+    th {
+      background: #edf1f5;
+      text-align: left;
+      padding: 8px 12px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 700;
+      color: var(--ink-muted);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--ink);
+      vertical-align: top;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #f5f7f9; }
+
+    code, .mono {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      background: #edf1f5;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    ul, ol {
+      margin-bottom: 12px;
+      padding-left: 24px;
+    }
+
+    li { margin-bottom: 4px; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+    }
+    .badge-green { background: var(--primary-soft); color: var(--primary); }
+    .badge-amber { background: var(--amber-soft); color: var(--amber); }
+    .badge-red { background: var(--red-soft); color: var(--red); }
+    .badge-info { background: var(--info-soft); color: var(--info); }
+    .badge-neutral { background: #edf1f5; color: var(--ink-muted); border: 1px solid var(--border); }
+
+    .callout {
+      background: var(--info-soft);
+      border-left: 3px solid var(--info);
+      padding: 12px 16px;
+      border-radius: 0 6px 6px 0;
+      margin-bottom: 16px;
+      font-size: 13px;
+      color: var(--ink);
+    }
+    .callout-warn { background: var(--amber-soft); border-left-color: var(--amber); }
+    .callout-success { background: var(--primary-soft); border-left-color: var(--primary); }
+
+    a { color: var(--info); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .toc { margin-bottom: 8px; }
+    .toc ol { padding-left: 22px; }
+    .toc li { margin-bottom: 3px; font-size: 13.5px; }
+
+    /* What / Why item block */
+    .item {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin-bottom: 14px;
+      background: #fbfcfd;
+    }
+    .item-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .what, .why {
+      position: relative;
+      padding-left: 14px;
+      margin-bottom: 8px;
+    }
+    .what {
+      border-left: 3px solid var(--info);
+    }
+    .why {
+      border-left: 3px solid var(--primary);
+      margin-bottom: 0;
+    }
+    .what .tag, .why .tag {
+      display: inline-block;
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 2px;
+    }
+    .what .tag { color: var(--info); }
+    .why .tag { color: var(--primary); }
+    .what p, .why p { margin-bottom: 0; font-size: 13.5px; }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 32px 0;
+    }
+
+    .file-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 20px;
+      margin-bottom: 16px;
+    }
+    .file-grid .mono { background: none; padding: 0; font-size: 12.5px; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <h1>Improvements, Bug Fixes &amp; Cleanup</h1>
+  <p class="subtitle">What we did on the EmQube Invoice rewrite, and why — organised by functional area (functionality-wise).</p>
+  <p class="subtitle status-line">
+    <span class="badge badge-green">Status as of 2026-09-02</span>&nbsp;
+    <span class="badge badge-neutral">Complements <code>docs/CURRENT-WORK.md</code>&nbsp;/&nbsp;<code>DECISIONS.md</code></span>
+  </p>
+
+  <div class="callout">
+    This is the running log of <b>improvements, bug fixes and cleanup</b> made while porting the legacy
+    app to the new Angular app. Every entry records <b>what</b> was done (functionality-wise) and <b>why</b>
+    it was done — either to match the old app's real behaviour, or to fix something that was broken or
+    misleading. It does <b>not</b> re-describe screens that are straight ports; only the meaningful changes
+    and the reasoning behind them.
+  </div>
+
+  <div class="toc">
+    <h2 style="border:none;margin-top:0;">Contents</h2>
+    <ol>
+      <li><a href="#login">Login</a></li>
+      <li><a href="#change-password">Change Password</a></li>
+      <li><a href="#auth">Session &amp; auth</a></li>
+      <li><a href="#sidebar">Role-driven menu &amp; sidebar</a></li>
+      <li><a href="#profile">Profile menu (login time)</a></li>
+      <li><a href="#config">UAT / LIVE runtime config</a></li>
+      <li><a href="#invoice-list">Invoice List</a></li>
+      <li><a href="#create-invoice">Create / Edit Invoice</a></li>
+      <li><a href="#copy-invoice">Copy Invoice</a></li>
+      <li><a href="#edit-gating">Edit gating (read-only view)</a></li>
+      <li><a href="#quote-list">Quote List</a></li>
+      <li><a href="#create-quote">Create / Edit Quote</a></li>
+      <li><a href="#customer-list">Customer List</a></li>
+      <li><a href="#shared">Shared building blocks</a></li>
+      <li><a href="#cross-cutting">Cross-cutting cleanup</a></li>
+      <li><a href="#urls">URLs &amp; navigation (how edit/copy links work)</a></li>
+    </ol>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- ================= LOGIN ================= -->
+  <h2 id="login"><span class="section-num">1.</span>Login</h2>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-green">Improvement</span> Branded logo on the login screen</div>
+    <div class="what"><span class="tag">What</span><p>
+      Replaced the plain "EmQube" text brand with the actual logo image
+      (<code>&lt;img src="/media/emqube-logo-black.svg"&gt;</code>, served from a copy under
+      <code>public/media/</code>).
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      Brand presence on the entry screen, consistent with the company identity the old app used.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-green">Improvement</span> White login background</div>
+    <div class="what"><span class="tag">What</span><p>
+      Login page background changed from the default grey to white (<code>var(--eq-surface)</code>).
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      Cleaner look against the auth layout; visually consistent with the rest of the app's surfaces.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-green">Improvement</span> Show / hide password toggle</div>
+    <div class="what"><span class="tag">What</span><p>
+      Added an eye toggle (<code>fa-eye</code> / <code>fa-eye-slash</code>) behind a
+      <code>.eq-password-wrap</code> + <code>.eq-password-toggle</code> button that switches the password
+      field between <code>type="password"</code> and <code>type="text"</code>.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      Passwords are typed on a touch display / shared screens; letting the user verify what they typed
+      reduces login failures. Also mirrors the same pattern used on the Change Password page.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-green">Improvement</span> Compact, right-aligned Sign In button</div>
+    <div class="what"><span class="tag">What</span><p>
+      Sign In is now the shared <code>eq-btn-sm</code> variant and right-aligned on the card.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      Tighter visual rhythm on the card; the large full-width button was over-bearing for a single-field form.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-green">Improvement</span> Login inputs use the shared field style</div>
+    <div class="what"><span class="tag">What</span><p>
+      The global <code>_forms.scss</code> <code>.eq-field</code> rule was extended to include
+      <code>input[type="password"]</code> and <code>input[type="email"]</code>, so the login (and change
+      password) inputs now use the exact same styling as the create/edit invoice fields — 38px tall,
+      13.5px text, <code>--eq-border</code>, radius, and the primary focus ring.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      Before this, login fields looked subtly different from every other form field in the app. One shared
+      source of truth instead of a duplicated bespoke style.
+    </p></div>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- ================= CHANGE PASSWORD ================= -->
+  <h2 id="change-password"><span class="section-num">2.</span>Change Password</h2>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-green">Improvement</span> Old-password field added</div>
+    <div class="what"><span class="tag">What</span><p>
+      The form now has an <b>Old Password</b> field in addition to New / Confirm, and all three fields get
+      their own independent eye toggle.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      The backend <code>ChangePasswordModel</code> / <code>SP ChangePassword(userId, OldPassword, NewPassword)</code>
+      requires the old password (it is encrypted server-side). Without the field the request could not be built
+      to the real contract, and a change could silently fail the old-password check.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-green">Improvement</span> Payload now matches the backend</div>
+    <div class="what"><span class="tag">What</span><p>
+      POST <code>Common/ChangePassword</code> sends <code>{ userId: profileId, OldPassword, NewPassword, ConfirmPassword }</code>
+      and validates old + new entered and new == confirm before submitting.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      Matches the real backend contract exactly; client-side validation avoids round-trips for the most
+      common mistakes.
+    </p></div>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- ================= AUTH ================= -->
+  <h2 id="auth"><span class="section-num">3.</span>Session &amp; auth</h2>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-info">Design</span> Session = the login payload, not a token</div>
+    <div class="what"><span class="tag">What</span><p>
+      <code>UserService</code> + <code>core/models/user.model.ts</code> describe the session. The authed session
+      is the <code>Login</code> payload stored as <code>localStorage.userDetails</code>; an <code>authGuard</code>
+      redirects unauthenticated users back to <code>/login</code>.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      The backend sends <b>no Authorization header at all</b> — role/user context is passed as plain body
+      values, so the login payload <i>is</i> the session. The scaffolded Bearer-token interceptor is effectively
+      dead code for now and was left in place rather than wired to something that doesn't exist.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-neutral">Scope</span> Direct <code>Common/GetLogin</code> only (no SSO)</div>
+    <div class="what"><span class="tag">What</span><p>
+      Only the direct username/password path is ported. The central-login SSO flow (<code>Common/GetLoginCDB</code>
+      + <code>/sso/validate-code</code>) is <b>not</b> ported.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      Deliberate scope decision (recorded in <code>DECISIONS.md</code>) — the direct path is what the old app
+      actually runs day-to-day; SSO needs its own separate, explicitly-requested effort.
+    </p></div>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- ================= SIDEBAR ================= -->
+  <h2 id="sidebar"><span class="section-num">4.</span>Role-driven menu &amp; sidebar</h2>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-green">Improvement</span> Menu grouping &amp; icons are now data-driven</div>
+    <div class="what"><span class="tag">What</span><p>
+      <code>main-layout.ts</code> splits Sales vs Master menus by the real
+      <code>ParentMenu.MenuGroup === 'Sales'</code> flag from <code>Common/GetSiteuserMenuList(roleId)</code>,
+      and <code>sidebar.ts</code> binds icons to the API's <code>ParentMenu.CssClass</code>. The hardcoded
+      name&rarr;group and name&rarr;icon maps were deleted.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      Previously any DB menu change (new menu, renamed menu, new icon) required a frontend code change. Now
+      the sidebar is a pure reflection of the data, so it can't drift from the backend.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-red">Bug fix</span> Executive / empty-role sidebar hidden</div>
+    <div class="what"><span class="tag">What</span><p>
+      Confirmed the real role table: <code>1=Admin, 2=Manager, 3=Executive, 4=SuperAdmin</code> (<b>Role 4 is
+      SuperAdmin, not Admin</b>). Executive (Role 3) has <b>no <code>MenuRole</code> rows</b> &rarr; empty menu.
+      When a role has no menus the hamburger button, <code>&lt;aside&gt;</code> sidebar and mobile backdrop are
+      all removed from the DOM via <code>@if (hasMenus)</code>, and a <code>body.eq-no-sidebar</code> class makes
+      <code>.eq-main</code>/<code>.eq-footer</code> full-width (brand width anchored at 160px).
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      An executive logging in used to land on a broken empty shell with a dangling hamburger and a dead sidebar.
+      Now the content area simply takes the full width — a clean, usable screen for a role with no menus.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-red">Bug fix</span> No dangling group titles on empty groups</div>
+    <div class="what"><span class="tag">What</span><p>
+      Both <code>SALES</code> and <code>MASTER DATA</code> section titles are now wrapped in <code>@if (…)</code>,
+      so an empty group renders no header at all.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      Roles with Sales-only menus (e.g. Manager) previously showed a meaningless empty "MASTER DATA" title;
+      roles with nothing showed an orphaned title.
+    </p></div>
+  </div>
+
+  <div class="callout">
+    <b>Important context:</b> the earlier assumption that <code>roleId == 4</code> meant "admin" was wrong and was
+    actively dangerous for edit-gating logic (see §10). Role 4 is <b>SuperAdmin</b>; the actual <code>admin</code>
+    user has <code>RoleId 1</code>.
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- ================= PROFILE ================= -->
+  <h2 id="profile"><span class="section-num">5.</span>Profile menu (login time)</h2>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-green">Improvement</span> Last-login shown in the profile dropdown</div>
+    <div class="what"><span class="tag">What</span><p>
+      A <code>login-time pull-left</code> span now sits inside the profile menu header as a direct child on its own
+      row (flex row, top-border separator). The <code>loginTime</code> getter formats <code>LastLogin</code> as
+      <code>d/M/yyyy, h:mm:ss am/pm</code>, and the span only renders when the value exists.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      Shows the real last-login info the old app kept, without cluttering the main header — useful when a shared
+      machine was used by someone else.
+    </p></div>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- ================= CONFIG ================= -->
+  <h2 id="config"><span class="section-num">6.</span>UAT / LIVE runtime config</h2>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-green">Improvement</span> Runtime API URL switching via <code>config.json</code></div>
+    <div class="what"><span class="tag">What</span><p>
+      <code>public/config.json</code> holds <code>{ apiUrl, fileBaseUrl }</code>. A new <code>ConfigService</code>
+      (<code>core/services/config.service.ts</code>) loads it at bootstrap through an <code>APP_INITIALIZER</code>
+      wired in <code>app.config.ts</code>. <code>ApiService.post</code> now targets <code>configService.apiUrl</code>,
+      and both print consumers (<code>invoice-list.ts</code>, <code>create-invoice.ts</code>) open generated PDFs from
+      <code>configService.fileBaseUrl</code> (<code>/Documents/Invoice/{file}</code>, <code>/Documents/Quote/{file}</code>).
+      Falls back to <code>environment.apiUrl</code> if the file is missing.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      The same build now targets UAT <b>or</b> LIVE just by deploying a different <code>config.json</code> — no
+      rebuild per environment. Print URLs need the file base because the API returns only a file name/path, not
+      a full URL.
+    </p></div>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- ================= INVOICE LIST ================= -->
+  <h2 id="invoice-list"><span class="section-num">7.</span>Invoice List</h2>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-red">Bug fix</span> KPI cards under-counted new invoices</div>
+    <div class="what"><span class="tag">What</span><p>
+      KPIs previously parsed <code>InvoiceDateString</code> — the <code>d/M/yyyy</code> display string — with
+      <code>new Date()</code>, which fails on that format. They now parse the ISO <code>InvoiceDate</code>
+      (falling back to the string), exactly like the old app (which parses <code>item.InvoiceDate</code> for KPI
+      math and uses the string only for display). Same fix applied to <code>PaymentRecdDate</code> for
+      "Paid this month". Unused <code>extractYear()</code> removed.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      Newly created/copied invoices silently vanished from "Invoiced this month" and "Outstanding (YR)" because
+      their date string could not be parsed. The numbers now count real invoices.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-green">Improvement</span> Outstanding KPI converts to AED at the invoice's saved rate</div>
+    <div class="what"><span class="tag">What</span><p>
+      "Outstanding (YR …)" now sums <code>InvoiceTotal × (ConversionRate || 1)</code> over non-cancelled, unpaid,
+      same-year invoices. The backend list already returns per-row <code>ConversionRate</code>; the field was added
+      to the frontend <code>InvoiceListModel</code> to consume it.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      USD (or any other-currency) invoices were being summed raw against AED invoices, so the card was wrong for
+      any shop with foreign-currency invoices. Converting at the rate recorded <i>on the invoice</i> matches the
+      business rule that each invoice's rate is fixed at creation.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-red">Cleanup</span> Endpoint hygiene on the list</div>
+    <div class="what"><span class="tag">What</span><p>
+      The new list calls the real <code>Invoice/GetCustomerList</code>. The old <code>invoicelist.component.ts</code>
+      called <code>Invoice/GetCustomers</code> — which <b>does not exist</b> — for months and it only surfaced when the
+      feature was actually wired up.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      Don't carry a dormant, broken call into the rewrite. Every endpoint is checked against the real controller
+      source before being built around (see <code>KNOWN-ISSUES.md</code>).
+    </p></div>
+  </div>
+
+  <div class="callout-success">
+    <b>Also present (straight ports, no change of behaviour):</b> search + Year/Status/Division/Customer filter toolbar
+    with clear button, KPI cards, 9-column table with inline status badges and division icons, action dropdown
+    (Edit always, Record Payment for due invoices, Print for non-cancelled), pagination (50/100/150), empty state,
+    skeleton loading, and filter persistence via localStorage (saved on change, restored once then deleted).
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- ================= CREATE / EDIT INVOICE ================= -->
+  <h2 id="create-invoice"><span class="section-num">8.</span>Create / Edit Invoice</h2>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-red">Bug fix</span> Loader freeze — form stuck on "Loading invoice form…"</div>
+    <div class="what"><span class="tag">What</span><p>
+      Root cause was change detection not re-rendering after <code>loading=false</code> even though all 13 boot
+      endpoints returned 200. Forced with <code>ChangeDetectorRef.detectChanges()</code> in the forkJoin next/error
+      handlers and in <code>loadInvoice()</code>. Also added per-group <code>timeout(15000)</code> +
+      <code>catchError → of(null)</code> and a 30s safety cap.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      The screen could be permanently stuck on loading for no real reason. The fallbacks also make one slow/failed
+      master-data endpoint degrade gracefully instead of blocking the whole form.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-red">Bug fix</span> Edit-load showed €0.00 / wrong status (VAT-code mapping)</div>
+    <div class="what"><span class="tag">What</span><p>
+      The backend DTO sends <code>VATCodeId</code> (capital), but the model read <code>VatCodeId</code>. Every loaded
+      line's VAT code became 0, <code>calculateTax()</code> skipped all lines, totals stayed 0, and the status badge
+      fell into the "Cancelled" heuristic (<code>InvoiceTotal == 0 &amp;&amp; TotalVAT == 0</code>). Fixed in
+      <code>normalizeRow()</code> to read <code>VATCodeId ?? VatCodeId</code>, with an <code>InvoiceVatRate</code>
+      fallback for the rate.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      Editing any saved invoice silently showed zeroed totals and a wrong status badge. This was the exact kind of
+      "same name, different casing" bug the docs warn about — the frontend model and the backend DTO disagreed.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-red">Bug fix</span> Cancelled invoices resurrected as "Paid"</div>
+    <div class="what"><span class="tag">What</span><p>
+      <code>cancelledOnLoad</code> is now captured from the backend header (<code>InvoiceTotal==0 &amp;&amp; TotalVAT==0</code>)
+      <b>before</b> <code>calculateTax()</code> runs, and <code>isCancelled</code> uses it for loaded invoices.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      <code>calculateTax()</code> recomputes totals from line <code>Qty × Rate</code> on load, which resurrected
+      non-zero totals on a cancelled invoice &rarr; it showed "Paid" and exposed the Copy button. New and copy
+      invoices are never treated as cancelled.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-green">Improvement</span> Header meta mirrors the old screen</div>
+    <div class="what"><span class="tag">What</span><p>
+      Edit mode now shows <code>Paid/Due/Cancelled badge · Customer Name · Invoiced {date} · Read-only badge</code>,
+      driven by the <code>invoiceDateLabel</code> getter. Back button reads "Back to Invoices".
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      At-a-glance status and context without opening the form; matches the old screen's information density.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-green">Improvement</span> Payment date is <b>not</b> auto-computed</div>
+    <div class="what"><span class="tag">What</span><p>
+      Removed <code>applyPaymentDate()</code> auto-fill from <code>onInvoiceDatePicked</code> /
+      <code>onPaymentTermPicked</code>. Payment date is only set when the user picks it (or parsed from the stored
+      value on edit-load). Bounds relaxed to the global invoice-date range (2017-06-10 &rarr; today).
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      The old app's <code>SetPaymentDate()</code> is defined but <b>never invoked</b>, and its payment-date input has
+      no change handler — so the old app never filled it automatically either. Matching the real behaviour beats
+      adding invisible magic that would change saved data.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-green">Improvement</span> Line table no longer forces page scroll</div>
+    <div class="what"><span class="tag">What</span><p>
+      Removed the fixed <code>&lt;colgroup&gt;</code> pixel widths; set <code>min-width: 0</code> + <code>table-layout: auto</code>
+      locally, and reused the old <code>num</code>/<code>actions</code> column classes.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      The fixed widths made the table wider than the viewport and pushed the whole page into horizontal scroll.
+    </p></div>
+  </div>
+
+  <div class="callout-success">
+    <b>Also present (faithful ports):</b> new quote pre-fill from the customer-quote selector; edit-load via
+    <code>GetInvoicesList</code> with back-solved discount mode; per-line discount (percent/flat) with live tax
+    recalc; VAT-code-grouped summary under the grid; faithful tax math for both the standard and simplified
+    (<code>IsTaxInclusive || VATType === 1</code>) branches; TinyMCE terms editor; save posts the whole form to the
+    (misspelled, kept as-is) <code>AddUpdateInvoive</code> endpoint &rarr; toast + redirect.
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- ================= COPY INVOICE ================= -->
+  <h2 id="copy-invoice"><span class="section-num">9.</span>Copy Invoice</h2>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-green">Improvement</span> In-page copy (no route change)</div>
+    <div class="what"><span class="tag">What</span><p>
+      Header <b>Copy</b> button on the edit page (<code>isEdit &amp;&amp; !isCancelled &amp;&amp; !isCopy</code>) opens an
+      ng-bootstrap confirm modal; <b>Yes</b> → <code>copyInvoice()</code>: sets <code>isCopy=true</code>, nulls
+      <code>TaxInvoiceId</code>, <code>InvoiceNumber</code>, and the Invoice/Delivery/Payment dates, and zeroes each
+      line's <code>TAXInvoiceDetailId</code>/<code>TaxInvoiceId</code>. Customer, lines and footer text are kept.
+      Saving then posts to the same <code>AddUpdateInvoive</code> endpoint and the backend creates a brand-new invoice.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      Matches the old app's copy semantics (same screen, data kept for review, new ids on save) without a
+      localStorage hand-off flag. A real copy is more useful than a blank form because it starts from the edited
+      source data.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-green">Improvement</span> Copy clears all dates, incl. payment</div>
+    <div class="what"><span class="tag">What</span><p>
+      <code>form.Payment*</code>, <code>paymentDateStruct</code> and the other date fields are all nulled, and a
+      <code>setTimeout(cdr.detectChanges())</code> makes the datepicker inputs visibly clear after the modal closes.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      The user should re-date the copy. Matches the old app, which also nulls the payment date in <code>CopyItem</code>.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-red">Bug fix</span> Copy blocked for cancelled invoices</div>
+    <div class="what"><span class="tag">What</span><p>
+      The Copy button is hidden and <code>copyInvoice()</code> guards on <code>isCancelled</code>.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      Copying a cancelled (then resurrected-totals) invoice was the symptom of the status bug in §8; once status is
+      correct, copying a cancelled invoice is meaningless.
+    </p></div>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- ================= EDIT GATING ================= -->
+  <h2 id="edit-gating"><span class="section-num">10.</span>Edit gating (read-only view)</h2>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-info">Design</span> Per-invoice read-only, not per-role</div>
+    <div class="what"><span class="tag">What</span><p>
+      <code>canEdit</code> = <code>invoiceEditable === 1</code> for saved edits (new/copy drafts always editable).
+      The invoice <b>list</b> passes the row's <code>IsEditable</code> to the edit route via the <code>editable</code>
+      query param (this replaces the old app's async <code>localStorage.IsEditable</code> hand-off). Default is
+      <b>0</b>, so an edit reached without an explicit <code>editable=1</code> renders read-only. The
+      <code>eq-readonly</code> class locks the form layout (<code>pointer-events:none</code>, re-enabling
+      <code>.eq-summary-actions</code>); <b>Save</b> + <b>Cancel Invoice</b> are hidden when <code>!canEdit</code>,
+      while <b>Copy</b> (header) and <b>Print</b> (summary) stay available.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      Mirrors the old app exactly: a locked invoice (<code>IsEditable != 1</code>) is a read-only view regardless of
+      who is logged in. Copy/Print are <b>not</b> permission-gated (only <code>IsCancel==false</code>) — same as the
+      old app. The <code>roleId == 4 always-edit</code> branch was dropped: the admin's real <code>RoleId</code> is 1,
+      so the only thing that ever unlocks a locked invoice is <code>IsEditable == 1</code> itself.
+    </p></div>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- ================= QUOTE LIST ================= -->
+  <h2 id="quote-list"><span class="section-num">11.</span>Quote List</h2>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-red">Bug fix (avoided)</span> Real field is <code>InvoiceRevNumber</code></div>
+    <div class="what"><span class="tag">What</span><p>
+      <code>QuoteListModel.InvoiceRevNumber</code> (string) is the real field. The old template rendered
+      <code>{{row.QuoteRevNumber}}</code>, which doesn't exist on the model — an old-app bug we did <b>not</b> port.
+      (It is simply not rendered; the model carries the real field.)
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      Rendering an undefined field would show <code>undefined</code>/empty in the new grid; the actual revision number
+      lives in <code>InvoiceRevNumber</code>.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-red">Bug fix (avoided)</span> No <code>Invoice/GetCustomers</code> call</div>
+    <div class="what"><span class="tag">What</span><p>
+      The old <code>quotelist.component.ts</code> calls the non-existent <code>Invoice/GetCustomers</code> (real:
+      <code>Invoice/GetCustomerList</code>) — the same bug as the old invoice list, still unfixed there. The new
+      quote list does not call it at all.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      Same endpoint-hygiene rule as §7: never build a service around an action the controller doesn't expose.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-green">Improvement</span> Division / Customer / Type filters added</div>
+    <div class="what"><span class="tag">What</span><p>
+      The quote list now has <b>Division</b>, <b>Customer</b> and <b>Type</b> filter dropdowns alongside Year
+      and search. Options are derived client-side from the loaded list
+      (<code>divisionOptions</code>/<code>customerOptions</code>/<code>typeOptions</code> computed signals over
+      distinct <code>DivisionName</code>/<code>CustomerName</code>/<code>QuotetypeText</code> values), applied in
+      <code>filteredList</code>, and persisted in the same <code>QuoteFilters</code> localStorage blob as the
+      year/query.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      The old quote list had no such filters (only search), but the backend list already returns all three fields,
+      so filtering client-side is free and matches the invoice list's filter model.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-red">Bug fix</span> Date column collapsed on later pages</div>
+    <div class="what"><span class="tag">What</span><p>
+      On page 2 the Date column shrunk and <code>10-01-2025</code> wrapped over 3 lines. Cause:
+      <code>.eq-table</code> uses <code>table-layout: auto</code>, so column widths are recomputed from each page's
+      visible rows — a different page's content re-balanced the columns and squeezed the date. Fixed by making the
+      date cell non-wrapping (<code>.eq-table td.eq-nowrap { white-space: nowrap }</code> in quote-list.scss) and
+      giving the Date column a <code>width: '90px'</code> hint.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      A dates column is short fixed-width content; allowing the auto-layout to shove it down below its own text
+      width is the whole bug. With a nowrap cell the column can never shrink below the date's width on any page.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-green">Improvement</span> Type moved inline with the quote number</div>
+    <div class="what"><span class="tag">What</span><p>
+      The standalone <b>Type</b> column was removed; the type now renders next to the number in the first cell —
+      <code>&lt;span class="eq-mono"&gt;2026-43 &lt;small&gt; - Proforma&lt;/small&gt;&lt;/span&gt;</code> — one
+      column freed up and the grid reads tighter. The Type <i>filter</i> is unaffected (it filters on
+      <code>QuotetypeText</code> regardless of where it renders).
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      A whole column for a 1-word value wasted horizontal space on a 10-column table; the number+type combo is
+      compact and keeps the same information visible.
+    </p></div>
+  </div>
+
+  <div class="callout-success">
+    <b>Also present (straight port):</b> search + Year toolbar, <b>no KPI cards</b> (the old quote list has none),
+    paginated table (default 100, 50/100/150), skeleton loading, empty state, <code>QuoteFilters</code> localStorage
+    persistence (year + query + division + customer + type), columns for number+type / date / customer-link / value /
+    tax / division / product / sales executive, and row actions: Edit → <code>/createquote/:id</code>, Copy →
+    <code>/createquote/:id?copy=1</code>, Print → <code>Invoice/GenerateQuote</code> →
+    <code>/Documents/Quote/{file}</code> via <code>ConfigService.fileBaseUrl</code>.
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- ================= CREATE / EDIT QUOTE ================= -->
+  <h2 id="create-quote"><span class="section-num">12.</span>Create / Edit Quote</h2>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-green">Improvement</span> Revisions table uses the real field</div>
+    <div class="what"><span class="tag">What</span><p>
+      The revisions card (loaded via <code>Invoice/getQuoteRevisions</code>) shows <b>Version</b> =
+      <code>rev.QuoteNumber</code> and <b>Date</b> = <code>rev.CreatedOn</code> (formatted), with a per-version
+      <b>Print PDF</b> action. The old app concatenated <code>{{item.QuoteNumber}}{{item.QuoteRevNumber}}</code> —
+      but the backend <code>QuoteRevisionModel</code> has no <code>QuoteRevNumber</code> field, so the old screen
+      rendered garbage like <code>Q-0001undefined</code>.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      Faithful-to-intent but not faithful-to-bug: we show what the old screen <i>meant</i> (version + date + pdf),
+      using a field that actually exists.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-info">Design</span> Quote VAT &amp; totals follow the quote formula, not the invoice formula</div>
+    <div class="what"><span class="tag">What</span><p>
+      Quotes use a <b>single shared VAT code</b> across all lines (one header select), a <b>header-level discount</b>
+      (percent or flat), and the saved totals are computed on the <b>discounted</b> pretax:
+      <code>aggPreTax = sum(qty×rate) − discount</code>, <code>aggTax = aggPreTax × VATRate</code>,
+      <code>aggTotal = aggPreTax + aggTax</code>. No tax-inclusive / simplified math. This exactly matches the old
+      create-quote's <code>CalculateTaxAmount()</code>, which differs from the invoice branch.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      The numbers the backend stores and reports are these discounted-pretax totals. A "cleaner" invoice-style
+      calculation would change saved values for any quote with a discount — a silent behavioural regression.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-info">Design</span> Quotes are always editable</div>
+    <div class="what"><span class="tag">What</span><p>
+      The create-quote page has no read-only mode and no <code>editable</code> query param; the <code>Quote/Proforma</code>
+      radio re-enables in copy mode.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      The old create-quote screen had no per-quote <code>IsEditable</code> lock (unlike invoices), so there is nothing
+      to gate on — copying the invoice gating here would invent a restriction the old app doesn't have.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-green">Improvement</span> Copy uses the same in-page pattern as invoices</div>
+    <div class="what"><span class="tag">What</span><p>
+      Header <b>Copy</b> button (edit mode only) → confirm modal → <code>copyQuote()</code>: <code>isCopy=true</code>,
+      <code>QuoteId</code>/<code>QuoteNumber</code>/<code>QuoteRevNumber</code> nulled, per-line
+      <code>QuoteDetailId</code>s nulled, toast. The list's <code>?copy=1</code> route does the same thing on load.
+      Saving posts the whole form to <code>Invoice/AddUpdateQuote</code> and the backend assigns a new quote.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      Mirror the old app's localStorage <code>invoiceIdcopy</code> flag — but via the route/query param the list
+      already passes, so no cross-screen global state.
+    </p></div>
+  </div>
+
+  <div class="callout-success">
+    <b>Also present (faithful port):</b> Quote/Proforma radio (disabled on saved quotes), customer select auto-fill,
+    read-only quote no. (<code>QuoteNumber + QuoteRevNumber</code>), LPO, date, currency → read-only rate, payment
+    terms (default 4), quote/proforma type, sales executive, division, place of supply, shared VAT code, line items
+    (product pick → description/UOM autofill, no per-line discount column — the old quote dropped it), discount row
+    in the line-summary table, AED + "Base (AED)" conversion columns, TinyMCE terms, summary card (Pre Tax / VAT /
+    Total + foreign-currency block), save validation toasts.
+  <div class="item">
+    <div class="item-title"><span class="badge badge-green">Improvement</span> "Show total" toggle restored (prints totals only when on)</div>
+    <div class="what"><span class="tag">What</span><p>
+      A <b>Show total</b> switch now sits below the Items summary table (the old app had exactly this switch
+      there, bound to <code>InvoiceData.showtotal</code>, default <code>true</code>). Backed by a new
+      <code>QuoteModel.showtotal</code> field: default <code>true</code>, loaded from the saved quote, saved with
+      it via <code>AddUpdateQuote</code>.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      It controls the <b>printed</b> PDF, not the screen: the backend <code>GenerateQuote</code>
+      (<code>InvoiceService.cs:964,1251,1278,1323,1335</code>) hides the Totals row, the amount in words, the
+      "Total Payable (currency)" cell and the Taxable-Value/VAT payable table whenever <code>showtotal</code> is
+      <code>false</code>. The old screen's switch was functional and the flag is stored per quote, so our port had
+      silently dropped a real feature — now restored and saved.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-red">Bug fix</span> VAT dropdown showed duplicated text</div>
+    <div class="what"><span class="tag">What</span><p>
+      Option text was <code>{{ VATCodeName }} {{ VATRate }}%</code>, but the backend's
+      <code>VATCodeName</code> already contains the rate (e.g. <code>5%</code>, <code>0%</code>,
+      <code>Exempt 0%</code>), so the dropdown displayed <code>5%&nbsp;&nbsp;5%</code>, <code>0% 0%</code>,
+      <code>Exempt 0%</code>. Now shows just <code>{{ VATCodeName }}</code> in both the Document Details VAT
+      select and the per-line VAT select — matching the old app's single <code>{{VATCode.VATCodeName}}</code>.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      The duplicated text was the exact "two things with the same meaning, rendered doubled" trap: the code
+      re-appended a rate the name already carried. Display now matches what the old screen showed. (The
+      create-invoice page had the same doubled pattern — fixed identically on 2026-09-02.)
+    </p></div>
+  </div>
+</div>
+
+  <hr class="section-divider">
+
+  <!-- ================= CUSTOMER LIST ================= -->
+  <h2 id="customer-list"><span class="section-num">13.</span>Customer List</h2>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-green">New screen</span> Customer list + add/edit modal (port)</div>
+    <div class="what"><span class="tag">What</span><p>
+      Built the Customer screen as a single page with a list and an add/edit modal, matching the old
+      <code>customer.component.*</code> (which had no separate create page either). Routes
+      <code>/customerlist</code> (the menu's <code>PageUrl</code>) and the leftover <code>/customer</code> both
+      load the real component now (both were placeholders). New <code>features/customers/</code> folder with
+      <code>services/customer.service.ts</code> (GetCustomerList / GetCustomer / AddCustomer / GetCountry /
+      GetState / GetCurrencyList) and models mirroring the backend <code>CustomerListModel</code> /
+      <code>CustomerModel</code> / <code>AddressModel</code>.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      Completes the Sales-area screens started by the invoice/quote lists. The customer list and modal reuse the
+      existing <code>EqTable</code>/<code>EqPaginator</code>/<code>EqBadge</code>/<code>EqToolbar</code> and the
+      already-scaffolded <code>_customers.scss</code> (switch + type-badge CSS) rather than the old
+      <code>mfDataTable</code>/<code>bsModal</code> libraries.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-red">Bug fix</span> Customer select bound to the right endpoint</div>
+    <div class="what"><span class="tag">What</span><p>
+      The new service uses <code>Invoice/GetCustomerList</code> (the real endpoint) for both the list and the
+      modal, and <code>Invoice/GetCustomer</code> for the edit-modal fetch. The old invoice/quote lists' habit of
+      calling the non-existent <code>Invoice/GetCustomers</code> was <b>not</b> repeated here.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      Same endpoint-hygiene rule as §7/§11: never build a service around an action the controller doesn't expose.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-red">Bug fix (avoided)</span> "Same as billing" toggle handling</div>
+    <div class="what"><span class="tag">What</span><p>
+      On add, <code>shippingAddressSame</code> defaults to <code>true</code> so the shipping fields are hidden and
+      on save the shipping address isn't required. On edit, it loads whatever shipping address the customer has and
+      shows the fields. Toggling the switch on copies Billing into Shipping with <code>AddressId=0</code>, exactly
+      like the old <code>onCheckBoxChange()</code>.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      The old app always set <code>shippingAddress = false</code> on <code>editItem()</code> even when shipping was
+      never filled in; ours shows the real stored values instead. The add-path behaviour (same-as-billing by
+      default) matches the old screen.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-red">Bug fix</span> Currency "null" string trap</div>
+    <div class="what"><span class="tag">What</span><p>
+      The old template used the string <code>value="null"</code> for the "select currency" placeholder and the
+      validator compared against the string <code>"null"</code>. In the new modal the placeholder is a real
+      <code>[ngValue]="null"</code> and the validator checks actual <code>null</code> — no string-conversion
+      foot-gun.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      The string form was a coercion trap (an untouched "Select Currency" would send the literal string
+      <code>"null"</code> to the backend). Angular's <code>[ngValue]</code> binding models it correctly.
+    </p></div>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- ================= SHARED ================= -->
+  <h2 id="shared"><span class="section-num">14.</span>Shared building blocks</h2>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-info">Design</span> Thin <code>.eq-*</code> wrappers instead of Angular Material</div>
+    <div class="what"><span class="tag">What</span><p>
+      Built <code>EqBadge</code>, <code>EqToolbar</code>, <code>EqDropdown</code>, <code>EqPaginator</code>,
+      <code>EqTable</code> (skeleton loading) and <code>ToastService</code> as small standalone wrapper components
+      over the shared <code>.eq-*</code> CSS classes.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      The old app's design language is months of tuned CSS; Material would have replaced it wholesale. Thin wrappers
+      give reuse across list and form screens while keeping the exact same visual system (per
+      <code>DECISIONS.md</code>).
+    </p></div>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- ================= CROSS-CUTTING ================= -->
+  <h2 id="cross-cutting"><span class="section-num">15.</span>Cross-cutting cleanup</h2>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-red">Bug fix</span> Icon glyphs were missing after the port</div>
+    <div class="what"><span class="tag">What</span><p>
+      <code>_icons.scss</code>: added the missing <code>icon-*::before { content }</code> glyph mappings for the
+      Simple Line Icons set (the old app's bundle had them, but the port only copied the <code>@font-face</code> +
+      family rule). Also added <code>.eq-icon-btn.dropdown-toggle::after { display:none }</code> to drop the
+      ng-bootstrap caret on kebab buttons.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      Every <code>&lt;i class="icon-doc"&gt;</code>/etc. rendered as an empty box after the port, and the kebab
+      menu showed a stray caret.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-green">Improvement</span> Menu routes resolve instead of falling to the wildcard</div>
+    <div class="what"><span class="tag">What</span><p>
+      Added placeholder routes for <code>customer</code> and <code>employee</code> so the DB menu <code>PageUrl</code>s
+      (<code>/customer</code>, <code>/employee</code>) navigate somewhere instead of falling through to the dashboard
+      wildcard.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      Clicking a real DB menu item silently landing on the dashboard was confusing; now it's an honest "coming soon"
+      placeholder until those screens are built.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-green">Improvement</span> Print &amp; file URLs go through runtime config</div>
+    <div class="what"><span class="tag">What</span><p>
+      Both invoice and quote print flows open <code>{fileBaseUrl}/Documents/Invoice|Quote/{file}</code> using the
+      runtime <code>ConfigService.fileBaseUrl</code>.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      Backend returns only a file path; the base must come from the environment config, and it must work on UAT and
+      LIVE without a rebuild (see §6).
+    </p></div>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- ================= URLS & NAVIGATION ================= -->
+  <h2 id="urls"><span class="section-num">16.</span>URLs &amp; navigation — how edit/copy links work</h2>
+
+  <p>
+    The number in <code>/createinvoice/31284?editable=0</code> or <code>/createquote/313</code> is not random —
+    it is the clicked row's <code>TaxInvoiceId</code>. This section is the reference for how those links are
+    built and what happens if you change or remove parts of them.
+  </p>
+
+  <table>
+    <thead>
+      <tr><th style="width:60%">URL</th><th>Behaviour</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>/createquote</code></td><td>New blank quote / proforma</td></tr>
+      <tr><td><code>/createquote/313</code></td><td>Edit quote #313 — loads that record from the backend</td></tr>
+      <tr><td><code>/createquote/313?copy=1</code></td><td>Copy of quote #313 — quote id, number and line ids reset for a fresh save</td></tr>
+      <tr><td><code>/createinvoice</code></td><td>New blank invoice</td></tr>
+      <tr><td><code>/createinvoice/31284</code></td><td>Edit invoice #31284 — read-only by default (no <code>editable</code> param)</td></tr>
+      <tr><td><code>/createinvoice/31284?editable=1</code></td><td>Edit invoice #31284, writable</td></tr>
+      <tr><td><code>/createinvoice/31284?editable=0</code></td><td>Edit invoice #31284, read-only (Save / Cancel hidden; Copy + Print stay)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-info">How it works</span> Where the number comes from</div>
+    <div class="what"><span class="tag">What</span><p>
+      Both lists navigate with the row's <code>TaxInvoiceId</code> as the <code>:id</code> route segment:
+      quote list → <code>router.navigate(['/createquote', row.TaxInvoiceId])</code>
+      (<code>quote-list.ts:166</code>, Copy adds <code>?copy=1</code>), invoice list →
+      <code>router.navigate(['/createinvoice', row.TaxInvoiceId], { queryParams: { editable: row.IsEditable === 1 ? 1 : 0 } })</code>
+      (<code>invoice-list.ts:296</code>). The create pages read <code>route.snapshot.paramMap.get('id')</code> in
+      <code>ngOnInit</code>: present → <b>edit mode</b> (loads that record from the backend); absent → <b>new</b>
+      blank form.
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      This is the route-param alternative to the old app's cross-screen <code>localStorage</code> hand-offs
+      (<code>invoiceIdcopy</code>, <code>invoiceId</code>): no global state, and a URL is shareable/bookmarkable.
+      The id <i>is</i> the database key (<code>QuoteId</code> / <code>TaxInvoiceId</code>) the page passes straight
+      to <code>getQuotesList(id)</code> / <code>getInvoicesList(id)</code>.
+    </p></div>
+  </div>
+
+  <div class="item">
+    <div class="item-title"><span class="badge badge-info">How it works</span> What <code>editable=0</code> does</div>
+    <div class="what"><span class="tag">What</span><p>
+      It carries the invoice's <code>IsEditable</code> flag from the list. <code>create-invoice.ts:180-183</code>
+      turns <code>editable=1</code> into <code>invoiceEditable=1</code>, anything else into <code>0</code>;
+      <code>canEdit = invoiceEditable === 1</code>. So <code>editable=0</code> → read-only view (Save + Cancel
+      hidden, Copy + Print still available). Quotes carry no such param — they are always editable (see §10/§12).
+    </p></div>
+    <div class="why"><span class="tag">Why</span><p>
+      Matches the old app's hand-off of a locked invoice (<code>IsEditable != 1</code>) as a read-only view. The
+      default is <code>0</code> so an edit reached without an explicit <code>editable=1</code> renders read-only —
+      a locked invoice can't be unlocked by hand-editing the URL.
+    </p></div>
+  </div>
+
+  <div class="callout">
+    <b>What if you remove parts of the URL?</b>
+    <ul>
+      <li>Removing <code>?editable=0</code> → the param is <code>null</code>, the branch is skipped and
+      <code>invoiceEditable</code> keeps its default <code>0</code>. <b>No break — same read-only behaviour.</b></li>
+      <li>Removing the number (<code>/createinvoice</code> or <code>/createquote</code>) → no <code>:id</code>, so the
+      page opens a <b>new, blank</b> document instead of the existing one.</li>
+      <li>A wrong/unknown id simply loads that id; if the backend returns nothing the page falls back to a new/default
+      form — it does not crash.</li>
+    </ul>
+  </div>
+
+  <hr class="section-divider">
+
+  <p class="subtitle">
+    Log scope: improvements / bug fixes / cleanup on the EmQube Invoice rewrite
+    (login → invoice list → create/edit invoice → copy → quote list → create/edit quote).
+    Source of truth for day-to-day status remains <code>docs/CURRENT-WORK.md</code>; rationale for deliberate
+    deviations lives in <code>docs/DECISIONS.md</code>.
+  </p>
+
+</div>
+</body>
+</html>

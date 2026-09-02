@@ -1,0 +1,263 @@
+<!-- Page Head -->
+<div class="eq-page-header">
+  <div>
+    <h1>Customers</h1>
+  </div>
+  <button type="button" class="eq-btn eq-btn-primary" (click)="openAdd(customerModal)">
+    <i class="icon-plus"></i> Add Customer/Prospect
+  </button>
+</div>
+
+<!-- Toolbar -->
+<eq-toolbar>
+  <div class="eq-toolbar-search">
+    <i class="icon-magnifier"></i>
+    <input
+      type="text"
+      placeholder="Search customer name or contact person"
+      [(ngModel)]="filterQuery"
+      (ngModelChange)="onSearchChange()"
+    />
+  </div>
+  <button class="eq-btn eq-btn-outline eq-toolbar-clear" (click)="clearSearch()">
+    <i class="icon-close"></i> Clear
+  </button>
+</eq-toolbar>
+
+<!-- Table -->
+<eq-table [columns]="columns" [loading]="loading()">
+  <ng-container eqTableBody>
+    @for (row of pageSlice(); track row.CustomerId) {
+      <tr>
+        <td class="eq-cell-customer">{{ row.CustomerName }}</td>
+        <td>{{ contactPerson(row) }}</td>
+        <td>{{ row.CityName }}</td>
+        <td>{{ row.CountryName }}</td>
+        <td>
+          @if (row.Status === 'Active') {
+            <eq-badge tone="success">{{ row.Status }}</eq-badge>
+          } @else {
+            <eq-badge tone="neutral">{{ row.Status }}</eq-badge>
+          }
+        </td>
+        <td>
+          @if (row.IsProspect) {
+            <eq-badge tone="info">Prospect</eq-badge>
+          } @else {
+            <eq-badge tone="success">Customer</eq-badge>
+          }
+        </td>
+        <td class="eq-col-action">
+          <button type="button" class="eq-icon-btn" (click)="openEdit(row, customerModal)" title="Edit Customer">
+            <i class="icon-pencil"></i>
+          </button>
+        </td>
+      </tr>
+    } @empty {
+      <tr>
+        <td [attr.colspan]="columns.length" class="eq-empty-row">
+          <div class="eq-empty">
+            <div class="eq-empty-icon"><i class="icon-people"></i></div>
+            <h2>No customers found</h2>
+            <p>Try adjusting your search query.</p>
+            <button class="eq-btn eq-btn-outline" (click)="clearSearch()">Clear</button>
+          </div>
+        </td>
+      </tr>
+    }
+  </ng-container>
+
+  <div eqTableFoot>
+    @if (!loading()) {
+      <eq-paginator
+        [totalItems]="filteredList().length"
+        [page]="page()"
+        [pageSize]="pageSize()"
+        [pageSizeOptions]="[100, 150, 200]"
+        (pageChange)="page.set($event)"
+        (pageSizeChange)="pageSize.set($event); page.set(1)"
+      />
+    }
+  </div>
+</eq-table>
+
+<!-- Add / Edit Customer Modal -->
+<ng-template #customerModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">{{ modalData.CustomerId ? 'Edit' : 'Add' }} Customer/Prospect</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <div class="eq-customer-form">
+
+      <!-- Is Individual / Prospect -->
+      <div class="eq-switch-toggle-row">
+        <span class="eq-switch-pair">
+          <label class="eq-switch"><input type="checkbox" [(ngModel)]="modalData.IsIndividual"><span class="slider round"></span></label>
+          <span class="eq-switch-toggle-text">Is Individual</span>
+        </span>
+        <span class="eq-switch-pair">
+          <label class="eq-switch"><input type="checkbox" [(ngModel)]="modalData.IsProspect"><span class="slider round"></span></label>
+          <span class="eq-switch-toggle-text">Prospect</span>
+        </span>
+      </div>
+
+      <div class="eq-form-grid">
+        <div class="eq-field eq-field-wide">
+          <label>Customer Name <span class="eq-required">*</span></label>
+          <input type="text" [(ngModel)]="modalData.CustomerName" />
+        </div>
+      </div>
+
+      <div class="eq-form-subtitle">Billing Address</div>
+      <div class="eq-form-grid">
+        <div class="eq-field eq-field-wide">
+          <label>Address <span class="eq-required">*</span></label>
+          <input type="text" [(ngModel)]="modalData.BillingAddress.Address" />
+        </div>
+        <div class="eq-field">
+          <label>City</label>
+          <input type="text" [(ngModel)]="modalData.BillingAddress.CityName" />
+        </div>
+        <div class="eq-field">
+          <label>Zip</label>
+          <input type="text" [(ngModel)]="modalData.BillingAddress.Zipcode" />
+        </div>
+        <div class="eq-field">
+          <label>Country <span class="eq-required">*</span></label>
+          <select [(ngModel)]="modalData.BillingAddress.CountryId" (ngModelChange)="onBillingCountryChange()">
+            <option [ngValue]="0">Select Country</option>
+            @for (c of countryList; track c.CountryId) {
+              <option [ngValue]="c.CountryId">{{ c.CountryName }}</option>
+            }
+          </select>
+        </div>
+        <div class="eq-field">
+          <label>State</label>
+          <select [(ngModel)]="modalData.BillingAddress.StateId">
+            <option [ngValue]="0">Select State</option>
+            @for (s of billingStates; track s.StateId) {
+              <option [ngValue]="s.StateId">{{ s.StateName }}</option>
+            }
+          </select>
+        </div>
+        <div class="eq-field eq-field-wide">
+          <label>Currency <span class="eq-required">*</span></label>
+          <select [(ngModel)]="modalData.CurrencyId">
+            <option [ngValue]="null">Select Currency</option>
+            @for (c of currencyList; track c.CurrencyId) {
+              <option [ngValue]="c.CurrencyId">{{ c.CurrencyName }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="eq-form-subtitle">Contact Person</div>
+      <div class="eq-form-grid">
+        <div class="eq-field">
+          <label>Name <span class="eq-required">*</span></label>
+          <input type="text" [(ngModel)]="modalData.FirstName" />
+        </div>
+        <div class="eq-field">
+          <label>Last Name</label>
+          <input type="text" [(ngModel)]="modalData.LastName" />
+        </div>
+        <div class="eq-field">
+          <label>Designation</label>
+          <input type="text" [(ngModel)]="modalData.Designation" />
+        </div>
+        <div class="eq-field">
+          <label>Phone</label>
+          <input type="text" [(ngModel)]="modalData.Phone" />
+        </div>
+        <div class="eq-field">
+          <label>Email</label>
+          <input type="email" [(ngModel)]="modalData.Email" />
+        </div>
+        <div class="eq-field">
+          <label>Web</label>
+          <input type="text" [(ngModel)]="modalData.Website" />
+        </div>
+      </div>
+
+      <div class="eq-form-subtitle">Status</div>
+      <div class="eq-form-grid">
+        <div class="eq-field">
+          <label>Status</label>
+          <select [(ngModel)]="modalData.IsActive">
+            <option [ngValue]="false">Inactive</option>
+            <option [ngValue]="true">Active</option>
+          </select>
+        </div>
+        <div class="eq-field">
+          <label>Registered</label>
+          <span class="eq-switch-pair">
+            <label class="eq-switch"><input type="checkbox" [(ngModel)]="modalData.VATEligible"><span class="slider round"></span></label>
+            <span class="eq-switch-toggle-text">VAT registered</span>
+          </span>
+        </div>
+        @if (!modalData.IsIndividual) {
+          <div class="eq-field eq-field-wide">
+            <label>Customer Code <span class="eq-required">*</span></label>
+            <input type="text" [(ngModel)]="modalData.CustomerCode" />
+          </div>
+        }
+        @if (modalData.VATEligible) {
+          <div class="eq-field eq-field-wide">
+            <label>Tax No. <span class="eq-required">*</span></label>
+            <input type="text" [(ngModel)]="modalData.VATNo" />
+          </div>
+        }
+      </div>
+
+      <div class="eq-form-subtitle-with-toggle">
+        <div class="eq-form-subtitle" style="margin: 0">Shipping Address</div>
+        <span class="eq-switch-pair">
+          <label class="eq-switch"><input type="checkbox" [(ngModel)]="shippingAddressSame" (ngModelChange)="onShippingSameToggle()"><span class="slider round"></span></label>
+          <span class="eq-switch-toggle-text">Same as billing address</span>
+        </span>
+      </div>
+
+      @if (!shippingAddressSame) {
+        <div class="eq-form-grid">
+          <div class="eq-field eq-field-wide">
+            <label>Address <span class="eq-required">*</span></label>
+            <input type="text" [(ngModel)]="modalData.ShippingAddress.Address" />
+          </div>
+          <div class="eq-field">
+            <label>City</label>
+            <input type="text" [(ngModel)]="modalData.ShippingAddress.CityName" />
+          </div>
+          <div class="eq-field">
+            <label>Zip</label>
+            <input type="text" [(ngModel)]="modalData.ShippingAddress.Zipcode" />
+          </div>
+          <div class="eq-field">
+            <label>Country</label>
+            <select [(ngModel)]="modalData.ShippingAddress.CountryId" (ngModelChange)="onShippingCountryChange()">
+              <option [ngValue]="0">Select Country</option>
+              @for (c of countryList; track c.CountryId) {
+                <option [ngValue]="c.CountryId">{{ c.CountryName }}</option>
+              }
+            </select>
+          </div>
+          <div class="eq-field">
+            <label>State</label>
+            <select [(ngModel)]="modalData.ShippingAddress.StateId">
+              <option [ngValue]="0">Select State</option>
+              @for (s of shippingStates; track s.StateId) {
+                <option [ngValue]="s.StateId">{{ s.StateName }}</option>
+              }
+            </select>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="eq-btn eq-btn-outline" (click)="modal.dismiss()">Close</button>
+    <button type="button" class="eq-btn eq-btn-primary" (click)="saveCustomer(modal)">
+      <i class="icon-check"></i> Save
+    </button>
+  </div>
+</ng-template>

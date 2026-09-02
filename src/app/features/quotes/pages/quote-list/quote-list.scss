@@ -1,0 +1,7 @@
+/*
+  Quote List — column stability fixes.
+  .eq-table uses table-layout:auto, so column widths are recomputed from each
+  page's visible rows. A nowrap date cell keeps the date column from being
+  squeezed (and wrapping "10-01-2025" into 3 lines) when pages have different content.
+*/
+.eq-table td.eq-nowrap { white-space: nowrap; }

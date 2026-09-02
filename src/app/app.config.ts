@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ApplicationConfig, APP_INITIALIZER, provideBrowserGlobalErrorListeners } from '@angular/core';
 import {
   provideHttpClient,
   withInterceptors
@@ -8,6 +8,7 @@ import { TINYMCE_SCRIPT_SRC } from '@tinymce/tinymce-angular';
 
 import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth-interceptor';
+import { ConfigService } from './core/services/config.service';
 
 
 export const appConfig: ApplicationConfig = {
@@ -22,6 +23,12 @@ export const appConfig: ApplicationConfig = {
     {
       provide: TINYMCE_SCRIPT_SRC,
       useValue: 'assets/tinymce/tinymce.min.js',
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (config: ConfigService) => () => config.load(),
+      deps: [ConfigService],
+      multi: true,
     },
   ]
 };

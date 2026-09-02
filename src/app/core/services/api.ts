@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment';
+import { ConfigService } from './config.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,10 +9,11 @@ import { environment } from '../../../environments/environment';
 export class ApiService {
 
   private http = inject(HttpClient);
+  private config = inject(ConfigService);
 
   post<T>(controller: string, action: string, body: unknown = null): Observable<T> {
     return this.http.post<T>(
-      `${environment.apiUrl}/${controller}/${action}`,
+      `${this.config.apiUrl}/${controller}/${action}`,
       body
     );
   }

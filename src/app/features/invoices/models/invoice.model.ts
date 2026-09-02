@@ -18,13 +18,37 @@ export interface InvoiceListModel {
   IsPaid: boolean;
   ProductName: string;
   PreTaxTotal: number;
-  IsEditable: boolean;
+  IsEditable: number;
   ConversionRate: number;
 }
 
 export interface BusinessDivision {
   BusinessDivisionId: number;
   DivisionName: string;
+}
+
+export interface QuoteListModel {
+  TaxInvoiceId: number;
+  QuoteNumber: string;
+  QuoteDateString: string;
+  DivisionName: string;
+  CustomerName: string;
+  CurrencySymbol: string;
+  InvoiceTotal: number | null;
+  TotalVAT: number | null;
+  SExecutiveFirstName: string;
+  SExecutiveLastName: string;
+  SExecutiveName: string;
+  InvoicePaidDate: string | null;
+  PaymentRecdDateString: string | null;
+  PaymentRecdDate: string | null;
+  InvoiceDate: string | null;
+  InvoiceRevNumber: string | null;
+  IsPaid: number;
+  ProductName: string;
+  QuotetypeText: string;
+  Quotetype: number | null;
+  QuotetypeValue: number | null;
 }
 
 export interface SalesExecutive {
@@ -149,13 +173,177 @@ export interface CustomerDetail extends CustomerOption {
   TermsandConditions: string;
 }
 
+// ---------------------------------------------------------------------------
+// Customer List / Add-Edit — full backend shape
+// ---------------------------------------------------------------------------
+
+export interface CustomerListModel {
+  CustomerId: number;
+  CustomerCode: string;
+  CustomerName: string;
+  CustomerType: number;
+  IndustryId: number | null;
+  IsIndividual: boolean;
+  IsProspect: boolean;
+  Website: string;
+  ProfileId: number | null;
+  Designation: string;
+  Email: string;
+  FirstName: string;
+  LastName: string;
+  Phone: string;
+  UserType: number | null;
+  AddressType: number | null;
+  AddressId: number | null;
+  IsPrimaryAddress: boolean | null;
+  Address: string;
+  CityName: string;
+  StateId: number | null;
+  Zipcode: string;
+  CountryId: number | null;
+  StateName: string;
+  CountryName: string;
+  IsActive: boolean;
+  Status: string;
+  VATEligible: boolean;
+  VATNo: string;
+  CurrencyId: number | null;
+  CurrencySymbol: string;
+  CurrencyName: string;
+  ConversionRate: string;
+  InvoiceStartDate: string | null;
+  TermsandConditions: string;
+}
+
+export interface AddressModel {
+  CountryId: number | null;
+  AddressId: number;
+  Address: string;
+  CityName: string;
+  StateId: number | null;
+  Zipcode: string;
+  IsActive: boolean;
+}
+
+export interface CustomerModel {
+  // all CustomerListModel fields
+  CustomerId: number;
+  CustomerCode: string;
+  CustomerName: string;
+  CustomerType: number;
+  IndustryId: number | null;
+  IsIndividual: boolean;
+  IsProspect: boolean;
+  Website: string;
+  ProfileId: number | null;
+  Designation: string;
+  Email: string;
+  FirstName: string;
+  LastName: string;
+  Phone: string;
+  UserType: number | null;
+  AddressType: number | null;
+  AddressId: number | null;
+  IsPrimaryAddress: boolean | null;
+  Address: string;
+  CityName: string;
+  StateId: number | null;
+  Zipcode: string;
+  CountryId: number | null;
+  StateName: string;
+  CountryName: string;
+  IsActive: boolean;
+  Status: string;
+  VATEligible: boolean;
+  VATNo: string;
+  CurrencyId: number | null;
+  CurrencySymbol: string;
+  CurrencyName: string;
+  ConversionRate: string;
+  InvoiceStartDate: string | null;
+  TermsandConditions: string;
+  // add/edit extras
+  SiteUserId: number | null;
+  CustomerTypeValue: number | null;
+  BillingAddress: AddressModel;
+  ShippingAddress: AddressModel;
+}
+
+export interface CountryModel {
+  CountryId: number;
+  CountryName: string;
+  CountryCode: string;
+  CountryShortName: string;
+}
+
+export interface RCountryList {
+  Error: ApiError | null;
+  CountryList: CountryModel[];
+}
+
+export function emptyAddress(): AddressModel {
+  return {
+    CountryId: 0,
+    AddressId: 0,
+    Address: '',
+    CityName: '',
+    StateId: 0,
+    Zipcode: '',
+    IsActive: true,
+  };
+}
+
+export function emptyCustomerModel(): CustomerModel {
+  return {
+    CustomerId: 0,
+    CustomerCode: '',
+    CustomerName: '',
+    CustomerType: 2,
+    IndustryId: null,
+    IsIndividual: false,
+    IsProspect: false,
+    Website: '',
+    ProfileId: null,
+    Designation: '',
+    Email: '',
+    FirstName: '',
+    LastName: '',
+    Phone: '',
+    UserType: null,
+    AddressType: null,
+    AddressId: null,
+    IsPrimaryAddress: true,
+    Address: '',
+    CityName: '',
+    StateId: null,
+    Zipcode: '',
+    CountryId: null,
+    StateName: '',
+    CountryName: '',
+    IsActive: true,
+    Status: 'Active',
+    VATEligible: false,
+    VATNo: '',
+    CurrencyId: null,
+    CurrencySymbol: '',
+    CurrencyName: '',
+    ConversionRate: '',
+    InvoiceStartDate: null,
+    TermsandConditions: '',
+    SiteUserId: null,
+    CustomerTypeValue: 2,
+    BillingAddress: emptyAddress(),
+    ShippingAddress: emptyAddress(),
+  };
+}
+
 export interface QuoteOption {
-  QuoteId: number;
+  QuoteId: number | null;
   QuoteNumber: string;
 }
 
 export interface QuoteDetailsModel {
-  QuoteId: number;
+  QuoteId: number | null;
   QuoteDetailId: number | null;
   ProductId: number;
   ProductName: string;
@@ -177,6 +365,10 @@ export interface QuoteModel extends QuoteOption {
   PlaceOfSupply: number | null;
   DeliveryDate: string | null;
   DeliveryDateString: string | null;
+  QuoteDate: string | null;
+  QuoteDateString: string | null;
+  QuoteRevNumber: string;
+  QuoteType: number | null;
   AttentionOf: string;
   LPONumber: string;
   InvoiceType: number | null;
@@ -187,14 +379,48 @@ export interface QuoteModel extends QuoteOption {
   PaymentTermId: number | null;
   CurrencyId: number | null;
   ConversionRate: number | null;
+  DiscountRate: number | null;
+  DiscountAmount: number | null;
+  VATType: number;
+  PreTaxTotal: number;
+  TotalVAT: number;
+  InvoiceTotal: number;
   FooterText: string;
   ITypeValue: number;
   VTypeValue: number;
   IsTaxInclusive: boolean;
+  showtotal: boolean;
   SimplifiedVATCodeId: number;
   SimplifiedDiscountRateId: number;
   SimplifiedDiscount: number;
   ProductList: QuoteDetailsModel[];
+  CreatedBy: number;
+}
+
+export interface QuoteRevisionModel {
+  QuoteId: number;
+  QuoteNumber: string;
+  QuoteDate: string | null;
+  QuoteDateString: string | null;
+  CreatedBy: number | null;
+  CreatedOn: string | null;
+}
+
+export interface QuoteLineItem {
+  QuoteId: number | null;
+  QuoteDetailId: number | null;
+  ProductId: number;
+  ProductName: string;
+  ProductDescription: string;
+  UOMId: number;
+  Quantity: number;
+  Rate: number;
+  VatCodeId: number;
+  VATCodeName: string;
+  VATRate: number;
+  PreTaxAmount: number;
+  TaxAmount: number;
+  Amount: number;
 }
 
 export interface RPaymentTermList {
@@ -349,4 +575,65 @@ export function emptyInvoiceForm(): InvoiceFormModel {
     SimplifiedDiscount: 0,
     ProductList: [emptyLineItem()],
   };
+}
+
+export function emptyQuoteLine(): QuoteLineItem {
+  return {
+    QuoteId: null,
+    QuoteDetailId: null,
+    ProductId: 0,
+    ProductName: '',
+    ProductDescription: '',
+    UOMId: 0,
+    Quantity: 1,
+    Rate: 0,
+    VatCodeId: 1,
+    VATCodeName: '',
+    VATRate: 0,
+    PreTaxAmount: 0,
+    TaxAmount: 0,
+    Amount: 0,
+  };
+}
+
+export function emptyQuote(): QuoteModel {
+  return {
+    QuoteId: null,
+    QuoteNumber: '',
+    QuoteRevNumber: '',
+    QuoteType: 1,
+    CustomerId: 0,
+    BillingAddress: '',
+    PlaceOfSupply: null,
+    DeliveryDate: null,
+    DeliveryDateString: null,
+    QuoteDate: null,
+    QuoteDateString: null,
+    AttentionOf: '',
+    LPONumber: '',
+    InvoiceType: null,
+    AccountLedgerId: 1,
+    CustomerVATNo: '',
+    SalesExecutiveId: null,
+    BusinessDivisionId: null,
+    PaymentTermId: null,
+    CurrencyId: null,
+    ConversionRate: null,
+    DiscountRate: null,
+    DiscountAmount: null,
+    VATType: 2,
+    PreTaxTotal: 0,
+    TotalVAT: 0,
+InvoiceTotal: 0,
+  FooterText: '',
+  ITypeValue: 0,
+  VTypeValue: 2,
+  IsTaxInclusive: true,
+  showtotal: true,
+  SimplifiedVATCodeId: 1,
+  SimplifiedDiscountRateId: 0,
+  SimplifiedDiscount: 0,
+  ProductList: [],
+  CreatedBy: 1,
+};
 }

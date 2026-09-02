@@ -26,7 +26,7 @@ import {
 } from '../../models/invoice.model';
 import { EqBadge } from '../../../../shared/components/eq-badge/eq-badge';
 import { ToastService } from '../../../../shared/services/toast.service';
-import { environment } from '../../../../../environments/environment';
+import { ConfigService } from '../../../../core/services/config.service';
 
 interface TaxSummary {
   VatCodeId: number;
@@ -50,6 +50,7 @@ export class CreateInvoice implements OnInit {
   private toast = inject(ToastService);
   private cdr = inject(ChangeDetectorRef);
   private modalService = inject(NgbModal);
+  private config = inject(ConfigService);
 
   form: InvoiceFormModel = emptyInvoiceForm();
   lines: InvoiceLineItem[] = this.form.ProductList;
@@ -110,6 +111,25 @@ export class CreateInvoice implements OnInit {
 
   private cancelledOnLoad = false;
 
+  // Set from the invoice-list Edit action (query param `editable`), mirroring the
+  // old app's per-invoice IsEditable hand-off to the edit screen. The edit
+  // endpoint doesn't carry it. Defaults to NON-editable (0) so that an edit
+  // reached without an explicit `editable=1` param renders read-only — the same
+  // way the old app treats a missing `IsEditable` as `!= 1` (locked). New and
+  // copy drafts stay editable via `canEdit`'s `!isEdit`/`isCopy` short-circuits.
+  invoiceEditable = 0;
+
+  // The form is editable only while the invoice itself is editable (or it's a
+  // brand-new/copy draft). Editing a saved invoice is a read-only view: the
+  // Copy/Print buttons stay available, but the fields stay locked. This matches
+  // the old app, where a locked invoice (IsEditable != 1) shows a read-only form
+  // regardless of the logged-in user's role.
+  get canEdit(): boolean {
+    if (!this.isEdit) return true;
+    if (this.isCopy) return true;
+    return this.invoiceEditable === 1;
+  }
+
   get isPaid(): boolean {
     return !!this.form.PaymentRecdDateString || !!this.form.PaymentRecdDate;
   }
@@ -157,6 +177,10 @@ export class CreateInvoice implements OnInit {
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
     const id = idParam ? Number(idParam) : null;
+    const editableParam = this.route.snapshot.queryParamMap.get('editable');
+    if (editableParam !== null) {
+      this.invoiceEditable = Number(editableParam) === 1 ? 1 : 0;
+    }
 
     const keys = [
       'customers',
@@ -791,7 +815,7 @@ export class CreateInvoice implements OnInit {
     this.api.generateInvoice(this.form.TaxInvoiceId).subscribe({
       next: (fileName) => {
         if (fileName) {
-          const baseUrl = environment.apiUrl.replace(/\/api$/, '');
+          const baseUrl = this.config.fileBaseUrl;
           window.open(`${baseUrl}/Documents/Invoice/${fileName}`, '_blank');
         }
       },

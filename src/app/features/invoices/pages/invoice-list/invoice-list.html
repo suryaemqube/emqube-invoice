@@ -99,7 +99,9 @@
         <td>{{ row.InvoiceDateString }}</td>
 
         <td class="name">
-          <a class="eq-link" [routerLink]="['/createinvoice', row.TaxInvoiceId]">{{ row.CustomerName }}</a>  
+          <a class="eq-link"
+             [routerLink]="['/createinvoice', row.TaxInvoiceId]"
+             [queryParams]="{ editable: row.IsEditable === 1 ? 1 : 0 }">{{ row.CustomerName }}</a>
         </td>
 
         <td class="num">{{ row.CurrencySymbol }} {{ row.PreTaxTotal | number:'1.2-2' }}</td>

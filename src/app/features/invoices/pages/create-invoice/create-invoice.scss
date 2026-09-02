@@ -55,3 +55,12 @@
   min-width: 0;
   table-layout: auto;
 }
+.eq-invoice-layout.eq-readonly {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.eq-invoice-layout.eq-readonly .eq-summary-actions {
+  pointer-events: auto;
+  opacity: 1;
+}

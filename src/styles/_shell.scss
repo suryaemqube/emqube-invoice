@@ -131,7 +131,7 @@ body {
 }
 .eq-profile.is-open .eq-profile-menu { display: block; }
 .eq-profile-menu-header {
-  display: flex; align-items: center; gap: var(--eq-sp-3);
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--eq-sp-3);
   padding: var(--eq-sp-2) var(--eq-sp-3) var(--eq-sp-3);
   border-bottom: 1px solid var(--eq-border);
   margin-bottom: var(--eq-sp-2);
@@ -233,6 +233,11 @@ body {
 
 /* ---------- main / breadcrumb / footer ---------- */
 .eq-main { margin-left: var(--eq-sidebar-width); flex: 1 1 auto; min-width: 0; transition: margin-left .15s ease; padding-bottom: var(--eq-sp-7); }
+
+/* no sidebar: executive / roles with no MenuRole rows */
+body.eq-no-sidebar .eq-main,
+body.eq-no-sidebar .eq-footer { margin-left: 0; }
+body.eq-no-sidebar .eq-header .navbar-brand { width: 160px; }
 
 .eq-breadcrumb {
   display: flex;

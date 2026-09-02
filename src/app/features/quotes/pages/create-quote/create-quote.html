@@ -1,0 +1,476 @@
+<div class="eq-invoice-header">
+  <div class="eq-invoice-header-text">
+    <h1>
+      @if (isCopy) {
+        Copy of
+        @if (quoteRevisionNumber) {
+          <span class="eq-mono">{{ quoteRevisionNumber }}</span>
+        }
+      } @else if (isEdit) {
+        Edit {{ typeLabel }}
+        @if (quoteRevisionNumber) {
+          <span class="eq-mono">{{ quoteRevisionNumber }}</span>
+        }
+      } @else {
+        New {{ typeLabel }}
+      }
+    </h1>
+    <div class="eq-invoice-meta">
+      <span>{{ selectedCustomerName }}</span>
+      @if (isEdit && quoteDateLabel) {
+        <span class="eq-invoice-meta-dot">·</span>
+        <span>{{ quoteDateLabel }}</span>
+      }
+    </div>
+  </div>
+  <div class="eq-invoice-header-actions">
+    @if (isEdit && !isCopy) {
+      <button class="eq-btn eq-btn-primary" (click)="openCopyModal()">
+        <i class="icon-docs"></i> Copy
+      </button>
+    }
+    <button class="eq-btn eq-btn-ghost" (click)="backToList()">
+      <i class="icon-arrow-left"></i> Back to Quote / Proforma
+    </button>
+  </div>
+</div>
+
+@if (loading) {
+  <div class="eq-loading-block">{{ loadingStatus }}</div>
+} @else {
+  <div class="eq-invoice-layout">
+    <div class="eq-invoice-form">
+      <!-- Document type -->
+      <section class="eq-form-card">
+        <h2 class="eq-form-card-title">Document Type</h2>
+        <div class="eq-quote-type">
+          <label class="eq-radio">
+            <input type="radio" [(ngModel)]="form.QuoteType" [value]="1" [disabled]="quoteTypeDisabled" />
+            Quote
+          </label>
+          <label class="eq-radio">
+            <input type="radio" [(ngModel)]="form.QuoteType" [value]="2" [disabled]="quoteTypeDisabled" />
+            Proforma
+          </label>
+        </div>
+      </section>
+
+      <!-- Customer -->
+      <section class="eq-form-card">
+        <h2 class="eq-form-card-title">Customer</h2>
+        <div class="eq-form-grid">
+          <div class="eq-field">
+            <label>Customer Name <span class="eq-required">*</span></label>
+            <select [ngModel]="form.CustomerId" (ngModelChange)="onCustomerChange($event)">
+              <option [ngValue]="0">Select Customer</option>
+              @for (c of customers; track c.CustomerId) {
+                <option [ngValue]="c.CustomerId">{{ c.CustomerName }}</option>
+              }
+            </select>
+          </div>
+          <div class="eq-field">
+            <label>Attention</label>
+            <input type="text" maxlength="30" [(ngModel)]="form.AttentionOf" />
+          </div>
+          <div class="eq-field">
+            <label>TRN #</label>
+            <input type="text" [(ngModel)]="form.CustomerVATNo" />
+          </div>
+          <div class="eq-field">
+            <label>Customer Address</label>
+            <textarea rows="3" [(ngModel)]="form.BillingAddress"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- Document Details -->
+      <section class="eq-form-card">
+        <h2 class="eq-form-card-title">Document Details</h2>
+        <div class="eq-form-grid eq-form-grid-3">
+          @if (isEdit) {
+            <div class="eq-field">
+              <label>Quote / Proforma No.</label>
+              <input type="text" [value]="quoteRevisionNumber" disabled />
+            </div>
+          }
+          <div class="eq-field">
+            <label>LPO Number / Customer Ref</label>
+            <input type="text" [(ngModel)]="form.LPONumber" />
+          </div>
+          <div class="eq-field">
+            <label>Date <span class="eq-required">*</span></label>
+            <input
+              type="text"
+              readonly
+              ngbDatepicker
+              [minDate]="minQuoteDate"
+              [maxDate]="maxQuoteDate"
+              #dateDp="ngbDatepicker"
+              [ngModel]="quoteDateStruct"
+              (ngModelChange)="onQuoteDatePicked($event)"
+              (click)="dateDp.toggle()"
+              placeholder="dd-mm-yyyy"
+            />
+          </div>
+          <div class="eq-field">
+            <label>Currency <span class="eq-required">*</span></label>
+            <select [ngModel]="form.CurrencyId" (ngModelChange)="onCurrencyPicked($event)">
+              <option [ngValue]="0">Select Currency</option>
+              @for (cur of currencies; track cur.CurrencyId) {
+                <option [ngValue]="cur.CurrencyId">{{ cur.CurrencySymbol }} — {{ cur.CurrencyName }}</option>
+              }
+            </select>
+          </div>
+          <div class="eq-field">
+            <label>Rate</label>
+            <input type="number" class="eq-mono" [(ngModel)]="form.ConversionRate" readonly />
+          </div>
+          <div class="eq-field">
+            <label>Payment Terms <span class="eq-required">*</span></label>
+            <select [(ngModel)]="form.PaymentTermId">
+              <option [ngValue]="null">Select Payment Term</option>
+              @for (pt of paymentTerms; track pt.PaymentTermId) {
+                <option [ngValue]="pt.PaymentTermId">{{ pt.Name }}</option>
+              }
+            </select>
+          </div>
+          <div class="eq-field">
+            <label>Quote/Proforma Type <span class="eq-required">*</span></label>
+            <select [(ngModel)]="form.InvoiceType">
+              <option [ngValue]="null">Select Type</option>
+              @for (t of invoiceTypes; track t.ParameterId) {
+                <option [ngValue]="t.ParameterValue">{{ t.Text }}</option>
+              }
+            </select>
+          </div>
+          <div class="eq-field">
+            <label>Sales Executive <span class="eq-required">*</span></label>
+            <select [(ngModel)]="form.SalesExecutiveId">
+              <option [ngValue]="null">Select Executive</option>
+              @for (e of salesExecutives; track e.SalesExecutiveId) {
+                <option [ngValue]="e.SalesExecutiveId">{{ e.Name }}</option>
+              }
+            </select>
+          </div>
+          <div class="eq-field">
+            <label>Division <span class="eq-required">*</span></label>
+            <select [(ngModel)]="form.BusinessDivisionId">
+              <option [ngValue]="null">Select Division</option>
+              @for (d of divisions; track d.BusinessDivisionId) {
+                <option [ngValue]="d.BusinessDivisionId">{{ d.DivisionName }}</option>
+              }
+            </select>
+          </div>
+          <div class="eq-field">
+            <label>Place of Supply <span class="eq-required">*</span></label>
+            <select [(ngModel)]="form.PlaceOfSupply">
+              <option [ngValue]="null">Select State</option>
+              @for (s of states; track s.StateId) {
+                <option [ngValue]="s.StateId">{{ s.StateName }}</option>
+              }
+            </select>
+          </div>
+          <div class="eq-field">
+            <label>VAT <span class="eq-required">*</span></label>
+            <select [ngModel]="vatCodeId" (ngModelChange)="onVatCodeChange($event)">
+              <option [ngValue]="0">Select</option>
+              @for (v of vatCodes; track v.VatCodeId) {
+                <option [ngValue]="v.VatCodeId">{{ v.VATCodeName }}</option>
+              }
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- Items -->
+      <section class="eq-form-card">
+        <div class="eq-form-card-head">
+          <h2 class="eq-form-card-title">Items</h2>
+          <button class="eq-btn eq-btn-outline eq-btn-sm" (click)="addLine()">
+            <i class="icon-plus"></i> Add Row
+          </button>
+        </div>
+        <div class="eq-line-table-scroll">
+          <table class="eq-line-table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>UOM</th>
+                <th class="num">Qty</th>
+                <th class="num">Rate</th>
+                <th class="num">PreTax</th>
+                <th>VAT</th>
+                <th class="num">Tax</th>
+                <th class="num">Amount</th>
+                <th class="actions"></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (line of lines; track $index) {
+                <tr>
+                  <td class="eq-item-cell">
+                    <select
+                      class="eq-line-select"
+                      [ngModel]="line.ProductId"
+                      (ngModelChange)="onProductChange(line, $event)"
+                    >
+                      <option [ngValue]="0">Select Product</option>
+                      @for (p of products; track p.ProductId) {
+                        <option [ngValue]="p.ProductId">{{ p.ProductName }}</option>
+                      }
+                    </select>
+                    <textarea
+                      rows="2"
+                      [ngModel]="line.ProductDescription"
+                      (ngModelChange)="line.ProductDescription = $event"
+                      placeholder="Description"
+                    ></textarea>
+                  </td>
+                  <td>
+                    <select
+                      class="eq-line-select"
+                      [ngModel]="line.UOMId"
+                      (ngModelChange)="onUomChange(line, $event)"
+                    >
+                      <option [ngValue]="0">—</option>
+                      @for (u of uoms; track u.UOMId) {
+                        <option [ngValue]="u.UOMId">{{ u.Name }}</option>
+                      }
+                    </select>
+                  </td>
+                  <td>
+                    <input
+                      class="eq-line-input num"
+                      type="number"
+                      min="0"
+                      [ngModel]="line.Quantity"
+                      (ngModelChange)="onQuantityChange(line, $event)"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      class="eq-line-input num"
+                      type="number"
+                      min="0"
+                      [ngModel]="line.Rate"
+                      (ngModelChange)="onRateChange(line, $event)"
+                    />
+                  </td>
+                  <td class="num">
+                    <span class="eq-mono">{{ line.PreTaxAmount | number: '1.2-2' }}</span>
+                  </td>
+                  <td>
+                    <select class="eq-line-select" [ngModel]="vatCodeId" (ngModelChange)="onVatCodeChange($event)">
+                      <option [ngValue]="0">Select</option>
+                      @for (v of vatCodes; track v.VatCodeId) {
+                        <option [ngValue]="v.VatCodeId">{{ v.VATCodeName }}</option>
+                      }
+                    </select>
+                  </td>
+                  <td class="num">
+                    <span class="eq-mono">{{ line.TaxAmount | number: '1.2-2' }}</span>
+                  </td>
+                  <td class="num">
+                    <span class="eq-mono">{{ line.Amount | number: '1.2-2' }}</span>
+                  </td>
+                  <td class="actions">
+                    <button class="eq-btn eq-btn-ghost eq-btn-sm" type="button" (click)="deleteLine($index)" title="Remove line">
+                      <i class="icon-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        @if (lines.length) {
+          <div class="eq-line-summary">
+            <table>
+              <thead>
+                <tr>
+                  <th></th>
+                  <th class="num">{{ uaeSymbol }}</th>
+                  @if (showForeign) {
+                    <th class="num">Base ({{ uaeSymbol }})</th>
+                  }
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Discount (%, AMT)</td>
+                  <td>
+                    <div class="eq-discount-cell">
+                      <input
+                        class="eq-line-input num"
+                        type="number"
+                        min="0"
+                        [ngModel]="discountValue"
+                        (ngModelChange)="onDiscountChange($event)"
+                      />
+                      <select class="eq-line-select" [ngModel]="discountMode" (ngModelChange)="onDiscountModeChange($event)">
+                        @for (r of rates; track r.ParameterId) {
+                          <option [ngValue]="r.ParameterValue">{{ r.Text }}</option>
+                        }
+                      </select>
+                    </div>
+                  </td>
+                  @if (showForeign) {
+                    <td></td>
+                  }
+                </tr>
+                <tr>
+                  <td>Pre Tax Total</td>
+                  <td class="num eq-mono">{{ currencySymbol }} {{ aggPreTax | number: '1.2-2' }}</td>
+                  @if (showForeign) {
+                    <td class="num eq-mono">{{ uaeSymbol }} {{ aggPreTaxUAE | number: '1.2-2' }}</td>
+                  }
+                </tr>
+                <tr>
+                  <td>VAT</td>
+                  <td class="num eq-mono">{{ currencySymbol }} {{ aggTax | number: '1.2-2' }}</td>
+                  @if (showForeign) {
+                    <td class="num eq-mono">{{ uaeSymbol }} {{ aggTaxUAE | number: '1.2-2' }}</td>
+                  }
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td>Total</td>
+                  <td class="num eq-mono">{{ currencySymbol }} {{ aggTotal | number: '1.2-2' }}</td>
+                  @if (showForeign) {
+                    <td class="num eq-mono">{{ uaeSymbol }} {{ aggTotalUAE | number: '1.2-2' }}</td>
+                  }
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        }
+        <div class="eq-switch-row">
+          <span class="eq-switch-text">
+            Show total
+            <span class="eq-switch-hint">When off, the printed Quote/Proforma PDF hides the totals, amount in words and payable summary.</span>
+          </span>
+          <label class="eq-switch mb-0">
+            <input name="showtotal" type="checkbox" class="form-control border-input" placeholder="" value="" [(ngModel)]="form.showtotal" />
+            <span class="slider round"></span>
+          </label>
+        </div>
+      </section>
+
+      <!-- Terms & Conditions -->
+      <section class="eq-form-card">
+        <h2 class="eq-form-card-title">Terms & Conditions</h2>
+        <div class="eq-editor-slot">
+          <div class="eq-editor-slot-note">These terms appear on the quote.</div>
+          <div class="eq-editor-slot-body">
+            <editor [init]="editorInit" [(ngModel)]="form.FooterText" />
+          </div>
+        </div>
+      </section>
+
+      <!-- Revisions -->
+      @if (isEdit && revisions.length) {
+        <section class="eq-form-card">
+          <h2 class="eq-form-card-title">Quote / Proforma Revisions</h2>
+          <div class="eq-revisions">
+            <table>
+              <thead>
+                <tr>
+                  <th>Version</th>
+                  <th>Date</th>
+                  <th>Document</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (rev of revisions; track rev.QuoteId) {
+                  <tr>
+                    <td class="eq-mono">{{ rev.QuoteNumber }}</td>
+                    <td>{{ rev.CreatedOn | date: 'd/M/yyyy, h:mm a' }}</td>
+                    <td>
+                      <button class="eq-btn eq-btn-ghost eq-btn-sm" (click)="printRevision(rev)">
+                        <i class="icon-printer"></i> Quote / Proforma
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </section>
+      }
+    </div>
+
+    <!-- Summary -->
+    <aside class="eq-summary">
+      <div class="eq-summary-card">
+        <h2 class="eq-summary-title">Summary</h2>
+        <dl class="eq-summary-list">
+          @if (showForeign) {
+            <div>
+              <dt>Pre Tax ({{ currencySymbol }})</dt>
+              <dd>{{ aggPreTax | number: '1.2-2' }}</dd>
+            </div>
+            <div>
+              <dt>VAT ({{ currencySymbol }})</dt>
+              <dd>{{ aggTax | number: '1.2-2' }}</dd>
+            </div>
+            <div>
+              <dt>Total ({{ currencySymbol }})</dt>
+              <dd>{{ aggTotal | number: '1.2-2' }}</dd>
+            </div>
+          }
+          <div>
+            <dt>Pre Tax ({{ uaeSymbol }})</dt>
+            <dd class="eq-mono">{{ aggPreTaxUAE | number: '1.2-2' }}</dd>
+          </div>
+          <div>
+            <dt>VAT ({{ uaeSymbol }})</dt>
+            <dd class="eq-mono">{{ aggTaxUAE | number: '1.2-2' }}</dd>
+          </div>
+          @if (aggDiscount > 0) {
+            <div>
+              <dt>Discount ({{ uaeSymbol }})</dt>
+              <dd class="eq-mono">{{ aggDiscountUAE | number: '1.2-2' }}</dd>
+            </div>
+          }
+        </dl>
+        <div class="eq-summary-total">
+          <span>Total ({{ uaeSymbol }})</span>
+          <span class="eq-mono">{{ aggTotalUAE | number: '1.2-2' }}</span>
+        </div>
+        <div class="eq-summary-actions">
+          <button class="eq-btn eq-btn-primary eq-btn-block" [disabled]="saving" (click)="save()">
+            <i class="icon-check"></i>
+            {{ saving ? 'Saving…' : isCopy ? 'Save Quote' : isEdit ? 'Update Quote' : 'Save Quote' }}
+          </button>
+          @if (isEdit && !isCopy) {
+            <button class="eq-btn eq-btn-outline eq-btn-block" (click)="printQuote()">
+              <i class="icon-printer"></i> Print Quote
+            </button>
+          }
+        </div>
+      </div>
+    </aside>
+  </div>
+}
+
+<!-- Copy Quote Confirm -->
+<ng-template #copyModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Copy Quote</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <p class="eq-modal-text">Do you want to copy this quote / proforma?</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="eq-btn eq-btn-outline" (click)="modal.dismiss()">No</button>
+    <button
+      type="button"
+      class="eq-btn eq-btn-primary"
+      (click)="copyQuote(); modal.close()"
+    >
+      <i class="icon-docs"></i> Yes
+    </button>
+  </div>
+</ng-template>

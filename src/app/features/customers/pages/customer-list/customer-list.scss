@@ -1,0 +1,36 @@
+.eq-customer-form .eq-field select {
+  width: 100%;
+  border: 1px solid var(--eq-border);
+  border-radius: var(--eq-radius-control);
+  background: var(--eq-surface);
+  color: var(--eq-ink);
+  font-size: 13.5px;
+  font-family: var(--eq-font-sans);
+  height: 38px;
+  padding: 0 var(--eq-sp-3);
+  box-sizing: border-box;
+}
+
+.eq-customer-form .eq-field select:focus {
+  outline: none;
+  border-color: var(--eq-primary);
+  box-shadow: 0 0 0 3px var(--eq-primary-soft);
+}
+
+.eq-customer-form .eq-field select:disabled {
+  background: var(--eq-surface-alt);
+  color: var(--eq-ink-faint);
+  cursor: not-allowed;
+}
+
+.eq-required {
+  color: var(--eq-red);
+  font-weight: 700;
+}
+
+.eq-switch-pair {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--eq-sp-2);
+  min-height: 38px;
+}

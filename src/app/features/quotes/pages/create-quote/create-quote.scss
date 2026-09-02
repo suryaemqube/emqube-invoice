@@ -1,0 +1,124 @@
+.eq-field select {
+  width: 100%;
+  border: 1px solid var(--eq-border);
+  border-radius: var(--eq-radius-control);
+  background: var(--eq-surface);
+  color: var(--eq-ink);
+  font-size: 13.5px;
+  font-family: var(--eq-font-sans);
+  height: 38px;
+  padding: 0 var(--eq-sp-3);
+  box-sizing: border-box;
+}
+
+.eq-field select:focus {
+  outline: none;
+  border-color: var(--eq-primary);
+  box-shadow: 0 0 0 3px var(--eq-primary-soft);
+}
+
+.eq-field select:disabled {
+  background: var(--eq-surface-alt);
+  color: var(--eq-ink-faint);
+  cursor: not-allowed;
+}
+
+.eq-invoice-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--eq-sp-3);
+  flex-wrap: wrap;
+}
+
+.eq-required {
+  color: var(--eq-red);
+  font-weight: 700;
+}
+
+.eq-loading-block {
+  padding: 32px 0;
+  text-align: center;
+  font-size: 13.5px;
+  color: var(--eq-ink-muted);
+}
+
+.eq-form-card {
+  min-width: 0;
+}
+
+.eq-line-table-scroll {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.eq-line-table {
+  min-width: 0;
+  table-layout: auto;
+}
+
+/* ---------- document type ---------- */
+.eq-quote-type {
+  display: flex;
+  align-items: center;
+  gap: var(--eq-sp-5);
+}
+
+.eq-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--eq-ink);
+  cursor: pointer;
+}
+
+.eq-radio input[type="radio"] {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--eq-primary);
+  cursor: pointer;
+}
+
+.eq-radio input[type="radio"][disabled] {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ---------- discount row inside the summary table ---------- */
+.eq-line-summary .eq-discount-cell .eq-line-input {
+  flex: 0 0 72px;
+  width: 72px;
+}
+
+/* ---------- quote revisions ---------- */
+.eq-revisions {
+  overflow-x: auto;
+}
+
+.eq-revisions table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+.eq-revisions th {
+  text-align: left;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--eq-ink-faint);
+  font-weight: 700;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--eq-border);
+}
+
+.eq-revisions td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--eq-border);
+  color: var(--eq-ink);
+}
+
+.eq-revisions tbody tr:last-child td {
+  border-bottom: none;
+}

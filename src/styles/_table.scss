@@ -219,3 +219,10 @@
   font-size: 11px; text-transform: uppercase; letter-spacing: .04em;
   font-weight: 700; color: var(--eq-ink-faint);
 }
+
+
+.eq-table td.name a{
+  color: var(--eq-ink);
+  // font-weight: 400;
+
+}

@@ -35,6 +35,7 @@ import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
     :host { display: block; }
     .eq-page-size {
       width: auto;
+      width: 80px;
       height: 30px;
       padding: 0 var(--eq-sp-3);
       font-size: 12.5px;

@@ -16,7 +16,14 @@
           <div class="eq-profile-name">{{ userDetail.FirstName }} {{ userDetail.LastName }}</div>
           <div class="eq-profile-role">{{ userDetail.RoleName }}</div>
         </div>
+        @if (loginTime) {
+          <span class="login-time pull-left">{{ loginTime }}</span>
+        }
       </div>
+
+      <a class="eq-profile-menu-item" href="javascript:void(0)" (click)="changePassword()">
+        <i class="icon-lock"></i>Change Password
+      </a>
 
       <a class="eq-profile-menu-item eq-profile-menu-item--danger" href="javascript:void(0)" (click)="logout()">
         <i class="icon-logout"></i>Logout

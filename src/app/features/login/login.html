@@ -1,0 +1,46 @@
+<div class="eq-login">
+  <div class="eq-login-card">
+    <img class="eq-login-logo" src="/media/emqube-logo-black.svg" alt="EmQube" />
+    <p class="eq-login-title">Sign in</p>
+
+    @if (loading) {
+      <div class="eq-login-loading">Signing in…</div>
+    }
+
+    <div class="eq-field">
+      <label>Username</label>
+      <input
+        type="text"
+        placeholder="Username"
+        [(ngModel)]="userName"
+        (keyup.enter)="getLogin()"
+        autocomplete="username"
+      />
+    </div>
+
+    <div class="eq-field">
+      <label>Password</label>
+      <div class="eq-password-wrap">
+        <input
+          [type]="showPassword ? 'text' : 'password'"
+          placeholder="Password"
+          [(ngModel)]="password"
+          (keyup.enter)="getLogin()"
+          autocomplete="current-password"
+        />
+        <button type="button" class="eq-password-toggle"
+                [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+                [title]="showPassword ? 'Hide password' : 'Show password'"
+                (click)="togglePassword()">
+          <i [class]="showPassword ? 'fa fa-eye-slash' : 'fa fa-eye'"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="eq-login-submit">
+      <button class="eq-btn eq-btn-primary eq-btn-sm" type="button" [disabled]="loading" (click)="getLogin()">
+        <i class="icon-check"></i> Sign In
+      </button>
+    </div>
+  </div>
+</div>
