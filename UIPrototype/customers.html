@@ -1,0 +1,531 @@
+<!doctype html>
+<!--
+  EmQube Invoice — UI Prototype — Customers (Stage 5 prototype)
+
+  STATUS: Visual/UX prototype only. Static HTML/CSS/JS, mock data only.
+  NOT connected to the Angular app, its services, its API, or the database.
+
+  The 9 rows below are transcribed as-is from the screenshot supplied for
+  this screen (real customer names, real cities/countries/status/type).
+  No additional rows were invented. The "Edit" modal is pre-filled with the
+  full detail also supplied for "3 S Middle East Services LLC"; every other
+  row's edit view falls back to blank/placeholder address fields since that
+  detail wasn't provided. Field list, section grouping (Billing Address /
+  Contact Person / Shipping Address) and every *ngIf (Customer Code only
+  when not Individual, Tax No. only when Registered, Shipping Address only
+  when "Same as billing" is off) come straight from the real
+  customer.component.html — see the comment block above the modal below.
+
+  Open this file directly in a browser. No build step required.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Customers — EmQube Invoice UI Prototype</title>
+  <link rel="icon" href="assets/img/favicon.png">
+
+  <!-- Existing framework + icon assets, copied unmodified from WebInvoice/src/assets -->
+  <link href="assets/css/style.css" rel="stylesheet">
+  <link href="assets/css/font-awesome.min.css" rel="stylesheet">
+  <link href="assets/css/simple-line-icons.css" rel="stylesheet">
+
+  <!-- EmQube design tokens + shell styling (unchanged) -->
+  <link href="css/tokens.css?v=5" rel="stylesheet">
+  <link href="css/prototype.css?v=7" rel="stylesheet">
+
+  <!-- New: Customers screen styling -->
+  <link href="css/customers.css?v=1" rel="stylesheet">
+</head>
+<body class="eq-app eq-sidebar-compact">
+
+  <div class="eq-prototype-banner" style="position:fixed;bottom:0;left:0;right:0;z-index:1050;background:#16202B;color:#fff;font-size:11.5px;padding:6px 16px;text-align:center;font-family:var(--eq-font-sans);">
+    UI Prototype &nbsp;·&nbsp; Static mock data &nbsp;·&nbsp; Not connected to the live application
+  </div>
+
+  <!-- ===================== HEADER ===================== -->
+  <header class="eq-header">
+    <button class="eq-header-toggle eq-header-toggle--mobile" id="eq-toggle-mobile" aria-label="Toggle navigation">
+      <i class="icon-menu"></i>
+    </button>
+    <button class="eq-header-toggle eq-header-toggle--desktop" id="eq-toggle-desktop" aria-label="Collapse sidebar">
+      <i class="icon-menu"></i>
+    </button>
+
+    <a class="navbar-brand" href="index.html" aria-label="EmQube Invoice"></a>
+
+    <div class="eq-header-title">
+      <span class="eq-header-title-label">Sales</span>
+      <span class="eq-header-title-current">Customers</span>
+    </div>
+
+    <div class="eq-header-spacer"></div>
+
+    <div class="eq-profile" id="eq-profile">
+      <button class="eq-profile-trigger" id="eq-profile-trigger">
+        <span class="eq-avatar">SM</span>
+        <span class="eq-profile-meta">
+          <span class="eq-profile-name">Sara Al Mansoori</span>
+          <span class="eq-profile-role">Accounts Manager</span>
+        </span>
+        <i class="fa fa-angle-down eq-profile-caret"></i>
+      </button>
+      <div class="eq-profile-menu" id="eq-profile-menu">
+        <div class="eq-profile-menu-header">
+          <span class="eq-avatar eq-avatar--lg">SM</span>
+          <div>
+            <div class="eq-profile-name">Sara Al Mansoori</div>
+            <div class="eq-profile-role">Accounts Manager · Sales Division</div>
+          </div>
+        </div>
+        <a href="#" class="eq-profile-menu-item"><i class="icon-lock"></i>Change Password</a>
+        <a href="#" class="eq-profile-menu-item eq-profile-menu-item--danger"><i class="icon-logout"></i>Logout</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="eq-backdrop" id="eq-backdrop"></div>
+
+  <!-- ===================== BODY ===================== -->
+  <div class="eq-app-body">
+
+    <!-- ---------- SIDEBAR ---------- -->
+    <div class="eq-sidebar" id="eq-sidebar">
+      <nav class="eq-sidebar-nav">
+        <ul class="eq-nav-list">
+
+          <li class="eq-nav-group-title">Sales</li>
+
+          <li>
+            <a class="eq-nav-link" href="index.html">
+              <i class="icon-speedometer"></i><span>Overview</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="invoices.html">
+              <i class="icon-doc"></i><span>Invoices</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Sales" data-title="Quotes" data-icon="icon-note"
+               data-desc="Quote/Proforma list and the create/edit quote workflow will be prototyped in a later stage.">
+              <i class="icon-note"></i><span>Quotes</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link active" href="customers.html">
+              <i class="icon-people"></i><span>Customers</span>
+            </a>
+          </li>
+
+          <li class="eq-nav-group-title">
+            Master Data
+            <span class="eq-nav-group-note">Representative items — final list to be confirmed</span>
+          </li>
+
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Products" data-icon="icon-basket"
+               data-desc="Product master data, served today through the generic metadata-driven screen.">
+              <i class="icon-basket"></i><span>Products</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Categories" data-icon="icon-tag"
+               data-desc="Product category master data.">
+              <i class="icon-tag"></i><span>Categories</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Payment Terms" data-icon="icon-wallet"
+               data-desc="Payment term master data.">
+              <i class="icon-wallet"></i><span>Payment Terms</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Employees" data-icon="icon-user"
+               data-desc="Internal user accounts, roles and site access.">
+              <i class="icon-user"></i><span>Employees</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Executives" data-icon="icon-star"
+               data-desc="Sales executive records referenced by invoices and quotes.">
+              <i class="icon-star"></i><span>Executives</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Units of Measure" data-icon="icon-size-fullscreen"
+               data-desc="Unit-of-measure master data used on invoice and quote line items.">
+              <i class="icon-size-fullscreen"></i><span>Units of Measure</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="VAT Codes" data-icon="icon-calculator"
+               data-desc="VAT/tax code master data used across invoicing and quoting.">
+              <i class="icon-calculator"></i><span>VAT Codes</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Currencies" data-icon="icon-globe"
+               data-desc="Currency and conversion-rate master data.">
+              <i class="icon-globe"></i><span>Currencies</span>
+            </a>
+          </li>
+
+        </ul>
+      </nav>
+      <button class="eq-sidebar-minimizer" id="eq-sidebar-minimizer" aria-label="Toggle compact sidebar" title="Toggle compact sidebar">
+        <i class="icon-arrow-left"></i>
+      </button>
+    </div>
+
+    <!-- ---------- MAIN ---------- -->
+    <main class="eq-main">
+      <ol class="eq-breadcrumb" id="eq-breadcrumb">
+        <li>Home</li>
+        <li>Sales</li>
+        <li class="active">Customers</li>
+      </ol>
+
+      <div class="container-fluid eq-content">
+
+        <!-- Customers page (this screen's real, built content) -->
+        <section class="eq-page" id="eq-page-main">
+          <div class="eq-page-header">
+            <div>
+              <h1>Customers</h1>
+            </div>
+            <button type="button" class="eq-btn eq-btn-primary" id="cust-add-btn">
+              <i class="icon-plus"></i>Add Customer/Prospect
+            </button>
+          </div>
+
+          <!-- ---------- TOOLBAR ---------- -->
+          <div class="eq-toolbar">
+            <div class="eq-toolbar-search">
+              <i class="icon-magnifier"></i>
+              <input type="text" id="cust-search" placeholder="Search customer name or contact person" autocomplete="off">
+            </div>
+            <div class="eq-toolbar-field">
+              <label for="cust-status">Status</label>
+              <select id="cust-status">
+                <option value="">All statuses</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div>
+            <div class="eq-toolbar-field">
+              <label for="cust-type">Type</label>
+              <select id="cust-type">
+                <option value="">Customers &amp; Prospects</option>
+                <option value="Customer">Customer</option>
+                <option value="Prospect">Prospect</option>
+              </select>
+            </div>
+            <button type="button" class="eq-btn eq-btn-outline eq-toolbar-clear" id="cust-clear">
+              <i class="icon-close"></i>Clear filters
+            </button>
+          </div>
+
+          <!-- ---------- TABLE CARD ---------- -->
+          <div class="eq-table-card">
+
+            <!-- Skeleton / loading state — shown briefly on first load -->
+            <div class="eq-skeleton" id="cust-skeleton" aria-hidden="true">
+              <div class="eq-skeleton-row" style="--i:0"></div>
+              <div class="eq-skeleton-row" style="--i:1"></div>
+              <div class="eq-skeleton-row" style="--i:2"></div>
+              <div class="eq-skeleton-row" style="--i:3"></div>
+              <div class="eq-skeleton-row" style="--i:4"></div>
+              <div class="eq-skeleton-row" style="--i:5"></div>
+            </div>
+
+            <!-- Table + pagination — populated by js/customers.js -->
+            <div id="cust-table-wrap" hidden>
+              <div class="eq-table-scroll">
+                <table class="eq-table" id="cust-table">
+                  <thead>
+                    <tr>
+                      <th data-sort="name">Customer Name</th>
+                      <th data-sort="contact">Contact Person</th>
+                      <th data-sort="city">City</th>
+                      <th data-sort="country">Country</th>
+                      <th data-sort="status">Status</th>
+                      <th data-sort="type">Prospect</th>
+                      <th class="actions">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="cust-tbody"><!-- rows rendered by js/customers.js --></tbody>
+                </table>
+              </div>
+
+              <!--
+                Pagination below reproduces exactly what the app's existing
+                <mfBootstrapPaginator> component renders (two <ul class="pagination">
+                lists of <li class="page-item"><a class="page-link">, using the
+                "active"/"disabled" classes) so the CSS here drops straight onto the
+                real component with no markup change. The live customer screen's
+                page-size set is [100,150,200]; a smaller set is used here only so
+                paging is visibly exercised across 9 sample rows.
+              -->
+              <div class="eq-table-footer">
+                <div class="eq-table-count" id="cust-count">0 customers</div>
+                <div class="eq-paginator" id="cust-pagination"></div>
+              </div>
+            </div>
+
+            <!-- Empty state — shown when filters match nothing -->
+            <div class="eq-empty" id="cust-empty" hidden>
+              <div class="eq-empty-icon icon-people"></div>
+              <h2>No customers match these filters</h2>
+              <p>Try a different search term, or clear filters to see all 9 sample customers.</p>
+              <button type="button" class="eq-btn eq-btn-outline" id="cust-empty-clear">Clear filters</button>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Placeholder page (shared — reused for every not-yet-built screen) -->
+        <section class="eq-page" id="eq-page-placeholder" hidden>
+          <div class="eq-page-header">
+            <div>
+              <h1 id="eq-placeholder-h1">&nbsp;</h1>
+              <p>This screen hasn't been prototyped yet.</p>
+            </div>
+          </div>
+          <div class="eq-empty">
+            <div class="eq-empty-icon icon-doc" id="eq-placeholder-icon"></div>
+            <h2 id="eq-placeholder-title">&nbsp;</h2>
+            <p id="eq-placeholder-desc">&nbsp;</p>
+            <span class="eq-badge eq-badge-neutral" id="eq-placeholder-stage">Not yet prototyped</span>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <footer class="eq-footer">
+    <div><b>EmQube Invoice</b> — UI Prototype</div>
+    <div class="eq-footer-meta">Static mock data only · Not connected to the live application</div>
+  </footer>
+
+  <!-- Toast used for actions that don't lead anywhere yet -->
+  <div class="eq-toast" id="eq-toast" role="status" aria-live="polite"></div>
+
+  <!--
+    ===================== ADD / EDIT CUSTOMER MODAL =====================
+    Deliberately uses ngx-bootstrap's own modal DOM (.modal > .modal-dialog >
+    .modal-content > .modal-header/.modal-body/.modal-footer, plus a separate
+    .modal-backdrop) so this styling drops onto the existing
+    <div bsModal #addCustomerModal> with no structural change.
+
+    Field-for-field, this reproduces app/customer/customer.component.html:
+      - Is Individual / Prospect            -> modalData.IsIndividual / IsProspect
+      - Customer Name*                      -> modalData.CustomerName
+      - Billing Address: Address*, City,
+        Zip, Country*, State, Currency*     -> modalData.BillingAddress.*, CurrencyId
+      - Contact Person: Name*, Last Name,
+        Designation, Phone, Email, Web      -> modalData.FirstName/LastName/Designation/Phone/Email/Website
+      - Status                              -> modalData.IsActive
+      - Customer Code* (only when NOT
+        Individual — same *ngIf as today)   -> modalData.CustomerCode
+      - Registered                          -> modalData.VATEligible
+      - Tax No.* (only when Registered —
+        same *ngIf as today)                -> modalData.VATNo
+      - Shipping Address (only shown when
+        "Same as billing address" is OFF —
+        same *ngIf as today): Address*,
+        City, Zip, Country, State           -> modalData.ShippingAddress.*
+    No new fields, no new validation rules — only the layout/visual style
+    changes (2–3 field grid instead of loose col-md-4, .eq-switch toggles
+    instead of the raw "switch" checkboxes, section subtitles).
+  -->
+  <div class="modal fade" id="customerModal" tabindex="-1" role="dialog" aria-labelledby="customerModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h4 class="modal-title" id="cust-modal-title">Add Customer/Prospect</h4>
+          <button type="button" class="close" data-modal-close aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+
+          <!-- Is Individual / Prospect -->
+          <div class="eq-switch-toggle-row">
+            <label class="eq-switch-toggle">
+              <span class="eq-switch"><input type="checkbox" id="cust-individual"><span class="slider"></span></span>
+              <span class="eq-switch-toggle-text">Is Individual</span>
+            </label>
+            <label class="eq-switch-toggle">
+              <span class="eq-switch"><input type="checkbox" id="cust-prospect"><span class="slider"></span></span>
+              <span class="eq-switch-toggle-text">Prospect</span>
+            </label>
+          </div>
+
+          <div class="eq-form-grid eq-modal-form-grid">
+            <div class="eq-field eq-field-wide">
+              <label for="cust-name">Customer Name <span class="eq-required">*</span></label>
+              <input type="text" id="cust-name" placeholder="e.g. 3 S Middle East Services LLC">
+            </div>
+          </div>
+
+          <div class="eq-form-subtitle">Billing Address</div>
+          <div class="eq-form-grid eq-modal-form-grid">
+            <div class="eq-field eq-field-wide">
+              <label for="cust-bill-address">Address <span class="eq-required">*</span></label>
+              <input type="text" id="cust-bill-address" placeholder="Office / building, street">
+            </div>
+            <div class="eq-field">
+              <label for="cust-bill-city">City</label>
+              <input type="text" id="cust-bill-city" placeholder="City">
+            </div>
+            <div class="eq-field">
+              <label for="cust-bill-zip">Zip</label>
+              <input type="text" id="cust-bill-zip" placeholder="Zip">
+            </div>
+            <div class="eq-field">
+              <label for="cust-bill-country">Country <span class="eq-required">*</span></label>
+              <select class="eq-line-select eq-field-select" id="cust-bill-country">
+                <option value="0">Select Country</option>
+                <option value="1" selected>United Arab Emirates</option>
+                <option value="2">Saudi Arabia</option>
+                <option value="3">Jordan</option>
+                <option value="4">India</option>
+              </select>
+            </div>
+            <div class="eq-field">
+              <label for="cust-bill-state">State</label>
+              <select class="eq-line-select eq-field-select" id="cust-bill-state">
+                <option value="0">Select State</option>
+                <option value="1" selected>Dubai</option>
+                <option value="2">Abu Dhabi</option>
+                <option value="3">Sharjah</option>
+              </select>
+            </div>
+            <div class="eq-field eq-field-wide">
+              <label for="cust-currency">Currency <span class="eq-required">*</span></label>
+              <select class="eq-line-select eq-field-select" id="cust-currency">
+                <option value="0">Select Currency</option>
+                <option value="1" selected>UAE Dirhams</option>
+                <option value="2">US Dollar</option>
+                <option value="3">Euro</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="eq-form-subtitle">Contact Person</div>
+          <div class="eq-form-grid eq-modal-form-grid">
+            <div class="eq-field">
+              <label for="cust-contact-first">Name <span class="eq-required">*</span></label>
+              <input type="text" id="cust-contact-first" placeholder="First name">
+            </div>
+            <div class="eq-field">
+              <label for="cust-contact-last">Last Name</label>
+              <input type="text" id="cust-contact-last" placeholder="Last name">
+            </div>
+            <div class="eq-field">
+              <label for="cust-designation">Designation</label>
+              <input type="text" id="cust-designation" placeholder="e.g. General Manager">
+            </div>
+            <div class="eq-field">
+              <label for="cust-phone">Phone</label>
+              <input type="text" id="cust-phone" placeholder="+971 …">
+            </div>
+            <div class="eq-field">
+              <label for="cust-email">Email</label>
+              <input type="text" id="cust-email" placeholder="name@company.com">
+            </div>
+            <div class="eq-field">
+              <label for="cust-web">Web</label>
+              <input type="text" id="cust-web" placeholder="www.company.com">
+            </div>
+          </div>
+
+          <div class="eq-form-subtitle">Status</div>
+          <div class="eq-form-grid eq-modal-form-grid eq-modal-form-grid-tight">
+            <div class="eq-field">
+              <label for="cust-status">Status</label>
+              <select class="eq-line-select eq-field-select" id="cust-status-select">
+                <option value="true" selected>Active</option>
+                <option value="false">Inactive</option>
+              </select>
+            </div>
+            <div class="eq-field">
+              <label>Registered</label>
+              <label class="eq-switch-toggle eq-switch-toggle-field">
+                <span class="eq-switch"><input type="checkbox" id="cust-registered" checked><span class="slider"></span></span>
+                <span class="eq-switch-toggle-text">VAT registered</span>
+              </label>
+            </div>
+            <div class="eq-field eq-field-wide" id="cust-code-field">
+              <label for="cust-code">Customer Code <span class="eq-required">*</span></label>
+              <input type="text" id="cust-code" placeholder="e.g. 3 S Middle">
+            </div>
+            <div class="eq-field eq-field-wide" id="cust-taxno-row">
+              <label for="cust-taxno">Tax No. <span class="eq-required">*</span></label>
+              <input type="text" id="cust-taxno" placeholder="TRN">
+            </div>
+          </div>
+
+          <div class="eq-form-subtitle eq-form-subtitle-with-toggle">
+            <span>Shipping Address</span>
+            <label class="eq-switch-toggle eq-switch-toggle-inline">
+              <span class="eq-switch"><input type="checkbox" id="cust-ship-same" checked><span class="slider"></span></span>
+              <span class="eq-switch-toggle-text">Same as billing address</span>
+            </label>
+          </div>
+
+          <div class="eq-form-grid eq-modal-form-grid" id="cust-shipping-fields" hidden>
+            <div class="eq-field eq-field-wide">
+              <label for="cust-ship-address">Address <span class="eq-required">*</span></label>
+              <input type="text" id="cust-ship-address" placeholder="Office / building, street">
+            </div>
+            <div class="eq-field">
+              <label for="cust-ship-city">City</label>
+              <input type="text" id="cust-ship-city" placeholder="City">
+            </div>
+            <div class="eq-field">
+              <label for="cust-ship-zip">Zip</label>
+              <input type="text" id="cust-ship-zip" placeholder="Zip">
+            </div>
+            <div class="eq-field">
+              <label for="cust-ship-country">Country</label>
+              <select class="eq-line-select eq-field-select" id="cust-ship-country">
+                <option value="0">Select Country</option>
+                <option value="1" selected>United Arab Emirates</option>
+                <option value="2">Saudi Arabia</option>
+                <option value="3">Jordan</option>
+                <option value="4">India</option>
+              </select>
+            </div>
+            <div class="eq-field">
+              <label for="cust-ship-state">State</label>
+              <select class="eq-line-select eq-field-select" id="cust-ship-state">
+                <option value="0">Select State</option>
+                <option value="1" selected>Dubai</option>
+                <option value="2">Abu Dhabi</option>
+                <option value="3">Sharjah</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="eq-btn eq-btn-outline" data-modal-close>Close</button>
+          <button type="button" class="eq-btn eq-btn-primary" data-coming-soon="Save customer">Save</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade" id="customerBackdrop"></div>
+
+  <script src="js/prototype.js?v=5"></script>
+  <script src="js/customers.js?v=1"></script>
+</body>
+</html>

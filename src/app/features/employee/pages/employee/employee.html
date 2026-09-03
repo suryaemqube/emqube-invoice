@@ -104,7 +104,7 @@
           <label>Designation</label>
           <input type="text" [(ngModel)]="modalData.Designation" />
         </div>
-        <div class="eq-field eq-field-wide">
+        <div class="eq-field">
           <label>Email <span class="eq-required">*</span></label>
           <input type="email" [(ngModel)]="modalData.Email" />
         </div>
@@ -126,9 +126,9 @@
             }
           </select>
         </div>
-        <div class="eq-field">
+        <div class="eq-field fdr">
           <label>Site Access</label>
-          <span class="eq-switch-pair">
+          <span class="eq-switch-pair df fdr">
             <label class="eq-switch"><input type="checkbox" [(ngModel)]="modalData.SiteAccess"><span class="slider round"></span></label>
             <span class="eq-switch-toggle-text">{{ modalData.SiteAccess ? 'Enabled' : 'Disabled' }}</span>
           </span>

@@ -1,0 +1,383 @@
+<!doctype html>
+<!--
+  EmQube Invoice — UI Prototype — Invoices (Stage 2)
+
+  STATUS: Visual/UX prototype only. Static HTML/CSS/JS, mock data only.
+  NOT connected to the Angular app, its services, its API, or the database.
+  The invoices below are static sample rows for layout/UX review. Status
+  (Paid / Due / Cancelled) is derived client-side for display only, from
+  fields the real InvoiceListModel already carries — see the comment above
+  the data array in js/invoices.js. Search, sort, filter and pagination all
+  run client-side over that in-memory array. No network requests are made
+  and no backend status logic was introduced or changed.
+
+  Open this file directly in a browser. No build step required.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Invoices — EmQube Invoice UI Prototype</title>
+  <link rel="icon" href="assets/img/favicon.png">
+
+  <!-- Existing framework + icon assets, copied unmodified from WebInvoice/src/assets -->
+  <link href="assets/css/style.css" rel="stylesheet">
+  <link href="assets/css/font-awesome.min.css" rel="stylesheet">
+  <link href="assets/css/simple-line-icons.css" rel="stylesheet">
+
+  <!-- EmQube design tokens + shell styling (unchanged from Stage 1) -->
+  <link href="css/tokens.css?v=5" rel="stylesheet">
+  <link href="css/prototype.css?v=7" rel="stylesheet">
+
+  <!-- New: Invoice List screen styling -->
+  <link href="css/invoices.css?v=5" rel="stylesheet">
+</head>
+<body class="eq-app eq-sidebar-compact">
+
+  <div class="eq-prototype-banner" style="position:fixed;bottom:0;left:0;right:0;z-index:1050;background:#16202B;color:#fff;font-size:11.5px;padding:6px 16px;text-align:center;font-family:var(--eq-font-sans);">
+    UI Prototype &nbsp;·&nbsp; Static mock data &nbsp;·&nbsp; Not connected to the live application
+  </div>
+
+  <!-- ===================== HEADER ===================== -->
+  <header class="eq-header">
+    <button class="eq-header-toggle eq-header-toggle--mobile" id="eq-toggle-mobile" aria-label="Toggle navigation">
+      <i class="icon-menu"></i>
+    </button>
+    <button class="eq-header-toggle eq-header-toggle--desktop" id="eq-toggle-desktop" aria-label="Collapse sidebar">
+      <i class="icon-menu"></i>
+    </button>
+
+    <a class="navbar-brand" href="index.html" aria-label="EmQube Invoice"></a>
+
+    <div class="eq-header-title">
+      <span class="eq-header-title-label" id="eq-header-group">Sales</span>
+      <span class="eq-header-title-current" id="eq-header-current">Invoices</span>
+    </div>
+
+    <div class="eq-header-spacer"></div>
+
+    <div class="eq-profile" id="eq-profile">
+      <button class="eq-profile-trigger" id="eq-profile-trigger">
+        <span class="eq-avatar">SM</span>
+        <span class="eq-profile-meta">
+          <span class="eq-profile-name">Sara Al Mansoori</span>
+          <span class="eq-profile-role">Accounts Manager</span>
+        </span>
+        <i class="fa fa-angle-down eq-profile-caret"></i>
+      </button>
+      <div class="eq-profile-menu" id="eq-profile-menu">
+        <div class="eq-profile-menu-header">
+          <span class="eq-avatar eq-avatar--lg">SM</span>
+          <div>
+            <div class="eq-profile-name">Sara Al Mansoori</div>
+            <div class="eq-profile-role">Accounts Manager · Sales Division</div>
+          </div>
+        </div>
+        <a href="#" class="eq-profile-menu-item"><i class="icon-lock"></i>Change Password</a>
+        <a href="#" class="eq-profile-menu-item eq-profile-menu-item--danger"><i class="icon-logout"></i>Logout</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="eq-backdrop" id="eq-backdrop"></div>
+
+  <!-- ===================== BODY ===================== -->
+  <div class="eq-app-body">
+
+    <!-- ---------- SIDEBAR ---------- -->
+    <div class="eq-sidebar" id="eq-sidebar">
+      <nav class="eq-sidebar-nav">
+        <ul class="eq-nav-list">
+
+          <li class="eq-nav-group-title">Sales</li>
+
+          <li>
+            <a class="eq-nav-link" href="index.html">
+              <i class="icon-speedometer"></i><span>Overview</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link active" href="invoices.html">
+              <i class="icon-doc"></i><span>Invoices</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Sales" data-title="Quotes" data-icon="icon-note"
+               data-desc="Quote/Proforma list and the create/edit quote workflow will be prototyped in a later stage.">
+              <i class="icon-note"></i><span>Quotes</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Sales" data-title="Customers" data-icon="icon-people"
+               data-desc="The customer list and add/edit customer screens will be prototyped in a later stage.">
+              <i class="icon-people"></i><span>Customers</span>
+            </a>
+          </li>
+
+          <li class="eq-nav-group-title">
+            Master Data
+            <span class="eq-nav-group-note">Representative items — final list to be confirmed</span>
+          </li>
+
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Products" data-icon="icon-basket"
+               data-desc="Product master data, served today through the generic metadata-driven screen.">
+              <i class="icon-basket"></i><span>Products</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Categories" data-icon="icon-tag"
+               data-desc="Product category master data.">
+              <i class="icon-tag"></i><span>Categories</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Payment Terms" data-icon="icon-wallet"
+               data-desc="Payment term master data.">
+              <i class="icon-wallet"></i><span>Payment Terms</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Employees" data-icon="icon-user"
+               data-desc="Internal user accounts, roles and site access.">
+              <i class="icon-user"></i><span>Employees</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Executives" data-icon="icon-star"
+               data-desc="Sales executive records referenced by invoices and quotes.">
+              <i class="icon-star"></i><span>Executives</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Units of Measure" data-icon="icon-size-fullscreen"
+               data-desc="Unit-of-measure master data used on invoice and quote line items.">
+              <i class="icon-size-fullscreen"></i><span>Units of Measure</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="VAT Codes" data-icon="icon-calculator"
+               data-desc="VAT/tax code master data used across invoicing and quoting.">
+              <i class="icon-calculator"></i><span>VAT Codes</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Currencies" data-icon="icon-globe"
+               data-desc="Currency and conversion-rate master data.">
+              <i class="icon-globe"></i><span>Currencies</span>
+            </a>
+          </li>
+
+        </ul>
+      </nav>
+      <button class="eq-sidebar-minimizer" id="eq-sidebar-minimizer" aria-label="Toggle compact sidebar" title="Toggle compact sidebar">
+        <i class="icon-arrow-left"></i>
+      </button>
+    </div>
+
+    <!-- ---------- MAIN ---------- -->
+    <main class="eq-main">
+      <ol class="eq-breadcrumb" id="eq-breadcrumb">
+        <li>Home</li>
+        <li>Sales</li>
+        <li class="active">Invoices</li>
+      </ol>
+
+      <div class="container-fluid eq-content">
+
+        <!-- Invoices page (this screen's real, built content) -->
+        <section class="eq-page" id="eq-page-main">
+          <div class="eq-page-header">
+            <div>
+              <h1>Invoices</h1>
+            </div>
+            <a href="new-invoice.html" class="eq-btn eq-btn-primary">
+              <i class="icon-plus"></i>New Invoice
+            </a>
+          </div>
+
+          <!-- ---------- TOOLBAR ---------- -->
+          <div class="eq-toolbar">
+            <div class="eq-toolbar-search">
+              <i class="icon-magnifier"></i>
+              <input type="text" id="inv-search" placeholder="Search invoice number or customer" autocomplete="off">
+            </div>
+            <div class="eq-toolbar-field">
+              <label for="inv-year">Year</label>
+              <select id="inv-year"><option value="">All years</option></select>
+            </div>
+            <div class="eq-toolbar-field">
+              <label for="inv-status">Status</label>
+              <select id="inv-status">
+                <option value="">All statuses</option>
+                <option value="paid">Paid</option>
+                <option value="due">Due</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+            <button type="button" class="eq-btn eq-btn-outline eq-toolbar-clear" id="inv-clear">
+              <i class="icon-close"></i>Clear filters
+            </button>
+          </div>
+
+          <!-- ---------- TABLE CARD ---------- -->
+          <div class="eq-table-card">
+
+            <!-- Skeleton / loading state — shown briefly on first load -->
+            <div class="eq-skeleton" id="inv-skeleton" aria-hidden="true">
+              <div class="eq-skeleton-row" style="--i:0"></div>
+              <div class="eq-skeleton-row" style="--i:1"></div>
+              <div class="eq-skeleton-row" style="--i:2"></div>
+              <div class="eq-skeleton-row" style="--i:3"></div>
+              <div class="eq-skeleton-row" style="--i:4"></div>
+              <div class="eq-skeleton-row" style="--i:5"></div>
+            </div>
+
+            <!-- Table + pagination — populated by js/invoices.js -->
+            <div id="inv-table-wrap" hidden>
+              <div class="eq-table-scroll">
+                <table class="eq-table" id="inv-table">
+                  <thead>
+                    <tr>
+                      <th data-sort="number">Invoice No.</th>
+                      <th data-sort="customer">Customer</th>
+                      <th data-sort="invoiceDate">Invoice Date</th>
+                      <th data-sort="preTax" class="num">Pre-Tax Amount</th>
+                      <th data-sort="vat" class="num">VAT</th>
+                      <th data-sort="total" class="num">Total</th>
+                      <th data-sort="status">Status</th>
+                      <th class="actions">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="inv-tbody"><!-- rows rendered by js/invoices.js --></tbody>
+                </table>
+              </div>
+
+              <!--
+                Pagination below reproduces exactly what the app's existing
+                <mfBootstrapPaginator> component renders (two <ul class="pagination">
+                lists of <li class="page-item"><a class="page-link">, using the
+                "active"/"disabled" classes) so the CSS here drops straight onto the
+                real component with no markup change. The live app's page-size set is
+                [50,100,150]; a smaller set is used here only so paging is visible
+                across 50 sample rows.
+              -->
+              <div class="eq-table-footer">
+                <div class="eq-table-count" id="inv-count">0 invoices</div>
+                <div class="eq-paginator" id="inv-pagination"></div>
+              </div>
+            </div>
+
+            <!-- Empty state — shown when filters match nothing -->
+            <div class="eq-empty" id="inv-empty" hidden>
+              <div class="eq-empty-icon icon-doc"></div>
+              <h2>No invoices match these filters</h2>
+              <p>Try a different search term, or clear filters to see all 24 sample invoices.</p>
+              <button type="button" class="eq-btn eq-btn-outline" id="inv-empty-clear">Clear filters</button>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Placeholder page (shared — reused for every not-yet-built screen) -->
+        <section class="eq-page" id="eq-page-placeholder" hidden>
+          <div class="eq-page-header">
+            <div>
+              <h1 id="eq-placeholder-h1">&nbsp;</h1>
+              <p>This screen hasn't been prototyped yet.</p>
+            </div>
+          </div>
+          <div class="eq-empty">
+            <div class="eq-empty-icon icon-doc" id="eq-placeholder-icon"></div>
+            <h2 id="eq-placeholder-title">&nbsp;</h2>
+            <p id="eq-placeholder-desc">&nbsp;</p>
+            <span class="eq-badge eq-badge-neutral" id="eq-placeholder-stage">Not yet prototyped</span>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <footer class="eq-footer">
+    <div><b>EmQube Invoice</b> — UI Prototype</div>
+    <div class="eq-footer-meta">Static mock data only · Not connected to the live application</div>
+  </footer>
+
+  <!-- Toast used for actions that don't lead anywhere yet (New Invoice, row actions) -->
+  <div class="eq-toast" id="eq-toast" role="status" aria-live="polite"></div>
+
+  <!--
+    ===================== RECORD PAYMENT MODAL =====================
+    Deliberately uses ngx-bootstrap's own modal DOM (.modal > .modal-dialog >
+    .modal-content > .modal-header/.modal-body/.modal-footer, plus a separate
+    .modal-backdrop) so this styling drops onto the existing <div bsModal
+    #addCustomerModal> with no structural change.
+
+    Everything shown here comes from data the component ALREADY has:
+    addNewItem(modal, row) assigns the whole clicked row to InvoiceData, so
+    InvoiceNumber / CustomerName / CurrencySymbol / InvoiceTotal /
+    InvoiceDateString are all interpolatable. minDate and maxDate are already
+    set from the invoice date and today. No new logic is required.
+  -->
+  <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h4 class="modal-title" id="paymentModalLabel">Record Payment</h4>
+          <button type="button" class="close" data-modal-close aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <!-- invoice context: pure interpolation of InvoiceData.* in the real app -->
+          <div class="eq-modal-context">
+            <div class="eq-modal-context-row">
+              <span class="k">Invoice</span>
+              <span class="v mono" id="pay-invoice-no">2026-77</span>
+            </div>
+            <div class="eq-modal-context-row">
+              <span class="k">Customer</span>
+              <span class="v" id="pay-customer">Motor Vehicle Trading Company (BMW)</span>
+            </div>
+            <div class="eq-modal-context-row">
+              <span class="k">Invoice date</span>
+              <span class="v" id="pay-invoice-date">06 Aug 2026</span>
+            </div>
+            <div class="eq-modal-context-row eq-modal-context-total">
+              <span class="k">Invoice total</span>
+              <span class="v mono" id="pay-total">AED 2,425.00</span>
+            </div>
+          </div>
+
+          <div class="eq-field eq-modal-field">
+            <label for="pay-date">Payment Date</label>
+            <input type="text" id="pay-date" placeholder="DD-MM-YYYY" autocomplete="off">
+            <p class="eq-field-hint">
+              Must be on or after the invoice date and no later than today
+              (the existing datepicker already enforces this via <code>minDate</code>/<code>maxDate</code>).
+            </p>
+          </div>
+
+          <p class="eq-modal-note">
+            Recording a payment stamps the payment date on this invoice. No amount is
+            captured — partial payments aren't supported by the current API.
+          </p>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="eq-btn eq-btn-outline" data-modal-close>Cancel</button>
+          <button type="button" class="eq-btn eq-btn-primary" data-coming-soon="Record payment">Record Payment</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade" id="paymentBackdrop"></div>
+
+  <script src="js/prototype.js?v=5"></script>
+  <script src="js/invoices.js?v=6"></script>
+</body>
+</html>

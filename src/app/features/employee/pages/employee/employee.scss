@@ -42,3 +42,14 @@
   color: var(--eq-ink-faint);
   cursor: not-allowed;
 }
+
+.fdr {
+  flex-direction: row;
+}
+
+.df {
+  display: flex;
+  gap: 8px;
+  vertical-align: middle;
+  align-items: center;
+}

@@ -1,0 +1,392 @@
+/*
+  EmQube Invoice — Invoice List screen styles (Stage 2 prototype)
+  Builds on tokens.css + prototype.css (shell). Reuses .eq-btn, .eq-badge,
+  .eq-empty, .eq-page-header etc. from prototype.css rather than
+  redefining them. Everything below is specific to this screen: the
+  toolbar, the table, its skeleton/empty states, pagination and the
+  small "not wired up yet" toast used on inert actions.
+*/
+
+/* ---------- toolbar ---------- */
+.eq-toolbar {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: var(--eq-sp-4);
+  background: var(--eq-surface);
+  border: 1px solid var(--eq-border);
+  border-radius: var(--eq-radius-card);
+  padding: var(--eq-sp-4) var(--eq-sp-5);
+  margin-bottom: var(--eq-sp-5);
+}
+.eq-toolbar-search {
+  position: relative;
+  flex: 1 1 260px;
+  min-width: 200px;
+}
+.eq-toolbar-search i {
+  position: absolute;
+  left: 12px; top: 50%; transform: translateY(-50%);
+  color: var(--eq-ink-faint);
+  font-size: 13px;
+}
+.eq-toolbar-search input {
+  width: 100%;
+  height: 36px;
+  padding: 0 var(--eq-sp-3) 0 34px;
+  border: 1px solid var(--eq-border);
+  border-radius: var(--eq-radius-control);
+  background: var(--eq-bg);
+  color: var(--eq-ink);
+  font-size: 13.5px;
+  font-family: var(--eq-font-sans);
+}
+.eq-toolbar-search input:focus,
+.eq-toolbar-field select:focus {
+  outline: none;
+  border-color: var(--eq-primary);
+  box-shadow: 0 0 0 3px var(--eq-primary-soft);
+}
+.eq-toolbar-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 140px;
+}
+.eq-toolbar-field label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  font-weight: 700;
+  color: var(--eq-ink-faint);
+}
+.eq-toolbar-field select {
+  height: 36px;
+  padding: 0 var(--eq-sp-3);
+  border: 1px solid var(--eq-border);
+  border-radius: var(--eq-radius-control);
+  background: var(--eq-bg);
+  color: var(--eq-ink);
+  font-size: 13.5px;
+  font-family: var(--eq-font-sans);
+}
+.eq-toolbar-clear {
+  margin-left: auto;
+  height: 36px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* ---------- table card ---------- */
+.eq-table-card {
+  background: var(--eq-surface);
+  border: 1px solid var(--eq-border);
+  border-radius: var(--eq-radius-card);
+  box-shadow: var(--eq-shadow-card);
+  overflow: hidden;
+}
+
+/* ---------- skeleton / loading state ---------- */
+.eq-skeleton { padding: var(--eq-sp-5); display: flex; flex-direction: column; gap: var(--eq-sp-3); }
+.eq-skeleton-row {
+  height: 20px;
+  border-radius: var(--eq-radius-control);
+  background: linear-gradient(90deg, var(--eq-surface-alt) 25%, var(--eq-border) 37%, var(--eq-surface-alt) 63%);
+  background-size: 400% 100%;
+  animation: eq-shimmer 1.4s ease infinite;
+  animation-delay: calc(var(--i) * 0.08s);
+}
+@keyframes eq-shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .eq-skeleton-row { animation: none; }
+}
+
+/* ---------- table ---------- */
+.eq-table-scroll { overflow-x: auto; }
+.eq-table {
+  width: 100%;
+  min-width: 920px;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+.eq-table th {
+  position: sticky; top: 0;
+  background: var(--eq-surface-alt);
+  text-align: left;
+  padding: var(--eq-sp-3) var(--eq-sp-4);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  font-weight: 700;
+  color: var(--eq-ink-muted);
+  border-bottom: 1px solid var(--eq-border);
+  white-space: nowrap;
+}
+.eq-table th[data-sort] { cursor: pointer; user-select: none; }
+.eq-table th[data-sort]:hover { color: var(--eq-ink); }
+.eq-table th[data-sort]::after {
+  content: "\2195";
+  margin-left: 5px;
+  font-size: 10px;
+  color: var(--eq-ink-faint);
+  display: inline-block;
+}
+.eq-table th[data-sort].sorted-asc::after { content: "\2191"; color: var(--eq-primary); }
+.eq-table th[data-sort].sorted-desc::after { content: "\2193"; color: var(--eq-primary); }
+.eq-table th.num, .eq-table td.num { text-align: right; white-space: nowrap; }
+.eq-table th.actions { text-align: right; }
+
+.eq-table td {
+  padding: var(--eq-sp-3) var(--eq-sp-4);
+  border-bottom: 1px solid var(--eq-border);
+  color: var(--eq-ink);
+  vertical-align: middle;
+}
+.eq-table tbody tr:last-child td { border-bottom: none; }
+.eq-table tbody tr:hover { background: var(--eq-surface-alt); }
+.eq-table td.num { font-family: var(--eq-font-mono); font-variant-numeric: tabular-nums; }
+.eq-table td.mono { font-family: var(--eq-font-mono); font-variant-numeric: tabular-nums; color: var(--eq-ink-muted); white-space: nowrap; }
+.eq-table td.wrap { white-space: normal; max-width: 320px; }
+
+/* row actions */
+.eq-row-actions { display: flex; justify-content: flex-end; gap: 2px; }
+.eq-icon-btn {
+  width: 30px; height: 30px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--eq-ink-muted);
+  border-radius: var(--eq-radius-control);
+  cursor: pointer;
+  font-size: 13px;
+}
+.eq-icon-btn:hover { background: var(--eq-surface-alt); color: var(--eq-ink); }
+.eq-icon-btn[disabled] { color: var(--eq-ink-faint); cursor: default; }
+.eq-icon-btn[disabled]:hover { background: transparent; }
+
+/* ---------- table footer / pagination ---------- */
+.eq-table-footer {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--eq-sp-4);
+  padding: var(--eq-sp-3) var(--eq-sp-5);
+  border-top: 1px solid var(--eq-border);
+}
+.eq-table-count { font-size: 12.5px; color: var(--eq-ink-muted); font-weight: 600; }
+
+/* ---------- pagination ----------
+   Targets the markup the app's existing <mfBootstrapPaginator> already
+   renders (ul.pagination > li.page-item > a.page-link, with .active and
+   .disabled), so this CSS can be dropped onto the real component without
+   touching its template. Selectors are deliberately specific enough to
+   win over the vendor Bootstrap/GenesisUI .pagination rules in style.css. */
+.eq-paginator { display: flex; align-items: center; gap: var(--eq-sp-4); margin-left: auto; flex-wrap: wrap; }
+.eq-paginator .pagination {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+}
+.eq-paginator .pagination .page-item { display: inline-flex; margin: 0; float: none; }
+.eq-paginator .pagination .page-item .page-link {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 30px; height: 30px;
+  padding: 0 8px; margin: 0;
+  float: none;
+  border: 1px solid var(--eq-border);
+  border-radius: var(--eq-radius-control);
+  background: var(--eq-surface);
+  color: var(--eq-ink-muted);
+  font-size: 12.5px;
+  font-family: var(--eq-font-mono);
+  line-height: 1;
+  text-decoration: none;
+}
+.eq-paginator .pagination .page-item .page-link:hover { background: var(--eq-surface-alt); color: var(--eq-ink); border-color: var(--eq-border); }
+.eq-paginator .pagination .page-item.active .page-link,
+.eq-paginator .pagination .page-item.active .page-link:hover {
+  background: var(--eq-primary); border-color: var(--eq-primary); color: #fff;
+}
+.eq-paginator .pagination .page-item.disabled .page-link,
+.eq-paginator .pagination .page-item.disabled .page-link:hover {
+  opacity: .4; cursor: default !important; background: var(--eq-surface); color: var(--eq-ink-muted);
+}
+/* second list = rows-per-page; the component floats it right */
+.eq-paginator .pagination.pull-right { float: none; }
+.eq-paginator .pagination.pull-right::before {
+  content: "Rows";
+  align-self: center;
+  margin-right: 4px;
+  font-size: 11px; text-transform: uppercase; letter-spacing: .04em;
+  font-weight: 700; color: var(--eq-ink-faint);
+}
+
+/* empty state sits inside the table card, so drop its own border/margin */
+#inv-empty.eq-empty { border: none; margin: 0 auto; padding: var(--eq-sp-7) var(--eq-sp-5); }
+
+/* ---------- toast ("not wired up yet") ---------- */
+.eq-toast {
+  position: fixed;
+  left: 50%; bottom: 46px;
+  transform: translate(-50%, 12px);
+  background: var(--eq-ink);
+  color: #fff;
+  font-size: 13px;
+  padding: 10px 16px;
+  border-radius: var(--eq-radius-control);
+  box-shadow: var(--eq-shadow-card);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .18s ease, transform .18s ease;
+  z-index: 1060;
+  max-width: 90vw;
+}
+.eq-toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* ---------- record payment modal ----------
+   Targets the Bootstrap / ngx-bootstrap modal classes the app already
+   renders (.modal, .modal-dialog, .modal-content, .modal-header,
+   .modal-body, .modal-footer, .close, .modal-backdrop), so this styling
+   applies to the existing <div bsModal #addCustomerModal> unchanged.
+   Note the app currently uses .modal-lg for a single date field — dropping
+   that one class is most of the visual fix on its own. */
+#paymentModal.modal {
+  display: none;
+  position: fixed; inset: 0;
+  z-index: 1055;
+  overflow-y: auto;
+  padding: var(--eq-sp-5);
+}
+#paymentModal.modal.in { display: block; }
+#paymentModal .modal-dialog {
+  max-width: 460px;
+  width: 100%;
+  margin: 6vh auto;
+}
+#paymentModal .modal-content {
+  background: var(--eq-surface);
+  border: 1px solid var(--eq-border);
+  border-radius: var(--eq-radius-card);
+  box-shadow: 0 12px 40px -8px rgba(22,32,43,.35);
+  overflow: hidden;
+}
+#paymentModal .modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--eq-sp-3);
+  padding: var(--eq-sp-4) var(--eq-sp-5);
+  border-bottom: 1px solid var(--eq-border);
+}
+#paymentModal .modal-title { margin: 0; font-size: 15.5px; font-weight: 700; color: var(--eq-ink); }
+#paymentModal .close {
+  border: none; background: transparent;
+  font-size: 22px; line-height: 1;
+  color: var(--eq-ink-faint);
+  cursor: pointer; padding: 0 4px;
+  opacity: 1; text-shadow: none;
+}
+#paymentModal .close:hover { color: var(--eq-ink); }
+#paymentModal .modal-body { padding: var(--eq-sp-5); }
+#paymentModal .modal-footer {
+  display: flex; justify-content: flex-end; gap: var(--eq-sp-2);
+  padding: var(--eq-sp-4) var(--eq-sp-5);
+  border-top: 1px solid var(--eq-border);
+  background: var(--eq-bg);
+}
+
+.modal-backdrop {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(15,23,32,.45);
+  z-index: 1050;
+}
+.modal-backdrop.in { display: block; opacity: 1; }
+
+/* invoice context block — all values already available on InvoiceData */
+.eq-modal-context {
+  background: var(--eq-bg);
+  border: 1px solid var(--eq-border);
+  border-radius: var(--eq-radius-control);
+  padding: var(--eq-sp-3) var(--eq-sp-4);
+  margin-bottom: var(--eq-sp-5);
+}
+.eq-modal-context-row {
+  display: flex; justify-content: space-between; align-items: baseline; gap: var(--eq-sp-4);
+  padding: 5px 0;
+  font-size: 13px;
+}
+.eq-modal-context-row .k { color: var(--eq-ink-muted); flex-shrink: 0; }
+.eq-modal-context-row .v { color: var(--eq-ink); font-weight: 600; text-align: right; }
+.eq-modal-context-total { border-top: 1px solid var(--eq-border); margin-top: 4px; padding-top: 8px; }
+.eq-modal-context-total .v { font-size: 14.5px; }
+
+.eq-modal-field { display: flex; flex-direction: column; gap: 6px; }
+.eq-modal-field label { font-size: 12.5px; font-weight: 600; color: var(--eq-ink-muted); }
+.eq-modal-field input {
+  width: 100%; box-sizing: border-box; height: 38px;
+  border: 1px solid var(--eq-border); border-radius: var(--eq-radius-control);
+  background: var(--eq-surface); color: var(--eq-ink);
+  font-size: 13.5px; font-family: var(--eq-font-sans); padding: 0 var(--eq-sp-3);
+}
+.eq-modal-field input:focus { outline: none; border-color: var(--eq-primary); box-shadow: 0 0 0 3px var(--eq-primary-soft); }
+.eq-field-hint { margin: 0; font-size: 11.5px; color: var(--eq-ink-faint); line-height: 1.5; }
+.eq-field-hint code { font-family: var(--eq-font-mono); font-size: 11px; }
+.eq-modal-note {
+  margin: var(--eq-sp-4) 0 0;
+  font-size: 12px; line-height: 1.5;
+  color: var(--eq-ink-muted);
+  background: var(--eq-amber-soft);
+  border-radius: var(--eq-radius-control);
+  padding: var(--eq-sp-3);
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 700px) {
+  .eq-toolbar { flex-direction: column; align-items: stretch; }
+  .eq-toolbar-field, .eq-toolbar-search { flex: none; min-width: 0; width: 100%; }
+  .eq-toolbar-clear { margin-left: 0; width: 100%; justify-content: center; }
+
+  /* table -> stacked cards */
+  .eq-table-scroll { overflow-x: visible; }
+  .eq-table { min-width: 0; }
+  .eq-table thead { display: none; }
+  .eq-table, .eq-table tbody { display: block; width: 100%; }
+  .eq-table tr {
+    display: block;
+    border: 1px solid var(--eq-border);
+    border-radius: var(--eq-radius-control);
+    margin: var(--eq-sp-3);
+    padding: var(--eq-sp-2) var(--eq-sp-3);
+  }
+  .eq-table tbody tr:hover { background: var(--eq-surface); }
+  .eq-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--eq-sp-3);
+    padding: 7px 0;
+    border-bottom: 1px dashed var(--eq-border);
+    text-align: right;
+  }
+  .eq-table td::before {
+    content: attr(data-label);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    font-weight: 700;
+    color: var(--eq-ink-faint);
+    text-align: left;
+  }
+  .eq-table td.actions { border-bottom: none; }
+  .eq-table td.actions::before { content: none; }
+  .eq-table tr td:last-child { border-bottom: none; }
+
+  .eq-table-footer { flex-direction: column; align-items: stretch; }
+  .eq-paginator { margin-left: 0; justify-content: center; }
+}

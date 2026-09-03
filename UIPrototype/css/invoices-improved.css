@@ -1,0 +1,261 @@
+/*
+  EmQube Invoice — Invoice List IMPROVED layout styles
+  =====================================================
+  Builds on tokens.css + prototype.css + invoices.css (Stage 2). Reuses the
+  base .eq-btn / .eq-badge / .eq-table / .eq-paginator / .eq-toolbar classes
+  and only ADDS the refinements described in the <head> comment of
+  invoices-improved.html:
+
+    A. Summary (KPI) cards  — reweighted, currency-aware, ordered by priority
+    B. Toolbar              — search band + facet band + active-filter chips
+    C. Table columns        — reprioritised; Status its own column, VAT added,
+                              Total promoted, Sales Exec / Paid Date compacted
+    D. Row states           — colour + strikethrough for cancelled, left accent
+                              bar for unpaid rows
+    E. Actions              — single kebab ⋮ menu instead of inline icon buttons
+    F. Table footer         — filtered totals summary strip
+*/
+
+/* ---------- page subtitle ---------- */
+.eq-page-sub { margin: 0; color: var(--eq-ink-muted); font-size: 13px; }
+
+/* ============================================================
+   A. KPI / summary cards
+   ============================================================ */
+.eq-kpi-grid-improved { grid-template-columns: repeat(4, 1fr); }
+
+/* Outstanding is the headline: slightly larger value + a subtle accent border */
+.eq-kpi-outstanding { border-top: 3px solid var(--eq-amber); }
+.eq-kpi-outstanding .eq-kpi-value { font-size: 28px; }
+
+/* due card uses a neutral accent */
+.eq-kpi-due { border-top: 3px solid var(--eq-info); }
+
+.eq-kpi-currency {
+  font-family: var(--eq-font-sans);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--eq-ink-faint);
+}
+
+/* count-only card uses a larger sans number (invoice count, not currency) */
+.eq-kpi-value-count {
+  font-family: var(--eq-font-sans);
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.eq-kpi-note {
+  margin-top: var(--eq-sp-2);
+  font-size: 11.5px;
+  color: var(--eq-ink-faint);
+}
+
+/* ============================================================
+   B. Toolbar — search band + facet band + chips
+   ============================================================ */
+.eq-toolbar-improved {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--eq-sp-4);
+}
+.eq-toolbar-improved .eq-toolbar-search { flex: none; width: 100%; }
+
+/* facet row: wraps the selects + clear button, left-aligned, flex-grow customer */
+.eq-toolbar-facets {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: var(--eq-sp-4);
+}
+.eq-toolbar-field-grow { flex: 1 1 220px; min-width: 180px; }
+.eq-toolbar-field-xs { min-width: 120px; }
+
+.eq-toolbar-improved .eq-toolbar-clear {
+  margin-left: 0;
+  flex-shrink: 0;
+}
+
+/* active-filter chips */
+.eq-toolbar-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--eq-sp-2);
+  align-items: center;
+  border-top: 1px solid var(--eq-border);
+  padding-top: var(--eq-sp-3);
+  font-size: 12px;
+  color: var(--eq-ink-muted);
+}
+.eq-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--eq-primary-soft);
+  color: var(--eq-primary);
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-weight: 600;
+  font-size: 11.5px;
+}
+.eq-filter-chip button {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  opacity: .7;
+}
+.eq-filter-chip button:hover { opacity: 1; }
+
+/* ============================================================
+   C. Table — reprioritised columns
+   ============================================================ */
+.eq-table-improved { min-width: 1080px; }
+
+/* column width control via helper classes on <th> */
+.eq-table-improved th.col-no      { width: 90px; }
+.eq-table-improved th.col-status  { width: 92px; }
+.eq-table-improved th.col-date    { width: 96px; white-space: nowrap; }
+.eq-table-improved th.col-customer{ width: 220px; }
+.eq-table-improved th.col-product { width: 170px; }
+.eq-table-improved th.col-money   { width: 96px; }
+.eq-table-improved th.col-total   { width: 108px; }
+.eq-table-improved th.col-exec    { width: 130px; }
+.eq-table-improved th.col-actions { width: 56px; }
+
+/* invoice number + revision */
+.eq-inv-no { font-family: var(--eq-font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--eq-ink); }
+.eq-inv-rev { font-size: 11px; color: var(--eq-ink-faint); margin-left: 3px; }
+
+/* status cell: dot + label, own column */
+.eq-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.eq-status .dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.eq-status-paid      { color: var(--eq-green); }
+.eq-status-paid .dot { background: var(--eq-green); }
+.eq-status-due       { color: var(--eq-amber); }
+.eq-status-due .dot  { background: var(--eq-amber); }
+.eq-status-cancelled { color: var(--eq-ink-faint); }
+.eq-status-cancelled .dot { background: var(--eq-ink-faint); }
+
+/* customer cell — emphasized, sortable hover link styling */
+.eq-table-improved td.col-customer-cell { font-weight: 600; color: var(--eq-ink); }
+
+/* product cell with a small division tag inline */
+.eq-product-cell { display: flex; flex-direction: column; gap: 2px; max-width: 200px; }
+.eq-product-name { color: var(--eq-ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; }
+.eq-product-division { font-size: 10.5px; color: var(--eq-ink-faint); text-transform: uppercase; letter-spacing: .03em; font-weight: 700; }
+
+/* sales exec — compact avatar + name, secondary weight */
+.eq-exec {
+  display: flex; align-items: center; gap: 6px;
+  color: var(--eq-ink-muted);
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+.eq-exec .eq-exec-avatar {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--eq-info-soft);
+  color: var(--eq-info);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* total is the key figure — bolder */
+.eq-table-improved td.col-total-cell { font-weight: 700; color: var(--eq-ink); }
+
+/* ============================================================
+   D. Row states
+   ============================================================ */
+.eq-table-improved tbody tr { border-left: 3px solid transparent; }
+
+/* unpaid (due) rows get a subtle amber left accent to draw the eye */
+.eq-table-improved tbody tr.tr-due { border-left-color: var(--eq-amber); background: #FFFCF7; }
+.eq-table-improved tbody tr.tr-due:hover { background: #FFF7EC; }
+
+/* cancelled rows de-emphasised + number struck through */
+.eq-table-improved tbody tr.tr-cancelled { opacity: .62; }
+.eq-table-improved tbody tr.tr-cancelled .eq-inv-no { text-decoration: line-through; }
+
+/* ============================================================
+   E. Actions — single kebab menu
+   ============================================================ */
+.eq-kebab {
+  position: relative;
+  display: inline-flex;
+}
+.eq-kebab-menu {
+  position: absolute;
+  right: 0; top: 100%;
+  min-width: 156px;
+  background: var(--eq-surface);
+  border: 1px solid var(--eq-border);
+  border-radius: var(--eq-radius-control);
+  box-shadow: var(--eq-shadow-card);
+  padding: var(--eq-sp-1);
+  margin-top: 4px;
+  z-index: 20;
+  display: none;
+}
+.eq-kebab.open .eq-kebab-menu { display: block; }
+.eq-kebab-menu button {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%;
+  border: none; background: transparent;
+  padding: 7px 10px;
+  border-radius: var(--eq-radius-control);
+  font-size: 12.5px;
+  color: var(--eq-ink);
+  cursor: pointer;
+  text-align: left;
+}
+.eq-kebab-menu button i { width: 15px; text-align: center; color: var(--eq-ink-muted); }
+.eq-kebab-menu button:hover { background: var(--eq-surface-alt); }
+.eq-kebab-menu .eq-kebab-danger { color: var(--eq-red); }
+.eq-kebab-menu .eq-kebab-danger i { color: var(--eq-red); }
+
+/* ============================================================
+   F. Table footer totals strip
+   ============================================================ */
+.eq-totals-row { background: var(--eq-surface-alt); }
+.eq-totals-row td { border-top: 2px solid var(--eq-border); font-weight: 700; color: var(--eq-ink); }
+.eq-totals-row .eq-totals-label { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--eq-ink-muted); }
+.eq-totals-row .eq-totals-total { font-size: 14px; }
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width: 991px) {
+  .eq-kpi-grid-improved { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 700px) {
+  .eq-kpi-grid-improved { grid-template-columns: 1fr; }
+  .eq-toolbar-facets { flex-direction: column; align-items: stretch; }
+  .eq-toolbar-facets .eq-toolbar-field,
+  .eq-toolbar-facets .eq-toolbar-field-grow,
+  .eq-toolbar-facets .eq-toolbar-field-xs { width: 100%; min-width: 0; }
+  .eq-toolbar-improved .eq-toolbar-clear { width: 100%; justify-content: center; }
+}
+
+/* Ensure the mobile stacked-card table (from invoices.css) still reads well;
+   hide the accent border and totality semantics on narrow screens */
+@media (max-width: 700px) {
+  .eq-table-improved tbody tr { border-left-width: 0; }
+  .eq-totals-row { display: none; }
+}

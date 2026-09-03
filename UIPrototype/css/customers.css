@@ -1,0 +1,422 @@
+/*
+  EmQube Invoice — Customers screen styles (prototype)
+  Builds on tokens.css + prototype.css (shell) and reuses .eq-toolbar,
+  .eq-table*, .eq-paginator, .eq-badge, .eq-empty, .eq-skeleton verbatim
+  from invoices.css's patterns (duplicated here rather than shared so this
+  file stays a single drop-in reference, same approach as create-quote.css
+  reusing create-invoice.css's field/grid rules by class name only).
+  Only the parts unique to this screen live here: the Prospect/Customer
+  type badge and the Add/Edit Customer modal (segmented toggles, section
+  subtitles, conditional rows).
+*/
+
+/* ---------- toolbar (identical pattern to Invoices) ---------- */
+.eq-toolbar {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--eq-sp-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--eq-sp-4);
+}
+.eq-toolbar-search {
+  position: relative;
+  flex: 1 1 260px;
+  min-width: 220px;
+}
+.eq-toolbar-search i {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  color: var(--eq-ink-faint); font-size: 13px; pointer-events: none;
+}
+.eq-toolbar-search input {
+  width: 100%; box-sizing: border-box;
+  height: 38px;
+  border: 1px solid var(--eq-border);
+  border-radius: var(--eq-radius-control);
+  background: var(--eq-surface);
+  color: var(--eq-ink);
+  font-size: 13.5px;
+  padding: 0 12px 0 34px;
+}
+.eq-toolbar-search input:focus,
+.eq-toolbar-field select:focus {
+  outline: none; border-color: var(--eq-primary); box-shadow: 0 0 0 3px var(--eq-primary-soft);
+}
+.eq-toolbar-field {
+  display: flex; flex-direction: column; gap: 4px;
+  min-width: 150px;
+}
+.eq-toolbar-field label {
+  font-size: 11px; text-transform: uppercase; letter-spacing: .04em;
+  font-weight: 700; color: var(--eq-ink-faint);
+}
+.eq-toolbar-field select {
+  height: 38px;
+  border: 1px solid var(--eq-border);
+  border-radius: var(--eq-radius-control);
+  background: var(--eq-surface);
+  color: var(--eq-ink);
+  font-size: 13px;
+  padding: 0 10px;
+  cursor: pointer;
+}
+.eq-toolbar-clear {
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+/* ---------- table card / skeleton (identical pattern to Invoices) ---------- */
+.eq-table-card {
+  background: var(--eq-surface);
+  border: 1px solid var(--eq-border);
+  border-radius: var(--eq-radius-card);
+  box-shadow: var(--eq-shadow-card);
+  overflow: hidden;
+}
+.eq-skeleton { padding: var(--eq-sp-5); display: flex; flex-direction: column; gap: var(--eq-sp-3); }
+.eq-skeleton-row {
+  height: 38px;
+  border-radius: var(--eq-radius-control);
+  background: linear-gradient(90deg, var(--eq-surface-alt) 25%, var(--eq-border) 37%, var(--eq-surface-alt) 63%);
+  background-size: 400% 100%;
+  animation: eq-skeleton-shimmer 1.4s ease infinite;
+  animation-delay: calc(var(--i) * .08s);
+}
+@keyframes eq-skeleton-shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .eq-skeleton-row { animation: none; }
+}
+
+/* ---------- table ---------- */
+.eq-table-scroll { overflow-x: auto; }
+.eq-table {
+  width: 100%;
+  min-width: 860px;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+.eq-table th {
+  position: sticky; top: 0;
+  background: var(--eq-surface-alt);
+  text-align: left;
+  padding: var(--eq-sp-3) var(--eq-sp-4);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  font-weight: 700;
+  color: var(--eq-ink-muted);
+  border-bottom: 1px solid var(--eq-border);
+  white-space: nowrap;
+}
+.eq-table th[data-sort] { cursor: pointer; user-select: none; }
+.eq-table th[data-sort]:hover { color: var(--eq-ink); }
+.eq-table th[data-sort]::after {
+  content: "\2195";
+  margin-left: 5px;
+  font-size: 10px;
+  color: var(--eq-ink-faint);
+  display: inline-block;
+}
+.eq-table th[data-sort].sorted-asc::after { content: "\2191"; color: var(--eq-primary); }
+.eq-table th[data-sort].sorted-desc::after { content: "\2193"; color: var(--eq-primary); }
+.eq-table th.actions { text-align: right; }
+
+.eq-table td {
+  padding: var(--eq-sp-3) var(--eq-sp-4);
+  border-bottom: 1px solid var(--eq-border);
+  color: var(--eq-ink);
+  vertical-align: middle;
+}
+.eq-table tbody tr:last-child td { border-bottom: none; }
+.eq-table tbody tr:hover { background: var(--eq-surface-alt); }
+.eq-table td.name { font-weight: 600; }
+.eq-table td.muted { color: var(--eq-ink-muted); }
+
+/* row actions */
+.eq-row-actions { display: flex; justify-content: flex-end; gap: 2px; }
+.eq-icon-btn {
+  width: 30px; height: 30px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--eq-ink-muted);
+  border-radius: var(--eq-radius-control);
+  cursor: pointer;
+  font-size: 13px;
+}
+.eq-icon-btn:hover { background: var(--eq-surface-alt); color: var(--eq-ink); }
+
+/* ---------- type badge (Customer / Prospect) ----------
+   Distinct from status (Active/Inactive), which reuses the standard
+   .eq-badge-success/.eq-badge-neutral tokens already defined in
+   prototype.css. Prospect gets the info tone so the two badges read as
+   different axes at a glance, not "two statuses". */
+.eq-badge-prospect { background: var(--eq-info-soft); color: var(--eq-info); }
+.eq-badge-customer { background: var(--eq-green-soft); color: var(--eq-green); }
+
+/* ---------- table footer / pagination (identical pattern to Invoices) ---------- */
+.eq-table-footer {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--eq-sp-4);
+  padding: var(--eq-sp-3) var(--eq-sp-5);
+  border-top: 1px solid var(--eq-border);
+}
+.eq-table-count { font-size: 12.5px; color: var(--eq-ink-muted); font-weight: 600; }
+
+.eq-paginator { display: flex; align-items: center; gap: var(--eq-sp-4); margin-left: auto; flex-wrap: wrap; }
+.eq-paginator .pagination {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+}
+.eq-paginator .pagination .page-item { display: inline-flex; margin: 0; float: none; }
+.eq-paginator .pagination .page-item .page-link {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 30px; height: 30px;
+  padding: 0 8px; margin: 0;
+  float: none;
+  border: 1px solid var(--eq-border);
+  border-radius: var(--eq-radius-control);
+  background: var(--eq-surface);
+  color: var(--eq-ink-muted);
+  font-size: 12.5px;
+  font-family: var(--eq-font-mono);
+  line-height: 1;
+  text-decoration: none;
+}
+.eq-paginator .pagination .page-item .page-link:hover { background: var(--eq-surface-alt); color: var(--eq-ink); border-color: var(--eq-border); }
+.eq-paginator .pagination .page-item.active .page-link,
+.eq-paginator .pagination .page-item.active .page-link:hover {
+  background: var(--eq-primary); border-color: var(--eq-primary); color: #fff;
+}
+.eq-paginator .pagination .page-item.disabled .page-link,
+.eq-paginator .pagination .page-item.disabled .page-link:hover {
+  opacity: .4; cursor: default !important; background: var(--eq-surface); color: var(--eq-ink-muted);
+}
+.eq-paginator .pagination.pull-right { float: none; }
+.eq-paginator .pagination.pull-right::before {
+  content: "Rows";
+  align-self: center;
+  margin-right: 4px;
+  font-size: 11px; text-transform: uppercase; letter-spacing: .04em;
+  font-weight: 700; color: var(--eq-ink-faint);
+}
+
+#cust-empty.eq-empty { border: none; margin: 0 auto; padding: var(--eq-sp-7) var(--eq-sp-5); }
+
+/* ---------- toast ---------- */
+.eq-toast {
+  position: fixed;
+  left: 50%; bottom: 46px;
+  transform: translate(-50%, 12px);
+  background: var(--eq-ink);
+  color: #fff;
+  font-size: 13px;
+  padding: 10px 16px;
+  border-radius: var(--eq-radius-control);
+  box-shadow: var(--eq-shadow-card);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .18s ease, transform .18s ease;
+  z-index: 1060;
+  max-width: 90vw;
+}
+.eq-toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* ==================================================================
+   ADD / EDIT CUSTOMER MODAL
+   Targets the Bootstrap / ngx-bootstrap modal classes the app already
+   renders (.modal, .modal-dialog, .modal-content, .modal-header,
+   .modal-body, .modal-footer, .close, .modal-backdrop), so this styling
+   applies to the existing <div bsModal #addCustomerModal> unchanged. The
+   only markup-level change is dropping .modal-lg's default 900px cap
+   down to a width that suits a 3-column field grid without becoming a
+   full-bleed sheet on a laptop screen.
+   ================================================================== */
+#customerModal.modal {
+  display: none;
+  position: fixed; inset: 0;
+  z-index: 1055;
+  overflow-y: auto;
+  padding: var(--eq-sp-4);
+}
+#customerModal.modal.in { display: block; }
+#customerModal .modal-dialog {
+  max-width: 600px;
+  width: 100%;
+  margin: 4vh auto;
+}
+#customerModal .modal-content {
+  background: var(--eq-surface);
+  border: 1px solid var(--eq-border);
+  border-radius: var(--eq-radius-card);
+  box-shadow: 0 12px 40px -8px rgba(22,32,43,.35);
+  overflow: hidden;
+}
+#customerModal .modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--eq-sp-3);
+  padding: var(--eq-sp-3) var(--eq-sp-4);
+  border-bottom: 1px solid var(--eq-border);
+}
+/* Vendor .modal-header::after is a Bootstrap-3 clearfix (content:"";
+   display:table). Inside a flex container a generated pseudo-element still
+   becomes a flex item — an invisible third item after .modal-title and
+   .close — so "justify-content: space-between" split the row into THREE
+   slots instead of two and stranded .close in the middle. Kill it. */
+#customerModal .modal-header::after { content: none; display: none; }
+#customerModal .modal-title { margin: 0; font-size: 15px; font-weight: 700; color: var(--eq-ink); }
+#customerModal .close {
+  border: none; background: transparent;
+  font-size: 20px; line-height: 1;
+  color: var(--eq-ink-faint);
+  cursor: pointer; padding: 0 2px;
+  opacity: 1; text-shadow: none;
+  margin-left: auto; /* belt-and-braces: flush right even if a future rule adds a sibling */
+}
+#customerModal .close:hover { color: var(--eq-ink); }
+#customerModal .modal-body {
+  padding: var(--eq-sp-4);
+  max-height: 74vh;
+  overflow-y: auto;
+}
+#customerModal .modal-footer {
+  display: flex; justify-content: flex-end; gap: var(--eq-sp-2);
+  padding: var(--eq-sp-3) var(--eq-sp-4);
+  border-top: 1px solid var(--eq-border);
+  background: var(--eq-bg);
+}
+
+.modal-backdrop {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(15,23,32,.45);
+  z-index: 1050;
+}
+.modal-backdrop.in { display: block; opacity: 1; }
+
+/* required-field asterisk: same red dot used for validation states
+   elsewhere, just inline instead of the raw style="color:red" span */
+.eq-required { color: var(--eq-red); font-weight: 700; }
+
+/* section subtitle, reused from create-invoice.css's .eq-form-subtitle,
+   duplicated here plus a variant that carries a toggle on the same line
+   (Shipping Address / "Same as billing address") */
+.eq-form-subtitle {
+  font-size: 11px; text-transform: uppercase; letter-spacing: .05em; font-weight: 700;
+  color: var(--eq-ink-faint);
+  margin: var(--eq-sp-4) 0 var(--eq-sp-2);
+}
+.eq-form-subtitle-with-toggle {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--eq-sp-3);
+  flex-wrap: wrap;
+}
+
+/* field grid — fixed at 2 columns throughout this modal (the 3-column
+   variant from create-invoice.css isn't used here on purpose: at this
+   dialog's compact width, 3-across leaves each field too narrow) */
+.eq-form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--eq-sp-3) var(--eq-sp-4); }
+.eq-modal-form-grid { margin-bottom: 0; }
+.eq-modal-form-grid-tight { align-items: end; }
+.eq-field-wide { grid-column: 1 / -1; }
+
+.eq-field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.eq-field label {
+  font-size: 12px; font-weight: 600; color: var(--eq-ink-muted);
+  display: flex; align-items: center; gap: 6px;
+}
+.eq-field input[type="text"] {
+  width: 100%; box-sizing: border-box;
+  height: 33px;
+  border: 1px solid var(--eq-border);
+  border-radius: var(--eq-radius-control);
+  background: var(--eq-surface);
+  color: var(--eq-ink);
+  font-size: 13px;
+  font-family: var(--eq-font-sans);
+  padding: 0 var(--eq-sp-3);
+}
+.eq-field input:focus { outline: none; border-color: var(--eq-primary); box-shadow: 0 0 0 3px var(--eq-primary-soft); }
+
+.eq-field .eq-line-select.eq-field-select {
+  width: 100%; box-sizing: border-box;
+  height: 33px;
+  font-size: 13px;
+  padding: 0 26px 0 var(--eq-sp-3);
+  border: 1px solid var(--eq-border);
+  border-radius: var(--eq-radius-control);
+  background-color: var(--eq-surface);
+  background-position: right 11px center;
+  color: var(--eq-ink);
+  -webkit-appearance: none; -moz-appearance: none; appearance: none;
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath fill='%238496A8' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 8px 5px;
+  cursor: pointer;
+}
+.eq-field .eq-line-select.eq-field-select:focus {
+  outline: none; border-color: var(--eq-primary); box-shadow: 0 0 0 3px var(--eq-primary-soft);
+}
+
+/* ---------- toggle switches (Is Individual / Prospect / Registered /
+   Same as billing address) — same slider visual as create-quote.css's
+   .eq-switch, wrapped in a label row that carries its own text so it
+   reads as one control instead of a bare checkbox */
+.eq-switch-toggle-row {
+  display: flex; align-items: center; gap: var(--eq-sp-4);
+  margin-bottom: var(--eq-sp-3);
+  padding-bottom: var(--eq-sp-3);
+  border-bottom: 1px dashed var(--eq-border);
+  flex-wrap: wrap;
+}
+.eq-switch-toggle {
+  display: inline-flex; align-items: center; gap: 8px;
+  cursor: pointer;
+}
+.eq-switch-toggle-text { font-size: 12.5px; font-weight: 600; color: var(--eq-ink); }
+.eq-switch-toggle-field { height: 33px; }
+.eq-switch-toggle-inline { gap: 8px; }
+.eq-switch-toggle-inline .eq-switch-toggle-text { font-size: 12px; font-weight: 600; color: var(--eq-ink-muted); text-transform: none; letter-spacing: 0; }
+
+.eq-switch { position: relative; display: inline-block; width: 38px; height: 21px; flex-shrink: 0; }
+.eq-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+.eq-switch .slider {
+  position: absolute; inset: 0;
+  background: var(--eq-border);
+  border-radius: 999px;
+  transition: background .15s ease;
+}
+.eq-switch .slider::before {
+  content: "";
+  position: absolute;
+  left: 3px; top: 3px;
+  width: 15px; height: 15px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform .15s ease;
+}
+.eq-switch input:checked + .slider { background: var(--eq-primary); }
+.eq-switch input:checked + .slider::before { transform: translateX(17px); }
+.eq-switch input:focus-visible + .slider { box-shadow: 0 0 0 3px var(--eq-primary-soft); }
+
+/* ---------- responsive ---------- */
+@media (max-width: 700px) {
+  .eq-toolbar { flex-direction: column; align-items: stretch; }
+  .eq-toolbar-field, .eq-toolbar-search { flex: none; min-width: 0; width: 100%; }
+  .eq-toolbar-clear { margin-left: 0; width: 100%; justify-content: center; }
+}
+@media (max-width: 480px) {
+  .eq-form-grid { grid-template-columns: 1fr; }
+  .eq-field-wide { grid-column: auto; }
+  #customerModal .modal-dialog { margin: 0; max-width: 100%; }
+  #customerModal.modal { padding: 0; }
+  #customerModal .modal-content { border-radius: 0; min-height: 100vh; }
+}

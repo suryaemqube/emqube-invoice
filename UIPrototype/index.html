@@ -1,0 +1,271 @@
+<!doctype html>
+<!--
+  EmQube Invoice — UI Prototype
+
+  STATUS: Visual/UX prototype only. Static HTML/CSS/JS, mock data only.
+  NOT connected to the Angular app, its services, its API, or the database.
+  NOT wired into routing, auth, RBAC, or the server-driven menu.
+  Nothing under WebInvoice/ or the backend was modified to build this —
+  assets/ below contains unmodified copies of the vendor CSS/icon files
+  this reuses; css/ and js/ are new, prototype-only files.
+
+  Open this file directly in a browser. No build step required.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>EmQube Invoice — UI Prototype</title>
+  <link rel="icon" href="assets/img/favicon.png">
+
+  <!-- Existing framework + icon assets, copied unmodified from WebInvoice/src/assets -->
+  <link href="assets/css/style.css" rel="stylesheet">
+  <link href="assets/css/font-awesome.min.css" rel="stylesheet">
+  <link href="assets/css/simple-line-icons.css" rel="stylesheet">
+
+  <!-- New: EmQube design tokens + prototype-only shell styling -->
+  <link href="css/tokens.css?v=5" rel="stylesheet">
+  <link href="css/prototype.css?v=7" rel="stylesheet">
+</head>
+<body class="eq-app eq-sidebar-compact">
+
+  <div class="eq-prototype-banner" style="position:fixed;bottom:0;left:0;right:0;z-index:1050;background:#16202B;color:#fff;font-size:11.5px;padding:6px 16px;text-align:center;font-family:var(--eq-font-sans);">
+    UI Prototype &nbsp;·&nbsp; Static mock data &nbsp;·&nbsp; Not connected to the live application
+  </div>
+
+  <!-- ===================== HEADER ===================== -->
+  <header class="eq-header">
+    <button class="eq-header-toggle eq-header-toggle--mobile" id="eq-toggle-mobile" aria-label="Toggle navigation">
+      <i class="icon-menu"></i>
+    </button>
+    <button class="eq-header-toggle eq-header-toggle--desktop" id="eq-toggle-desktop" aria-label="Collapse sidebar">
+      <i class="icon-menu"></i>
+    </button>
+
+    <a class="navbar-brand" href="#" aria-label="EmQube Invoice"></a>
+
+    <div class="eq-header-title">
+      <span class="eq-header-title-label" id="eq-header-group">Sales</span>
+      <span class="eq-header-title-current" id="eq-header-current">Overview</span>
+    </div>
+
+    <div class="eq-header-spacer"></div>
+
+    <div class="eq-profile" id="eq-profile">
+      <button class="eq-profile-trigger" id="eq-profile-trigger">
+        <span class="eq-avatar">SM</span>
+        <span class="eq-profile-meta">
+          <span class="eq-profile-name">Sara Al Mansoori</span>
+          <span class="eq-profile-role">Accounts Manager</span>
+        </span>
+        <i class="fa fa-angle-down eq-profile-caret"></i>
+      </button>
+      <div class="eq-profile-menu" id="eq-profile-menu">
+        <div class="eq-profile-menu-header">
+          <span class="eq-avatar eq-avatar--lg">SM</span>
+          <div>
+            <div class="eq-profile-name">Sara Al Mansoori</div>
+            <div class="eq-profile-role">Accounts Manager · Sales Division</div>
+          </div>
+        </div>
+        <a href="#" class="eq-profile-menu-item"><i class="icon-lock"></i>Change Password</a>
+        <a href="#" class="eq-profile-menu-item eq-profile-menu-item--danger"><i class="icon-logout"></i>Logout</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="eq-backdrop" id="eq-backdrop"></div>
+
+  <!-- ===================== BODY ===================== -->
+  <div class="eq-app-body">
+
+    <!-- ---------- SIDEBAR ---------- -->
+    <div class="eq-sidebar" id="eq-sidebar">
+      <nav class="eq-sidebar-nav">
+        <ul class="eq-nav-list">
+
+          <li class="eq-nav-group-title">Sales</li>
+
+          <li>
+            <a class="eq-nav-link active" href="index.html">
+              <i class="icon-speedometer"></i><span>Overview</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="invoices.html">
+              <i class="icon-doc"></i><span>Invoices</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Sales" data-title="Quotes" data-icon="icon-note"
+               data-desc="Quote/Proforma list and the create/edit quote workflow will be prototyped in a later stage.">
+              <i class="icon-note"></i><span>Quotes</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Sales" data-title="Customers" data-icon="icon-people"
+               data-desc="The customer list and add/edit customer screens will be prototyped in a later stage.">
+              <i class="icon-people"></i><span>Customers</span>
+            </a>
+          </li>
+
+          <li class="eq-nav-group-title">
+            Master Data
+            <span class="eq-nav-group-note">Representative items — final list to be confirmed</span>
+          </li>
+
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Products" data-icon="icon-basket"
+               data-desc="Product master data, served today through the generic metadata-driven screen.">
+              <i class="icon-basket"></i><span>Products</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Categories" data-icon="icon-tag"
+               data-desc="Product category master data.">
+              <i class="icon-tag"></i><span>Categories</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Payment Terms" data-icon="icon-wallet"
+               data-desc="Payment term master data.">
+              <i class="icon-wallet"></i><span>Payment Terms</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Employees" data-icon="icon-user"
+               data-desc="Internal user accounts, roles and site access.">
+              <i class="icon-user"></i><span>Employees</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Executives" data-icon="icon-star"
+               data-desc="Sales executive records referenced by invoices and quotes.">
+              <i class="icon-star"></i><span>Executives</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Units of Measure" data-icon="icon-size-fullscreen"
+               data-desc="Unit-of-measure master data used on invoice and quote line items.">
+              <i class="icon-size-fullscreen"></i><span>Units of Measure</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="VAT Codes" data-icon="icon-calculator"
+               data-desc="VAT/tax code master data used across invoicing and quoting.">
+              <i class="icon-calculator"></i><span>VAT Codes</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Currencies" data-icon="icon-globe"
+               data-desc="Currency and conversion-rate master data.">
+              <i class="icon-globe"></i><span>Currencies</span>
+            </a>
+          </li>
+
+        </ul>
+      </nav>
+      <button class="eq-sidebar-minimizer" id="eq-sidebar-minimizer" aria-label="Toggle compact sidebar" title="Toggle compact sidebar">
+        <i class="icon-arrow-left"></i>
+      </button>
+    </div>
+
+    <!-- ---------- MAIN ---------- -->
+    <main class="eq-main">
+      <ol class="eq-breadcrumb" id="eq-breadcrumb">
+        <li>Home</li>
+        <li>Sales</li>
+        <li class="active">Overview</li>
+      </ol>
+
+      <div class="container-fluid eq-content">
+
+        <!-- Overview page (this screen's real, built content) -->
+        <section class="eq-page" id="eq-page-main">
+          <div class="eq-page-header">
+            <div>
+              <h1>Overview</h1>
+              <p>Welcome back, Sara — here's what's happening across Sales today. All figures on this screen are illustrative mock data.</p>
+            </div>
+            <a href="#" class="eq-btn eq-btn-primary"><i class="icon-plus"></i>New Invoice</a>
+          </div>
+
+          <div class="eq-kpi-grid">
+            <div class="eq-kpi">
+              <div class="eq-kpi-label">Outstanding</div>
+              <div class="eq-kpi-value eq-mono">AED 184,320</div>
+              <div class="eq-kpi-delta"><span class="eq-badge eq-badge-danger">12 overdue</span></div>
+            </div>
+            <div class="eq-kpi">
+              <div class="eq-kpi-label">Invoiced this month</div>
+              <div class="eq-kpi-value eq-mono">AED 96,450</div>
+              <div class="eq-kpi-delta"><span class="eq-badge eq-badge-success">+18% vs last month</span></div>
+            </div>
+            <div class="eq-kpi">
+              <div class="eq-kpi-label">Quotes awaiting response</div>
+              <div class="eq-kpi-value eq-mono">7 <small>quotes</small></div>
+              <div class="eq-kpi-delta"><span class="eq-badge eq-badge-info">AED 212,900 potential</span></div>
+            </div>
+            <div class="eq-kpi">
+              <div class="eq-kpi-label">Paid this month</div>
+              <div class="eq-kpi-value eq-mono">AED 142,780</div>
+              <div class="eq-kpi-delta"><span class="eq-badge eq-badge-success">34 payments recorded</span></div>
+            </div>
+          </div>
+
+          <div class="eq-roadmap">
+            <h2>Prototype roadmap</h2>
+            <p>Selecting any other item in the sidebar shows a placeholder until it's built — here's what's done and what's next.</p>
+            <ul class="eq-roadmap-list">
+              <li class="eq-roadmap-item">
+                <span class="stage">Done</span>
+                <span class="name">Invoices</span>
+                <span class="desc"><a href="invoices.html">List</a> and <a href="create-invoice.html">create/edit</a> are both live.</span>
+              </li>
+              <li class="eq-roadmap-item">
+                <span class="stage">Next</span>
+                <span class="name">Quotes</span>
+                <span class="desc">List, and the create/edit quote workflow</span>
+              </li>
+              <li class="eq-roadmap-item">
+                <span class="stage">Later</span>
+                <span class="name">Customers</span>
+                <span class="desc">List and add/edit customer</span>
+              </li>
+              <li class="eq-roadmap-item">
+                <span class="stage">Later</span>
+                <span class="name">Master Data</span>
+                <span class="desc">Products, Categories, Payment Terms, Employees, Executives</span>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- Placeholder page (reused for every not-yet-built screen) -->
+        <section class="eq-page" id="eq-page-placeholder" hidden>
+          <div class="eq-page-header">
+            <div>
+              <h1 id="eq-placeholder-h1">&nbsp;</h1>
+              <p>This screen hasn't been prototyped yet.</p>
+            </div>
+          </div>
+          <div class="eq-empty">
+            <div class="eq-empty-icon icon-doc" id="eq-placeholder-icon"></div>
+            <h2 id="eq-placeholder-title">&nbsp;</h2>
+            <p id="eq-placeholder-desc">&nbsp;</p>
+            <span class="eq-badge eq-badge-neutral" id="eq-placeholder-stage">Not yet prototyped</span>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <footer class="eq-footer">
+    <div><b>EmQube Invoice</b> — UI Prototype</div>
+    <div class="eq-footer-meta">Static mock data only · Not connected to the live application</div>
+  </footer>
+
+  <script src="js/prototype.js?v=5"></script>
+</body>
+</html>

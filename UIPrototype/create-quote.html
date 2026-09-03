@@ -1,0 +1,538 @@
+<!doctype html>
+<!--
+  EmQube Invoice — UI Prototype — Edit Quote / Proforma
+
+  STATUS: Visual/UX prototype only. Static HTML/CSS/JS, mock data only.
+  NOT connected to the Angular app, its services, its API, or the database.
+
+  Modelled on create-quote.component.html. Differences from the invoice
+  screen, all taken from that template rather than invented:
+    - a Quote / Proforma type selector, locked once the quote has an id
+      ([disabled]="InvoiceData.QuoteId != null")
+    - "Quote No./Proforma No" carries the revision suffix (QuoteRevisionNumber)
+    - there is NO Tax & Delivery card — it is commented out in the real
+      template, so Place of Supply sits in Document Details instead
+    - VAT is a single document-level code (VatCodeId), not per line
+    - the line grid has NO Discount column; discount is document-level and
+      lives in the totals block as "Discount(%, AMT)"
+    - a "Show total" toggle (InvoiceData.showtotal) controls whether totals
+      are printed on the PDF
+    - a Quote/Proforma Revisions panel, shown when QuoteRevision.length > 0
+    - actions are Save + "Generate Invoice" + Back. There is no Cancel Quote.
+      NOTE: despite its label, "Generate Invoice" calls generatePdf() — it
+      prints THIS quote's PDF, it does not create an invoice.
+
+  Open this file directly in a browser. No build step required.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Edit Quote 2026-31 — EmQube Invoice UI Prototype</title>
+  <link rel="icon" href="assets/img/favicon.png">
+
+  <link href="assets/css/style.css" rel="stylesheet">
+  <link href="assets/css/font-awesome.min.css" rel="stylesheet">
+  <link href="assets/css/simple-line-icons.css" rel="stylesheet">
+
+  <link href="css/tokens.css?v=5" rel="stylesheet">
+  <link href="css/prototype.css?v=7" rel="stylesheet">
+  <link href="css/create-invoice.css?v=7" rel="stylesheet">
+  <link href="css/create-quote.css?v=1" rel="stylesheet">
+</head>
+<body class="eq-app eq-sidebar-compact">
+
+  <div class="eq-prototype-banner" style="position:fixed;bottom:0;left:0;right:0;z-index:1050;background:#16202B;color:#fff;font-size:11.5px;padding:6px 16px;text-align:center;font-family:var(--eq-font-sans);">
+    UI Prototype &nbsp;·&nbsp; Static mock data &nbsp;·&nbsp; Not connected to the live application
+  </div>
+
+  <!-- ===================== HEADER ===================== -->
+  <header class="eq-header">
+    <button class="eq-header-toggle eq-header-toggle--mobile" id="eq-toggle-mobile" aria-label="Toggle navigation">
+      <i class="icon-menu"></i>
+    </button>
+    <button class="eq-header-toggle eq-header-toggle--desktop" id="eq-toggle-desktop" aria-label="Collapse sidebar">
+      <i class="icon-menu"></i>
+    </button>
+
+    <a class="navbar-brand" href="index.html" aria-label="EmQube Invoice"></a>
+
+    <div class="eq-header-title">
+      <span class="eq-header-title-label" id="eq-header-group">Sales</span>
+      <span class="eq-header-title-current" id="eq-header-current">Edit Quote</span>
+    </div>
+
+    <div class="eq-header-spacer"></div>
+
+    <div class="eq-profile" id="eq-profile">
+      <button class="eq-profile-trigger" id="eq-profile-trigger">
+        <span class="eq-avatar">SM</span>
+        <span class="eq-profile-meta">
+          <span class="eq-profile-name">Sara Al Mansoori</span>
+          <span class="eq-profile-role">Accounts Manager</span>
+        </span>
+        <i class="fa fa-angle-down eq-profile-caret"></i>
+      </button>
+      <div class="eq-profile-menu" id="eq-profile-menu">
+        <div class="eq-profile-menu-header">
+          <span class="eq-avatar eq-avatar--lg">SM</span>
+          <div>
+            <div class="eq-profile-name">Sara Al Mansoori</div>
+            <div class="eq-profile-role">Accounts Manager · Sales Division</div>
+          </div>
+        </div>
+        <a href="#" class="eq-profile-menu-item"><i class="icon-lock"></i>Change Password</a>
+        <a href="#" class="eq-profile-menu-item eq-profile-menu-item--danger"><i class="icon-logout"></i>Logout</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="eq-backdrop" id="eq-backdrop"></div>
+
+  <!-- ===================== BODY ===================== -->
+  <div class="eq-app-body">
+
+    <div class="eq-sidebar" id="eq-sidebar">
+      <nav class="eq-sidebar-nav">
+        <ul class="eq-nav-list">
+
+          <li class="eq-nav-group-title">Sales</li>
+
+          <li><a class="eq-nav-link" href="index.html"><i class="icon-speedometer"></i><span>Overview</span></a></li>
+          <li><a class="eq-nav-link" href="invoices.html"><i class="icon-doc"></i><span>Invoices</span></a></li>
+          <li><a class="eq-nav-link active" href="create-quote.html"><i class="icon-note"></i><span>Quotes</span></a></li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Sales" data-title="Customers" data-icon="icon-people"
+               data-desc="The customer list and add/edit customer screens will be prototyped in a later stage.">
+              <i class="icon-people"></i><span>Customers</span>
+            </a>
+          </li>
+
+          <li class="eq-nav-group-title">
+            Master Data
+            <span class="eq-nav-group-note">Representative items — final list to be confirmed</span>
+          </li>
+
+          <li><a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Products" data-icon="icon-basket" data-desc="Product master data."><i class="icon-basket"></i><span>Products</span></a></li>
+          <li><a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Categories" data-icon="icon-tag" data-desc="Product category master data."><i class="icon-tag"></i><span>Categories</span></a></li>
+          <li><a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Payment Terms" data-icon="icon-wallet" data-desc="Payment term master data."><i class="icon-wallet"></i><span>Payment Terms</span></a></li>
+          <li><a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Employees" data-icon="icon-user" data-desc="Internal user accounts, roles and site access."><i class="icon-user"></i><span>Employees</span></a></li>
+          <li><a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Executives" data-icon="icon-star" data-desc="Sales executive records."><i class="icon-star"></i><span>Executives</span></a></li>
+          <li><a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Units of Measure" data-icon="icon-size-fullscreen" data-desc="Unit-of-measure master data."><i class="icon-size-fullscreen"></i><span>Units of Measure</span></a></li>
+          <li><a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="VAT Codes" data-icon="icon-calculator" data-desc="VAT/tax code master data."><i class="icon-calculator"></i><span>VAT Codes</span></a></li>
+          <li><a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Currencies" data-icon="icon-globe" data-desc="Currency and conversion-rate master data."><i class="icon-globe"></i><span>Currencies</span></a></li>
+
+        </ul>
+      </nav>
+      <button class="eq-sidebar-minimizer" id="eq-sidebar-minimizer" aria-label="Toggle compact sidebar" title="Toggle compact sidebar">
+        <i class="icon-arrow-left"></i>
+      </button>
+    </div>
+
+    <!-- ---------- MAIN ---------- -->
+    <main class="eq-main">
+      <ol class="eq-breadcrumb" id="eq-breadcrumb">
+        <li>Home</li>
+        <li>Sales</li>
+        <li>Quotes</li>
+        <li class="active">Edit Quote</li>
+      </ol>
+
+      <div class="container-fluid eq-content">
+
+        <section class="eq-page" id="eq-page-main">
+
+          <div class="eq-invoice-header">
+            <div class="eq-invoice-header-text">
+              <h1>Edit Quote/Proforma <span class="eq-mono">2026-31-R2</span></h1>
+              <div class="eq-invoice-meta">
+                <span class="eq-badge eq-badge-info">Quote</span>
+                <span>E-Movers LLC</span>
+                <span class="eq-invoice-meta-dot">·</span>
+                <span>Revision 2 of 3</span>
+              </div>
+            </div>
+            <div class="eq-page-head-actions" style="display:flex;gap:8px;">
+              <button type="button" class="eq-btn eq-btn-outline" data-coming-soon="Copy quote">
+                <i class="icon-docs"></i>Copy
+              </button>
+              <a href="invoices.html" class="eq-btn eq-btn-outline">
+                <i class="icon-arrow-left"></i>Back to Quotes
+              </a>
+            </div>
+          </div>
+
+          <div class="eq-invoice-layout">
+            <div class="eq-invoice-form">
+
+              <!-- ============ DOCUMENT TYPE ============ -->
+              <section class="eq-form-card">
+                <div class="eq-form-card-head">
+                  <h2 class="eq-form-card-title">Document Type</h2>
+                  <span class="eq-badge eq-badge-neutral">Locked after first save</span>
+                </div>
+                <div class="eq-doctype is-locked" role="radiogroup" aria-label="Document type">
+                  <label class="is-selected"><input type="radio" name="quotetype" checked disabled>Quote</label>
+                  <label><input type="radio" name="quotetype" disabled>Proforma</label>
+                </div>
+              </section>
+
+              <!-- ============ CUSTOMER ============ -->
+              <section class="eq-form-card">
+                <h2 class="eq-form-card-title">Customer</h2>
+                <div class="eq-form-grid">
+                  <div class="eq-field">
+                    <label for="q-customer">Customer Name</label>
+                    <div class="eq-select-wrap">
+                      <input type="text" id="q-customer" value="E-Movers LLC" readonly>
+                      <i class="icon-arrow-down"></i>
+                    </div>
+                  </div>
+                  <div class="eq-field">
+                    <label for="q-attention">Attention</label>
+                    <input type="text" id="q-attention" value="Rashid Al Habtoor" readonly>
+                  </div>
+                  <div class="eq-field">
+                    <label for="q-address">Customer Address</label>
+                    <textarea id="q-address" rows="2" readonly>Warehouse 4, Al Quoz Industrial Area 3, Dubai, UAE</textarea>
+                  </div>
+                  <div class="eq-field">
+                    <label for="q-trn">TRN # :</label>
+                    <input type="text" id="q-trn" value="100234567800003" readonly>
+                  </div>
+                </div>
+              </section>
+
+              <!-- ============ DOCUMENT DETAILS ============
+                   Place of Supply and VAT live here because the quote screen
+                   has no separate Tax & Delivery card. -->
+              <section class="eq-form-card">
+                <h2 class="eq-form-card-title">Document Details</h2>
+                <div class="eq-form-grid eq-form-grid-3">
+                  <div class="eq-field">
+                    <label for="q-number">Quote No./Proforma No</label>
+                    <input type="text" id="q-number" class="eq-mono" value="2026-31-R2" readonly disabled>
+                  </div>
+                  <div class="eq-field">
+                    <label for="q-lpo">LPO Number/Customer Ref</label>
+                    <input type="text" id="q-lpo" value="EM-PO-4471" readonly>
+                  </div>
+                  <div class="eq-field">
+                    <label for="q-date">Date</label>
+                    <input type="text" id="q-date" value="02-04-2026" readonly>
+                  </div>
+
+                  <div class="eq-field">
+                    <label for="q-currency">Currency</label>
+                    <select class="eq-line-select eq-field-select" id="q-currency">
+                      <option value="0">Select</option>
+                      <option value="1" selected>AED</option>
+                      <option value="2">USD</option>
+                      <option value="3">EUR</option>
+                    </select>
+                  </div>
+                  <div class="eq-field">
+                    <label for="q-rate">Rate</label>
+                    <input type="text" id="q-rate" value="1" readonly disabled>
+                  </div>
+                  <div class="eq-field">
+                    <label for="q-terms">Payment Terms <i class="icon-info" title="These payment terms have this information with it"></i></label>
+                    <select class="eq-line-select eq-field-select" id="q-terms">
+                      <option value="0">Select</option>
+                      <option value="1">One Time</option>
+                      <option value="2" selected>Quarterly</option>
+                      <option value="3">Annual</option>
+                      <option value="4">Bi Annual</option>
+                      <option value="5">Two-monthly</option>
+                    </select>
+                  </div>
+
+                  <div class="eq-field">
+                    <label for="q-type">Quote/Proforma Type</label>
+                    <select class="eq-line-select eq-field-select" id="q-type">
+                      <option value="0">Select</option>
+                      <option value="1" selected>Local</option>
+                      <option value="2">Export</option>
+                      <option value="3">Export -IS</option>
+                    </select>
+                  </div>
+                  <div class="eq-field">
+                    <label for="q-exec">Sales Executive</label>
+                    <select class="eq-line-select eq-field-select" id="q-exec">
+                      <option value="0">Select</option>
+                      <option value="1">Accounts Dubai</option>
+                      <option value="2">Mohammed Sutarwala</option>
+                      <option value="10" selected>Sundaram Muurgan</option>
+                      <option value="11">Legends Accounts</option>
+                      <option value="16">Vishnu Das</option>
+                      <option value="17">Abdullah Farman</option>
+                    </select>
+                  </div>
+                  <div class="eq-field">
+                    <label for="q-division">Division</label>
+                    <select class="eq-line-select eq-field-select" id="q-division">
+                      <option value="0">Select</option>
+                      <option value="2">Web</option>
+                      <option value="3" selected>Software</option>
+                    </select>
+                  </div>
+
+                  <div class="eq-field">
+                    <label for="q-supply">Place of Supply</label>
+                    <select class="eq-line-select eq-field-select" id="q-supply">
+                      <option value="0">Select</option>
+                      <option value="1" selected>Dubai</option>
+                      <option value="2">Abu Dhabi</option>
+                      <option value="3">Sharjah</option>
+                      <option value="13">Jordan</option>
+                    </select>
+                  </div>
+                  <div class="eq-field">
+                    <label for="q-vat">VAT <i class="icon-info" title="A quote uses one VAT code for the whole document"></i></label>
+                    <select class="eq-line-select eq-field-select" id="q-vat">
+                      <option value="0">Select</option>
+                      <option value="1" selected>5%</option>
+                      <option value="2">0%</option>
+                      <option value="3">Exempt</option>
+                    </select>
+                  </div>
+                </div>
+              </section>
+
+              <!-- ============ ITEMS ============
+                   Note: no Discount column — on a quote the discount is
+                   document-level and appears in the totals block below. -->
+              <section class="eq-form-card eq-items-card">
+                <div class="eq-form-card-head">
+                  <h2 class="eq-form-card-title">Items</h2>
+                  <button type="button" class="eq-btn eq-btn-outline eq-btn-sm" data-coming-soon="Add line item">
+                    <i class="icon-plus"></i>Add Row
+                  </button>
+                </div>
+
+                <div class="eq-line-table-scroll">
+                  <table class="eq-line-table">
+                    <colgroup>
+                      <col style="width:230px">
+                      <col style="width:90px">
+                      <col style="width:60px">
+                      <col style="width:90px">
+                      <col style="width:96px">
+                      <col style="width:82px">
+                      <col style="width:82px">
+                      <col style="width:96px">
+                      <col style="width:38px">
+                    </colgroup>
+                    <thead>
+                      <tr>
+                        <th>Item</th>
+                        <th>UOM</th>
+                        <th class="num">Qty</th>
+                        <th class="num">Rate</th>
+                        <th class="num">PreTax</th>
+                        <th>VAT</th>
+                        <th class="num">Tax</th>
+                        <th class="num">Amount</th>
+                        <th class="actions"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-label="Item" class="eq-item-cell">
+                          <select class="eq-line-select">
+                            <option selected>Software AMC</option>
+                            <option>Software Development</option>
+                            <option>Web Development</option>
+                            <option>SEO Services</option>
+                          </select>
+                          <textarea rows="4" readonly>Annual maintenance contract for the E-Movers logistics platform — system usage, maintenance support, data hosting and email support. 01 Apr 2026 – 31 Mar 2027.</textarea>
+                        </td>
+                        <td data-label="UOM">
+                          <select class="eq-line-select">
+                            <option value="0">Select</option>
+                            <option value="1">Pcs</option>
+                            <option value="4">Hrs</option>
+                            <option value="6" selected>User</option>
+                            <option value="8">Site</option>
+                          </select>
+                        </td>
+                        <td data-label="Qty"><input type="number" class="eq-line-input num" value="1"></td>
+                        <td data-label="Rate"><input type="number" class="eq-line-input num" value="33480"></td>
+                        <td data-label="PreTax"><input type="number" class="eq-line-input num" value="33480" disabled></td>
+                        <td data-label="VAT">
+                          <select class="eq-line-select">
+                            <option value="1" selected>5%</option>
+                            <option value="2">0%</option>
+                            <option value="3">Exempt</option>
+                          </select>
+                        </td>
+                        <td data-label="Tax"><input type="number" class="eq-line-input num" value="1674" disabled></td>
+                        <td data-label="Amount"><input type="number" class="eq-line-input num" value="35154" disabled></td>
+                        <td data-label="" class="actions">
+                          <button type="button" class="eq-icon-btn" title="Remove line" data-coming-soon="Remove line item"><i class="icon-trash"></i></button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- document-level totals, including the document-level discount -->
+                <div class="eq-line-summary">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th></th>
+                        <th class="num">AED</th>
+                        <th class="num">Base (AED)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Discount (%, AMT)</td>
+                        <td colspan="2">
+                          <div class="eq-discount-row">
+                            <input type="number" class="eq-line-input num" value="0">
+                            <select class="eq-line-select">
+                              <option value="0" selected>Select</option>
+                              <option value="1">%</option>
+                              <option value="2">Amt</option>
+                            </select>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr><td>Pre Tax Total</td><td class="num mono">33,480.00</td><td class="num mono">33,480.00</td></tr>
+                      <tr><td>VAT</td><td class="num mono">1,674.00</td><td class="num mono">1,674.00</td></tr>
+                    </tbody>
+                    <tfoot>
+                      <tr><td>Total</td><td class="num mono">35,154.00</td><td class="num mono">35,154.00</td></tr>
+                    </tfoot>
+                  </table>
+                </div>
+
+                <!-- controls whether totals are printed on the PDF -->
+                <div class="eq-switch-row">
+                  <span class="eq-switch-text">
+                    Show total
+                    <span class="eq-switch-hint">Include the totals block when this quote is printed</span>
+                  </span>
+                  <label class="eq-switch">
+                    <input type="checkbox" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </section>
+
+              <!-- ============ TERMS & CONDITIONS ============ -->
+              <section class="eq-form-card">
+                <h2 class="eq-form-card-title">Terms &amp; Conditions</h2>
+                <div class="eq-editor-slot">
+                  <div class="eq-editor-slot-note">Existing rich-text editor (<code>&lt;simple-tiny&gt;</code>) renders here — unchanged</div>
+                  <div class="eq-editor-slot-body">
+                    <p>This quotation is valid for 30 days from the date of issue.</p>
+                    <p>
+                      Account Name: Emqube LLC<br>
+                      Bank Name: Emirates NBD Bank, Al Ras, Dubai.<br>
+                      A/c Number: 1011105257001<br>
+                      IBAN: AE430260001011105257001<br>
+                      Swift Code: EBILAEAD
+                    </p>
+                  </div>
+                </div>
+              </section>
+
+              <!-- ============ REVISIONS ============
+                   Only rendered when QuoteRevision.length > 0. Each version
+                   number re-opens that revision as a copy; the document link
+                   prints that revision's PDF. -->
+              <section class="eq-form-card">
+                <h2 class="eq-form-card-title">Quote/Proforma Revisions</h2>
+                <div class="eq-revisions">
+                  <table>
+                    <thead>
+                      <tr><th style="width:120px">Version</th><th style="width:150px">Date</th><th>Document</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><a href="#" data-coming-soon="Open revision 2026-31">2026-31</a></td>
+                        <td>12 Mar 2026</td>
+                        <td><a href="#" class="eq-rev-doc" data-coming-soon="Print revision 2026-31"><i class="icon-doc"></i>quote 2026-31 · 12 Mar 2026</a></td>
+                      </tr>
+                      <tr>
+                        <td><a href="#" data-coming-soon="Open revision 2026-31-R1">2026-31-R1</a></td>
+                        <td>20 Mar 2026</td>
+                        <td><a href="#" class="eq-rev-doc" data-coming-soon="Print revision 2026-31-R1"><i class="icon-doc"></i>quote 2026-31-R1 · 20 Mar 2026</a></td>
+                      </tr>
+                      <tr>
+                        <td><span class="eq-rev-current">2026-31-R2</span></td>
+                        <td>02 Apr 2026</td>
+                        <td><span class="eq-rev-current">Current revision</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+
+            </div>
+
+            <!-- ============ SUMMARY / ACTIONS ============ -->
+            <aside class="eq-summary">
+              <div class="eq-summary-card">
+                <h2 class="eq-summary-title">Summary</h2>
+                <dl class="eq-summary-list">
+                  <div><dt>Pre Tax Total</dt><dd class="mono">AED 33,480.00</dd></div>
+                  <div><dt>Discount</dt><dd class="mono">AED 0.00</dd></div>
+                  <div><dt>VAT (5%)</dt><dd class="mono">AED 1,674.00</dd></div>
+                </dl>
+                <div class="eq-summary-total">
+                  <span>Total</span>
+                  <span class="mono">AED 35,154.00</span>
+                </div>
+
+                <!-- A quote has no Cancel action. "Generate Invoice" is the
+                     app's existing label for generatePdf() — it prints this
+                     quote, it does not create an invoice. -->
+                <div class="eq-summary-actions">
+                  <button type="button" class="eq-btn eq-btn-primary eq-btn-block" data-coming-soon="Save quote">
+                    <i class="icon-check"></i>Save
+                  </button>
+                  <button type="button" class="eq-btn eq-btn-outline eq-btn-block" data-coming-soon="Generate/print quote PDF">
+                    <i class="icon-printer"></i>Generate Invoice
+                  </button>
+                </div>
+              </div>
+            </aside>
+          </div>
+
+        </section>
+
+        <!-- Placeholder page (shared) -->
+        <section class="eq-page" id="eq-page-placeholder" hidden>
+          <div class="eq-page-header">
+            <div>
+              <h1 id="eq-placeholder-h1">&nbsp;</h1>
+              <p>This screen hasn't been prototyped yet.</p>
+            </div>
+          </div>
+          <div class="eq-empty">
+            <div class="eq-empty-icon icon-doc" id="eq-placeholder-icon"></div>
+            <h2 id="eq-placeholder-title">&nbsp;</h2>
+            <p id="eq-placeholder-desc">&nbsp;</p>
+            <span class="eq-badge eq-badge-neutral" id="eq-placeholder-stage">Not yet prototyped</span>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <footer class="eq-footer">
+    <div><b>EmQube Invoice</b> — UI Prototype</div>
+    <div class="eq-footer-meta">Static mock data only · Not connected to the live application</div>
+  </footer>
+
+  <div class="eq-toast" id="eq-toast" role="status" aria-live="polite"></div>
+
+  <script src="js/prototype.js?v=5"></script>
+  <script src="js/create-invoice.js?v=2"></script>
+</body>
+</html>

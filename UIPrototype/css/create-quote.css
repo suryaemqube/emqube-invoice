@@ -1,0 +1,99 @@
+/*
+  EmQube Invoice — Create/Edit Quote screen styles (prototype)
+  Loaded AFTER create-invoice.css and reuses everything from it (cards,
+  field grid, line table, summary rail). Only the parts unique to the quote
+  screen live here: the Quote/Proforma type selector, the "Show total"
+  switch and the revisions panel.
+*/
+
+/* ---------- Quote / Proforma type selector ---------- */
+.eq-doctype {
+  display: inline-flex;
+  padding: 3px;
+  gap: 3px;
+  background: var(--eq-surface-alt);
+  border: 1px solid var(--eq-border);
+  border-radius: var(--eq-radius-control);
+}
+.eq-doctype label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  padding: 5px 14px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--eq-ink-muted);
+  cursor: pointer;
+}
+.eq-doctype input { accent-color: var(--eq-primary); margin: 0; }
+.eq-doctype label.is-selected { background: var(--eq-surface); color: var(--eq-ink); box-shadow: var(--eq-shadow-card); }
+.eq-doctype.is-locked label { cursor: not-allowed; opacity: .75; }
+
+/* ---------- "Show total" switch ---------- */
+.eq-switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--eq-sp-4);
+  margin-top: var(--eq-sp-4);
+  padding-top: var(--eq-sp-4);
+  border-top: 1px dashed var(--eq-border);
+}
+.eq-switch-row .eq-switch-text { font-size: 13px; color: var(--eq-ink); font-weight: 600; }
+.eq-switch-row .eq-switch-hint { display: block; font-size: 11.5px; font-weight: 400; color: var(--eq-ink-faint); margin-top: 2px; }
+.eq-switch { position: relative; display: inline-block; width: 40px; height: 22px; flex-shrink: 0; }
+.eq-switch input { opacity: 0; width: 0; height: 0; }
+.eq-switch .slider {
+  position: absolute; inset: 0;
+  background: var(--eq-border);
+  border-radius: 999px;
+  transition: background .15s ease;
+}
+.eq-switch .slider::before {
+  content: "";
+  position: absolute;
+  left: 3px; top: 3px;
+  width: 16px; height: 16px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform .15s ease;
+}
+.eq-switch input:checked + .slider { background: var(--eq-primary); }
+.eq-switch input:checked + .slider::before { transform: translateX(18px); }
+
+/* ---------- document-level discount row in the totals block ---------- */
+.eq-discount-row { display: flex; align-items: center; gap: 4px; justify-content: flex-end; }
+.eq-discount-row .eq-line-input { width: 64px; flex: 0 0 64px; }
+.eq-discount-row .eq-line-select { width: 78px; flex: 0 0 78px; }
+
+/* ---------- revisions panel ---------- */
+.eq-revisions { margin-top: 0; }
+.eq-revisions table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.eq-revisions th {
+  padding: var(--eq-sp-2);
+  background: var(--eq-surface-alt);
+  border: none;
+  border-bottom: 1px solid var(--eq-border);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  font-weight: 700;
+  color: var(--eq-ink-muted);
+  text-align: left;
+  white-space: nowrap;
+}
+.eq-revisions td {
+  padding: var(--eq-sp-2);
+  border: none;
+  border-bottom: 1px solid var(--eq-border);
+  color: var(--eq-ink);
+  vertical-align: middle;
+}
+.eq-revisions tr:last-child td { border-bottom: none; }
+.eq-revisions tbody tr:hover td { background: var(--eq-surface-alt); }
+.eq-revisions a { color: var(--eq-primary); text-decoration: none; font-weight: 600; }
+.eq-revisions a:hover { text-decoration: underline; }
+.eq-revisions .eq-rev-current { color: var(--eq-ink-muted); font-weight: 600; }
+.eq-revisions .eq-rev-doc { display: inline-flex; align-items: center; gap: 6px; font-weight: 400; }

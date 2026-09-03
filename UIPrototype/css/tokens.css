@@ -1,0 +1,67 @@
+/*
+  EmQube Invoice — Design tokens
+  Source: UX Discovery Report, "Design system" section.
+  These are the ONLY place color/spacing/radius/type values should be
+  defined. Component styles in prototype.css consume these variables —
+  they never hardcode a hex value or px size directly.
+*/
+:root {
+  /* Brand references */
+  --eq-blue: #0E4194;
+  --eq-blue-hover: #0B3579;
+  --eq-blue-soft: #E7EDF8;
+  --eq-green: #0D9C4A;
+  --eq-green-hover: #0B7C3B;
+  --eq-green-soft: #E4F5EA;
+
+  /* Primary interactive color — currently mapped to brand green.
+     Component rules consume --eq-primary*, never --eq-blue/--eq-green
+     directly, so the accent can be swapped by editing only this block. */
+  --eq-primary: var(--eq-green);
+  --eq-primary-hover: var(--eq-green-hover);
+  --eq-primary-soft: var(--eq-green-soft);
+  --eq-amber: #B4700A;        /* warning */
+  --eq-amber-soft: #FBF0DE;
+  --eq-red: #C23B3B;          /* danger / error */
+  --eq-red-soft: #FBEAEA;
+  --eq-info: #2C6E9E;         /* informative, distinct from brand blue */
+  --eq-info-soft: #E5EFF6;
+
+  /* Neutrals */
+  --eq-bg: #F5F7F9;
+  --eq-surface: #FFFFFF;
+  --eq-surface-alt: #EDF1F5;
+  --eq-border: #DCE3EA;
+  --eq-ink: #16202B;
+  --eq-ink-muted: #57697C;
+  --eq-ink-faint: #8496A8;
+
+  /* Type */
+  --eq-font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --eq-font-mono: ui-monospace, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+
+  /* Spacing scale — 4px base */
+  --eq-sp-1: 4px;
+  --eq-sp-2: 8px;
+  --eq-sp-3: 12px;
+  --eq-sp-4: 16px;
+  --eq-sp-5: 24px;
+  --eq-sp-6: 32px;
+  --eq-sp-7: 48px;
+
+  /* Radius */
+  --eq-radius-control: 6px;
+  --eq-radius-card: 10px;
+
+  /* Shell metrics */
+  --eq-header-height: 60px;
+  --eq-sidebar-width: 240px;
+  --eq-sidebar-width-compact: 56px;
+  /* Kept equal to the closed sidebar width by definition, not by
+     coincidence, so the toggle box always lines up with the collapsed
+     sidebar edge below it. */
+  --eq-header-toggle-width: var(--eq-sidebar-width-compact);
+
+  /* Shadow */
+  --eq-shadow-card: 0 1px 2px rgba(22,32,43,0.05), 0 6px 16px -8px rgba(22,32,43,0.12);
+}

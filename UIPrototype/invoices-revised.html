@@ -1,0 +1,481 @@
+<!doctype html>
+<!--
+  ============================================================================
+  EmQube Invoice — UI Prototype — Invoices (REVISED layout, v2)
+  ============================================================================
+
+  STATUS: Visual/UX prototype only. Static HTML/CSS/JS, mock data only.
+  NOT connected to the Angular app, its services, its API, or the database.
+  Status (Paid / Due / Cancelled) is derived client-side for display using
+  the same rules as the real app (see notes at the bottom).
+
+  This is REVISION 2 of the improved invoice list. It incorporates review
+  feedback on the first prototype (invoices-improved.html). Changes & the
+  reasoning for each are listed below and in the accompanying
+  INVOICES-REDESIGN-NOTES.md file.
+
+  ----------------------------------------------------------------------------
+  WHAT CHANGED FROM REVISION 1 (and why)
+  ----------------------------------------------------------------------------
+
+  1. 'Paid Date' column REMOVED → merged into the Status cell.
+     A dedicated paid-date column cost a full column of width for data that
+     only matters on PAID rows. Now the payment date is rendered in a small
+     second line directly under the status pill, tinted with the status
+     colour, so it only appears where it is meaningful and takes no extra
+     horizontal space. Due rows can show the invoice date lightly there
+     instead, giving every row a consistent sub-line.
+
+  2. Sales Exec avatar REMOVED.
+     The circular initials avatar added visual noise for data (the exec
+     name) that is informational, not a primary identity to recognise at a
+     glance. Exec is now rendered as plain muted text, keeping the cell
+     compact.
+
+  3. 'Customer' column REMOVED → customer name is now a LINK inside the
+     (renamed) "Customer / Item" column, with the product line-item title(s)
+     stacked beneath it.
+     The old layout duplicated the customer name across a dedicated column
+     AND the product cell. Merging them gives one wide, readable identity
+     column. Because an invoice can carry MORE THAN ONE product/line item,
+     the cell is structured as:
+         [ Customer Name (link → open invoice) ]
+         [ · line item 1                       ]
+         [ · line item 2                       ]
+          (all line titles are shown, stacked)
+     Single-item invoices show just the one title. This directly answers
+     "we sometimes have both products on a single invoice": every line item
+     on the invoice is visible, not a truncated single 'ProductName'.
+
+  4. Actions are UPFRONT ICONS again, not hidden in a ⋮ kebab menu.
+     Review preferred immediate, one-click actions over a discoverable menu.
+     The row now shows Edit (pencil), Record Payment (card, only when due)
+     and Print (printer, only when not cancelled) as inline icon buttons —
+     the same actions the real Angular screen exposes. Row actions are
+     contextual: a cancelled invoice shows only a View action.
+
+  5. Toolbar filters are now COLLAPSIBLE behind a filter icon beside search.
+     To free vertical space and keep the screen focused, the facet row
+     (Year / Status / Division / Customer + Clear) starts collapsed and is
+     toggled by a filter button placed beside the search box. The button
+     shows a count badge of how many facets are active. An 'active filter'
+     chip row still appears when anything is filtered, so the user can clear
+     individual facets without expanding the panel.
+
+  ----------------------------------------------------------------------------
+  KEPT FROM REVISION 1 (unchanged in v2, unless noted)
+  ----------------------------------------------------------------------------
+    - Currency-aware KPI summary cards (Outstanding / Invoiced / Paid / Open).
+    - Status as its own column with a coloured dot + label.
+    - VAT as its own column (no mental arithmetic).
+    - Total promoted and bolded as the key figure.
+    - Cancelled rows struck-through & muted; due rows accented.
+    - Sortable columns.
+    - (The v1 "filtered totals strip" in the table footer was REMOVED on
+      request — see below.)
+
+  ----------------------------------------------------------------------------
+  V2 REVIEW CHANGES APPLIED AFTER FEEDBACK
+  ----------------------------------------------------------------------------
+    - Filtered-totals row in the table footer REMOVED (requested).
+    - Mobile (<=700px) now renders the table as readable stacked cards: the
+      previous stacked layout showed only the field label and hid the value.
+      Cells now stack label-over-content so every value is visible, actions
+      are right-aligned icon-only, and the invoice cards flow full width.
+    - Mobile filter panel can no longer overflow the section: the facet row
+      and its selects are forced full-width with box-sizing to fit the card.
+    - Page-head now keeps the title and the New Invoice button SIDE BY SIDE
+      on mobile (overriding the shell's column stacking), and the button's
+      text label is hidden so only the plus icon shows.
+    - New Invoice icon remains the plain plus (icon-plus), not a circled one.
+    - Edit pencil icon REMOVED from the actions column — the customer name is
+      already a direct link that opens the invoice, so a separate pencil was
+      redundant. The actions column now shows only Record Payment (on due rows)
+      and Print (when not cancelled); cancelled rows show only a View icon.
+    - The 'Actions' column header TITLE removed — the header cell is blank
+      (icons carry their own tooltips), which keeps the column narrow.
+
+  ----------------------------------------------------------------------------
+  NOTES ON THE DATA / STATUS MODEL (unchanged, not invented)
+  ----------------------------------------------------------------------------
+    - Status is derived, not stored: Cancelled iff InvoiceTotal==0 &&
+      TotalVAT==0; Paid iff a payment date exists; else Due (BUSINESS-RULES.md).
+    - No 'Overdue' / 'Due Date' is shown: InvoiceListModel carries no due
+      date, so claiming one would invent data (KNOWN-ISSUES.md).
+    - The sample data now models invoices with MULTIPLE line items (a single
+      invoice can legitimately bill two or more products) — see the
+      'products' array in js/invoices-revised.js.
+    - Currency shown per row in the invoice's own symbol; the footer totals
+      aggregate AED rows (multi-currency conversion must use per-row
+      ConversionRate — see BUSINESS-RULES.md).
+  ----------------------------------------------------------------------------
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Invoices (Revised v2) — EmQube Invoice UI Prototype</title>
+  <link rel="icon" href="assets/img/favicon.png">
+
+  <!-- Existing framework + icon assets, copied unmodified from WebInvoice/src/assets -->
+  <link href="assets/css/style.css" rel="stylesheet">
+  <link href="assets/css/font-awesome.min.css" rel="stylesheet">
+  <link href="assets/css/simple-line-icons.css" rel="stylesheet">
+
+  <!-- EmQube design tokens + shell styling (unchanged) -->
+  <link href="css/tokens.css?v=5" rel="stylesheet">
+  <link href="css/prototype.css?v=7" rel="stylesheet">
+
+  <!-- Reused Stage-2 invoice styles (toolbar, table, pagination, icon buttons) -->
+  <link href="css/invoices.css?v=5" rel="stylesheet">
+
+  <!-- REVISED: Invoice List v2 layout styling -->
+  <link href="css/invoices-revised.css?v=1" rel="stylesheet">
+</head>
+<body class="eq-app eq-sidebar-compact">
+
+  <div class="eq-prototype-banner" style="position:fixed;bottom:0;left:0;right:0;z-index:1050;background:#16202B;color:#fff;font-size:11.5px;padding:6px 16px;text-align:center;font-family:var(--eq-font-sans);">
+    UI Prototype — Invoice List v2 (revised) &nbsp;·&nbsp; Static mock data &nbsp;·&nbsp; Not connected to the live application
+  </div>
+
+  <!-- ===================== HEADER ===================== -->
+  <header class="eq-header">
+    <button class="eq-header-toggle eq-header-toggle--mobile" id="eq-toggle-mobile" aria-label="Toggle navigation">
+      <i class="icon-menu"></i>
+    </button>
+    <button class="eq-header-toggle eq-header-toggle--desktop" id="eq-toggle-desktop" aria-label="Collapse sidebar">
+      <i class="icon-menu"></i>
+    </button>
+
+    <a class="navbar-brand" href="index.html" aria-label="EmQube Invoice"></a>
+
+    <div class="eq-header-title">
+      <span class="eq-header-title-label" id="eq-header-group">Sales</span>
+      <span class="eq-header-title-current" id="eq-header-current">Invoices</span>
+    </div>
+
+    <div class="eq-header-spacer"></div>
+
+    <div class="eq-profile" id="eq-profile">
+      <button class="eq-profile-trigger" id="eq-profile-trigger">
+        <span class="eq-avatar">SM</span>
+        <span class="eq-profile-meta">
+          <span class="eq-profile-name">Sara Al Mansoori</span>
+          <span class="eq-profile-role">Accounts Manager</span>
+        </span>
+        <i class="fa fa-angle-down eq-profile-caret"></i>
+      </button>
+      <div class="eq-profile-menu" id="eq-profile-menu">
+        <div class="eq-profile-menu-header">
+          <span class="eq-avatar eq-avatar--lg">SM</span>
+          <div>
+            <div class="eq-profile-name">Sara Al Mansoori</div>
+            <div class="eq-profile-role">Accounts Manager · Sales Division</div>
+          </div>
+        </div>
+        <a href="#" class="eq-profile-menu-item"><i class="icon-lock"></i>Change Password</a>
+        <a href="#" class="eq-profile-menu-item eq-profile-menu-item--danger"><i class="icon-logout"></i>Logout</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="eq-backdrop" id="eq-backdrop"></div>
+
+  <!-- ===================== BODY ===================== -->
+  <div class="eq-app-body">
+
+    <!-- ---------- SIDEBAR ---------- -->
+    <div class="eq-sidebar" id="eq-sidebar">
+      <nav class="eq-sidebar-nav">
+        <ul class="eq-nav-list">
+
+          <li class="eq-nav-group-title">Sales</li>
+
+          <li>
+            <a class="eq-nav-link" href="index.html">
+              <i class="icon-speedometer"></i><span>Overview</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link active" href="invoices-revised.html">
+              <i class="icon-doc"></i><span>Invoices</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Sales" data-title="Quotes" data-icon="icon-note"
+               data-desc="Quote/Proforma list and the create/edit quote workflow will be prototyped in a later stage.">
+              <i class="icon-note"></i><span>Quotes</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Sales" data-title="Customers" data-icon="icon-people"
+               data-desc="The customer list and add/edit customer screens will be prototyped in a later stage.">
+              <i class="icon-people"></i><span>Customers</span>
+            </a>
+          </li>
+
+          <li class="eq-nav-group-title">
+            Master Data
+            <span class="eq-nav-group-note">Representative items — final list to be confirmed</span>
+          </li>
+
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Products" data-icon="icon-basket"
+               data-desc="Product master data, served today through the generic metadata-driven screen.">
+              <i class="icon-basket"></i><span>Products</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Categories" data-icon="icon-tag"
+               data-desc="Product category master data.">
+              <i class="icon-tag"></i><span>Categories</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Payment Terms" data-icon="icon-wallet"
+               data-desc="Payment term master data.">
+              <i class="icon-wallet"></i><span>Payment Terms</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Employees" data-icon="icon-user"
+               data-desc="Internal user accounts, roles and site access.">
+              <i class="icon-user"></i><span>Employees</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Executives" data-icon="icon-star"
+               data-desc="Sales executive records referenced by invoices and quotes.">
+              <i class="icon-star"></i><span>Executives</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Units of Measure" data-icon="icon-size-fullscreen"
+               data-desc="Unit-of-measure master data used on invoice and quote line items.">
+              <i class="icon-size-fullscreen"></i><span>Units of Measure</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="VAT Codes" data-icon="icon-calculator"
+               data-desc="VAT/tax code master data used across invoicing and quoting.">
+              <i class="icon-calculator"></i><span>VAT Codes</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Currencies" data-icon="icon-globe"
+               data-desc="Currency and conversion-rate master data.">
+              <i class="icon-globe"></i><span>Currencies</span>
+            </a>
+          </li>
+
+        </ul>
+      </nav>
+      <button class="eq-sidebar-minimizer" id="eq-sidebar-minimizer" aria-label="Toggle compact sidebar" title="Toggle compact sidebar">
+        <i class="icon-arrow-left"></i>
+      </button>
+    </div>
+
+    <!-- ---------- MAIN ---------- -->
+    <main class="eq-main">
+      <!-- <ol class="eq-breadcrumb" id="eq-breadcrumb">
+        <li>Home</li>
+        <li>Sales</li>
+        <li class="active">Invoices</li>
+      </ol> -->
+
+      <div class="container-fluid eq-content">
+
+        <section class="eq-page">
+          <div class="eq-page-header eq-page-header-revised">
+            <div>
+              <h1>Invoices</h1>
+              <!-- <p class="eq-page-sub">All invoices across divisions, with outstanding and monthly payment summaries.</p> -->
+            </div>
+            <a href="new-invoice.html" class="eq-btn eq-btn-primary eq-new-invoice">
+              <i class="icon-plus"></i><span class="eq-new-invoice-label">New Invoice</span>
+            </a>
+          </div>
+
+          <!-- ---------- SUMMARY / KPI CARDS ---------- -->
+          <div class="eq-kpi-grid eq-kpi-grid-improved">
+            <!-- 1. Outstanding — the headline figure -->
+            <div class="eq-kpi eq-kpi-outstanding">
+              <div class="eq-kpi-label">Outstanding (YTD)</div>
+              <div class="eq-kpi-value">
+                <span class="eq-kpi-currency">AED</span>&nbsp;<span id="kpi-outstanding">0.00</span>
+              </div>
+              <div class="eq-kpi-delta">
+                <span class="eq-badge eq-badge-warning" id="kpi-outstanding-badge">Unpaid</span>
+              </div>
+              <div class="eq-kpi-note" id="kpi-outstanding-note">&nbsp;</div>
+            </div>
+
+            <!-- 2. Invoiced this month -->
+            <div class="eq-kpi">
+              <div class="eq-kpi-label">Invoiced (This Month)</div>
+              <div class="eq-kpi-value">
+                <span class="eq-kpi-currency">AED</span>&nbsp;<span id="kpi-invoiced">0.00</span>
+              </div>
+              <div class="eq-kpi-delta">
+                <span class="eq-badge eq-badge-info" id="kpi-invoiced-badge">0 invoices</span>
+              </div>
+              <div class="eq-kpi-note">Gross value billed this month</div>
+            </div>
+
+            <!-- 3. Paid this month -->
+            <div class="eq-kpi">
+              <div class="eq-kpi-label">Paid (This Month)</div>
+              <div class="eq-kpi-value">
+                <span class="eq-kpi-currency">AED</span>&nbsp;<span id="kpi-paid">0.00</span>
+              </div>
+              <div class="eq-kpi-delta">
+                <span class="eq-badge eq-badge-success" id="kpi-paid-badge">0 paid</span>
+              </div>
+              <div class="eq-kpi-note">Payments recorded this month</div>
+            </div>
+
+            <!-- 4. Open / unpaid -->
+            <div class="eq-kpi eq-kpi-due">
+              <div class="eq-kpi-label">Open / Unpaid</div>
+              <div class="eq-kpi-value eq-kpi-value-count" id="kpi-due">0</div>
+              <div class="eq-kpi-delta">
+                <span class="eq-badge eq-badge-neutral">invoices</span>
+              </div>
+              <div class="eq-kpi-note" id="kpi-due-note">&nbsp;</div>
+            </div>
+          </div>
+
+          <!-- ---------- TOOLBAR (search + collapsible filters) ---------- -->
+          <div class="eq-toolbar eq-toolbar-collapse">
+            <!-- Row 1: search (always visible) + filter toggle -->
+            <div class="eq-toolbar-top">
+              <div class="eq-toolbar-search">
+                <i class="icon-magnifier"></i>
+                <input type="text" id="inv-search" placeholder="Search invoice no., customer, product…" autocomplete="off">
+              </div>
+              <button type="button" class="eq-btn eq-btn-outline eq-filter-toggle" id="inv-filter-toggle"
+                      aria-expanded="false" aria-controls="inv-facets" title="Show / hide filters">
+                <i class="icon-options" id="inv-filter-toggle-icon"></i>
+                <span>Filters</span>
+                <span class="eq-filter-count" id="inv-filter-count" hidden>0</span>
+              </button>
+            </div>
+
+            <!-- Row 2: facet panel (collapsible — hidden until toggled) -->
+            <div class="eq-toolbar-facets" id="inv-facets" hidden>
+              <div class="eq-toolbar-field">
+                <label for="inv-year">Year</label>
+                <select id="inv-year"><option value="">All years</option></select>
+              </div>
+              <div class="eq-toolbar-field">
+                <label for="inv-status">Status</label>
+                <select id="inv-status">
+                  <option value="">All statuses</option>
+                  <option value="paid">Paid</option>
+                  <option value="due">Due</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+              <div class="eq-toolbar-field eq-toolbar-field-xs">
+                <label for="inv-division">Division</label>
+                <select id="inv-division">
+                  <option value="">All divisions</option>
+                  <option value="Web">Web</option>
+                  <option value="Software">Software</option>
+                </select>
+              </div>
+              <div class="eq-toolbar-field eq-toolbar-field-grow">
+                <label for="inv-customer">Customer</label>
+                <select id="inv-customer"><option value="">All customers</option></select>
+              </div>
+              <button type="button" class="eq-btn eq-btn-outline eq-toolbar-clear" id="inv-clear">
+                <i class="icon-close"></i>Clear
+              </button>
+            </div>
+
+            <!-- Row 3: active-filter chips -->
+            <div class="eq-toolbar-chips" id="inv-chips" hidden></div>
+          </div>
+
+          <!-- ---------- TABLE CARD ---------- -->
+          <div class="eq-table-card">
+
+            <!-- skeleton / loading state -->
+            <div class="eq-skeleton" id="inv-skeleton" aria-hidden="true">
+              <div class="eq-skeleton-row" style="--i:0"></div>
+              <div class="eq-skeleton-row" style="--i:1"></div>
+              <div class="eq-skeleton-row" style="--i:2"></div>
+              <div class="eq-skeleton-row" style="--i:3"></div>
+              <div class="eq-skeleton-row" style="--i:4"></div>
+              <div class="eq-skeleton-row" style="--i:5"></div>
+            </div>
+
+            <div id="inv-table-wrap" hidden>
+              <div class="eq-table-scroll">
+                <table class="eq-table eq-table-revised" id="inv-table">
+                  <thead>
+                    <tr>
+                      <th data-sort="number" class="col-no">Invoice</th>
+                      <th data-sort="status" class="col-status">Status</th>
+                      <th data-sort="invoiceDate" class="col-date">Date</th>
+                      <th data-sort="customer" class="col-customer">Customer / Products</th>
+                      <th data-sort="preTax" class="num col-money">Pre-Tax</th>
+                      <th data-sort="vat" class="num col-money">VAT</th>
+                      <th data-sort="total" class="num col-total">Total</th>
+                      <th class="col-exec">Sales Exec.</th>
+                      <th class="actions col-actions">&nbsp;</th>
+                    </tr>
+                  </thead>
+                  <tbody id="inv-tbody"><!-- rows rendered by js/invoices-revised.js --></tbody>
+                </table>
+              </div>
+
+              <div class="eq-table-footer">
+                <div class="eq-table-count" id="inv-count">0 invoices</div>
+                <div class="eq-paginator" id="inv-pagination"></div>
+              </div>
+            </div>
+
+            <!-- empty state -->
+            <div class="eq-empty" id="inv-empty" hidden>
+              <div class="eq-empty-icon icon-doc"></div>
+              <h2>No invoices match</h2>
+              <p>Try a different search term, or clear the filters to see all 55 sample invoices.</p>
+              <button type="button" class="eq-btn eq-btn-outline" id="inv-empty-clear">Clear filters</button>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- placeholder page (shared) -->
+        <section class="eq-page" id="eq-page-placeholder" hidden>
+          <div class="eq-page-header">
+            <div>
+              <h1 id="eq-placeholder-h1">&nbsp;</h1>
+              <p>This screen hasn't been prototyped yet.</p>
+            </div>
+          </div>
+          <div class="eq-empty">
+            <div class="eq-empty-icon icon-doc" id="eq-placeholder-icon"></div>
+            <h2 id="eq-placeholder-title">&nbsp;</h2>
+            <p id="eq-placeholder-desc">&nbsp;</p>
+            <span class="eq-badge eq-badge-neutral" id="eq-placeholder-stage">Not yet prototyped</span>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <footer class="eq-footer">
+    <div><b>EmQube Invoice</b> — UI Prototype</div>
+    <div class="eq-footer-meta">Static mock data only · Not connected to the live application</div>
+  </footer>
+
+  <!-- Toast for inert actions -->
+  <div class="eq-toast" id="eq-toast" role="status" aria-live="polite"></div>
+
+  <script src="js/prototype.js?v=5"></script>
+  <script src="js/invoices-revised.js?v=1"></script>
+</body>
+</html>

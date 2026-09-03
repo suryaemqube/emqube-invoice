@@ -1,0 +1,567 @@
+<!doctype html>
+<!--
+  EmQube Invoice — UI Prototype — New Invoice (Stage 3)
+
+  STATUS: Visual/UX prototype only. Static HTML/CSS/JS, mock data only.
+  NOT connected to the Angular app, its services, its API, or the database.
+
+  This is the CREATE state of the same shared component that new-invoice
+  and edit-invoice both use. Differences from the edit screen, all taken
+  from the real rendered markup:
+    - "Quote/Proforma No." is shown instead of "Invoice No." (the real
+      template swaps these on *ngIf TaxInvoiceId == null)
+    - every field is enabled and empty/at its default
+    - the second card's "Invoice Type" (VAT type) and "Rate Inc. VAT" are
+      disabled here too — they are disabled in the real app as well
+    - actions are Save + Back only; Print / Copy / Cancel Invoice are
+      hidden until the invoice exists (*ngIf on TaxInvoiceId)
+  All dropdown options below are the real option lists from the app.
+
+  Open this file directly in a browser. No build step required.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>New Invoice — EmQube Invoice UI Prototype</title>
+  <link rel="icon" href="assets/img/favicon.png">
+
+  <!-- Existing framework + icon assets, copied unmodified from WebInvoice/src/assets -->
+  <link href="assets/css/style.css" rel="stylesheet">
+  <link href="assets/css/font-awesome.min.css" rel="stylesheet">
+  <link href="assets/css/simple-line-icons.css" rel="stylesheet">
+
+  <!-- EmQube design tokens + shell styling -->
+  <link href="css/tokens.css?v=5" rel="stylesheet">
+  <link href="css/prototype.css?v=7" rel="stylesheet">
+
+  <!-- Shared with the edit-invoice screen -->
+  <link href="css/create-invoice.css?v=7" rel="stylesheet">
+</head>
+<body class="eq-app eq-sidebar-compact">
+
+  <div class="eq-prototype-banner" style="position:fixed;bottom:0;left:0;right:0;z-index:1050;background:#16202B;color:#fff;font-size:11.5px;padding:6px 16px;text-align:center;font-family:var(--eq-font-sans);">
+    UI Prototype &nbsp;·&nbsp; Static mock data &nbsp;·&nbsp; Not connected to the live application
+  </div>
+
+  <!-- ===================== HEADER ===================== -->
+  <header class="eq-header">
+    <button class="eq-header-toggle eq-header-toggle--mobile" id="eq-toggle-mobile" aria-label="Toggle navigation">
+      <i class="icon-menu"></i>
+    </button>
+    <button class="eq-header-toggle eq-header-toggle--desktop" id="eq-toggle-desktop" aria-label="Collapse sidebar">
+      <i class="icon-menu"></i>
+    </button>
+
+    <a class="navbar-brand" href="index.html" aria-label="EmQube Invoice"></a>
+
+    <div class="eq-header-title">
+      <span class="eq-header-title-label" id="eq-header-group">Sales</span>
+      <span class="eq-header-title-current" id="eq-header-current">New Invoice</span>
+    </div>
+
+    <div class="eq-header-spacer"></div>
+
+    <div class="eq-profile" id="eq-profile">
+      <button class="eq-profile-trigger" id="eq-profile-trigger">
+        <span class="eq-avatar">SM</span>
+        <span class="eq-profile-meta">
+          <span class="eq-profile-name">Sara Al Mansoori</span>
+          <span class="eq-profile-role">Accounts Manager</span>
+        </span>
+        <i class="fa fa-angle-down eq-profile-caret"></i>
+      </button>
+      <div class="eq-profile-menu" id="eq-profile-menu">
+        <div class="eq-profile-menu-header">
+          <span class="eq-avatar eq-avatar--lg">SM</span>
+          <div>
+            <div class="eq-profile-name">Sara Al Mansoori</div>
+            <div class="eq-profile-role">Accounts Manager · Sales Division</div>
+          </div>
+        </div>
+        <a href="#" class="eq-profile-menu-item"><i class="icon-lock"></i>Change Password</a>
+        <a href="#" class="eq-profile-menu-item eq-profile-menu-item--danger"><i class="icon-logout"></i>Logout</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="eq-backdrop" id="eq-backdrop"></div>
+
+  <!-- ===================== BODY ===================== -->
+  <div class="eq-app-body">
+
+    <!-- ---------- SIDEBAR ---------- -->
+    <div class="eq-sidebar" id="eq-sidebar">
+      <nav class="eq-sidebar-nav">
+        <ul class="eq-nav-list">
+
+          <li class="eq-nav-group-title">Sales</li>
+
+          <li>
+            <a class="eq-nav-link" href="index.html">
+              <i class="icon-speedometer"></i><span>Overview</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link active" href="invoices.html">
+              <i class="icon-doc"></i><span>Invoices</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Sales" data-title="Quotes" data-icon="icon-note"
+               data-desc="Quote/Proforma list and the create/edit quote workflow will be prototyped in a later stage.">
+              <i class="icon-note"></i><span>Quotes</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Sales" data-title="Customers" data-icon="icon-people"
+               data-desc="The customer list and add/edit customer screens will be prototyped in a later stage.">
+              <i class="icon-people"></i><span>Customers</span>
+            </a>
+          </li>
+
+          <li class="eq-nav-group-title">
+            Master Data
+            <span class="eq-nav-group-note">Representative items — final list to be confirmed</span>
+          </li>
+
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Products" data-icon="icon-basket"
+               data-desc="Product master data, served today through the generic metadata-driven screen.">
+              <i class="icon-basket"></i><span>Products</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Categories" data-icon="icon-tag"
+               data-desc="Product category master data.">
+              <i class="icon-tag"></i><span>Categories</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Payment Terms" data-icon="icon-wallet"
+               data-desc="Payment term master data.">
+              <i class="icon-wallet"></i><span>Payment Terms</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Employees" data-icon="icon-user"
+               data-desc="Internal user accounts, roles and site access.">
+              <i class="icon-user"></i><span>Employees</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Executives" data-icon="icon-star"
+               data-desc="Sales executive records referenced by invoices and quotes.">
+              <i class="icon-star"></i><span>Executives</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Units of Measure" data-icon="icon-size-fullscreen"
+               data-desc="Unit-of-measure master data used on invoice and quote line items.">
+              <i class="icon-size-fullscreen"></i><span>Units of Measure</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="VAT Codes" data-icon="icon-calculator"
+               data-desc="VAT/tax code master data used across invoicing and quoting.">
+              <i class="icon-calculator"></i><span>VAT Codes</span>
+            </a>
+          </li>
+          <li>
+            <a class="eq-nav-link" href="#" data-page="placeholder" data-group="Master Data" data-title="Currencies" data-icon="icon-globe"
+               data-desc="Currency and conversion-rate master data.">
+              <i class="icon-globe"></i><span>Currencies</span>
+            </a>
+          </li>
+
+        </ul>
+      </nav>
+      <button class="eq-sidebar-minimizer" id="eq-sidebar-minimizer" aria-label="Toggle compact sidebar" title="Toggle compact sidebar">
+        <i class="icon-arrow-left"></i>
+      </button>
+    </div>
+
+    <!-- ---------- MAIN ---------- -->
+    <main class="eq-main">
+      <ol class="eq-breadcrumb" id="eq-breadcrumb">
+        <li>Home</li>
+        <li>Sales</li>
+        <li>Invoices</li>
+        <li class="active">New Invoice</li>
+      </ol>
+
+      <div class="container-fluid eq-content">
+
+        <section class="eq-page" id="eq-page-main">
+
+          <div class="eq-invoice-header">
+            <div class="eq-invoice-header-text">
+              <h1>New Invoice</h1>
+              <div class="eq-invoice-meta">
+                <span>Invoice number is generated on save</span>
+              </div>
+            </div>
+            <a href="invoices.html" class="eq-btn eq-btn-outline">
+              <i class="icon-arrow-left"></i>Back to Invoices
+            </a>
+          </div>
+
+          <div class="eq-invoice-layout">
+            <div class="eq-invoice-form">
+
+              <!-- ============ CUSTOMER ============ -->
+              <section class="eq-form-card">
+                <h2 class="eq-form-card-title">Customer</h2>
+                <div class="eq-form-grid">
+                  <div class="eq-field">
+                    <label for="f-customer">Customer Name</label>
+                    <div class="eq-select-wrap">
+                      <input type="text" id="f-customer" placeholder="Select Customer">
+                      <i class="icon-arrow-down"></i>
+                    </div>
+                  </div>
+                  <div class="eq-field">
+                    <label for="f-attention">Attention</label>
+                    <input type="text" id="f-attention" maxlength="30">
+                  </div>
+                  <div class="eq-field">
+                    <label for="f-address">Customer Address</label>
+                    <textarea id="f-address" rows="2" placeholder="Customer Address"></textarea>
+                  </div>
+                  <div class="eq-field">
+                    <label for="f-trn">TRN # :</label>
+                    <input type="text" id="f-trn" maxlength="30">
+                  </div>
+                </div>
+              </section>
+
+              <!-- ============ DOCUMENT DETAILS ============ -->
+              <section class="eq-form-card">
+                <h2 class="eq-form-card-title">Document Details</h2>
+                <div class="eq-form-grid eq-form-grid-3">
+                  <!-- On a new invoice the app shows Quote/Proforma No. in place of Invoice No. -->
+                  <div class="eq-field">
+                    <label for="f-quote">Quote/Proforma No.</label>
+                    <select class="eq-line-select eq-field-select" id="f-quote" name="QuoteNoInput">
+                      <option value="0" selected>Select</option>
+                    </select>
+                  </div>
+                  <div class="eq-field">
+                    <label for="f-lpo">LPO Number/Customer Ref</label>
+                    <input type="text" id="f-lpo" maxlength="30">
+                  </div>
+                  <div class="eq-field">
+                    <label for="f-idate">Date</label>
+                    <input type="text" id="f-idate" placeholder="DD-MM-YYYY" autocomplete="off">
+                  </div>
+                  <div class="eq-field">
+                    <label for="f-currency">Currency</label>
+                    <select class="eq-line-select eq-field-select" id="f-currency" name="currency">
+                      <option value="0" selected>Select</option>
+                      <option value="1">AED</option>
+                      <option value="2">USD</option>
+                      <option value="3">EUR</option>
+                    </select>
+                  </div>
+                  <div class="eq-field">
+                    <label for="f-rate">Rate</label>
+                    <input type="text" id="f-rate" disabled>
+                  </div>
+                  <div class="eq-field">
+                    <label for="f-terms">Payment Terms <i class="icon-info" title="These payment terms have this information with it"></i></label>
+                    <select class="eq-line-select eq-field-select" id="f-terms" name="PaymentTerm">
+                      <option value="0">Select</option>
+                      <option value="1">One Time</option>
+                      <option value="2">Quarterly</option>
+                      <option value="3">Annual</option>
+                      <option value="4" selected>Bi Annual</option>
+                      <option value="5">Two-monthly</option>
+                    </select>
+                  </div>
+                  <div class="eq-field">
+                    <label for="f-itype">Invoice Type</label>
+                    <select class="eq-line-select eq-field-select" id="f-itype" name="State">
+                      <option value="0">Select</option>
+                      <option value="1" selected>Local</option>
+                      <option value="2">Export</option>
+                      <option value="3">Export -IS</option>
+                    </select>
+                  </div>
+                  <div class="eq-field">
+                    <label for="f-exec">Sales Executive</label>
+                    <select class="eq-line-select eq-field-select" id="f-exec" name="Sales Executive">
+                      <option value="0" selected>Select</option>
+                      <option value="1">Accounts Dubai</option>
+                      <option value="2">Mohammed Sutarwala</option>
+                      <option value="10">Sundaram Muurgan</option>
+                      <option value="11">Legends Accounts</option>
+                      <option value="16">Vishnu Das</option>
+                      <option value="17">Abdullah Farman</option>
+                    </select>
+                  </div>
+                  <div class="eq-field">
+                    <label for="f-division">Division</label>
+                    <select class="eq-line-select eq-field-select" id="f-division" name="Division">
+                      <option value="0" selected>Select</option>
+                      <option value="2">Web</option>
+                      <option value="3">Software</option>
+                    </select>
+                  </div>
+                </div>
+              </section>
+
+              <!-- ============ TAX & DELIVERY ============ -->
+              <section class="eq-form-card">
+                <h2 class="eq-form-card-title">Tax &amp; Delivery</h2>
+                <div class="eq-form-grid eq-form-grid-3">
+                  <!-- These two are disabled in the real app on new invoices as well -->
+                  <div class="eq-field">
+                    <label for="f-vtype">Invoice Type</label>
+                    <select class="eq-line-select eq-field-select" id="f-vtype" name="Invoice Type" disabled>
+                      <option value="0">Select</option>
+                      <option value="1">Simplified</option>
+                      <option value="2" selected>Tax Invoice</option>
+                    </select>
+                  </div>
+                  <div class="eq-field">
+                    <label for="f-inclusive">Rate Inc. VAT</label>
+                    <label class="eq-check-inline eq-field-checkbox"><input type="checkbox" id="f-inclusive" disabled>Prices include VAT</label>
+                  </div>
+                  <div class="eq-field">
+                    <label for="f-ledger">Sales Ledger</label>
+                    <select class="eq-line-select eq-field-select" id="f-ledger" name="Sales Ledger">
+                      <option value="0">Select</option>
+                      <option value="1" selected>SLOC</option>
+                      <option value="2">SEX</option>
+                      <option value="3">SEXIS</option>
+                    </select>
+                  </div>
+                  <div class="eq-field">
+                    <label for="f-delivery">Delivery Date</label>
+                    <input type="text" id="f-delivery" placeholder="DD-MM-YYYY" autocomplete="off">
+                  </div>
+                  <div class="eq-field">
+                    <label for="f-pdate">Payment Date</label>
+                    <input type="text" id="f-pdate" placeholder="DD-MM-YYYY" autocomplete="off">
+                  </div>
+                  <div class="eq-field">
+                    <label for="f-supply">Place of Supply</label>
+                    <select class="eq-line-select eq-field-select" id="f-supply" name="Place of Supply">
+                      <option value="0" selected>Select</option>
+                      <option value="1">Dubai</option>
+                      <option value="2">Abu Dhabi</option>
+                      <option value="3">Sharjah</option>
+                      <option value="4">Ajman</option>
+                      <option value="5">Ras Al Khaimah</option>
+                      <option value="6">Umm Al Quwain</option>
+                      <option value="7">Fujairah</option>
+                      <option value="8">Saudi Arabia</option>
+                      <option value="9">Bahrain</option>
+                      <option value="10">Oman</option>
+                      <option value="11">Qatar</option>
+                      <option value="12">Lebanon</option>
+                      <option value="13">Jordan</option>
+                      <option value="14">Kuwait</option>
+                      <option value="15">USA</option>
+                      <option value="16">Canada</option>
+                      <option value="17">Maharashtra</option>
+                      <option value="18">Switzerland</option>
+                      <option value="19">Germany</option>
+                      <option value="20">Singapore</option>
+                      <option value="21">Kenya</option>
+                      <option value="23">SouthSudan</option>
+                      <option value="24">Belgium</option>
+                      <option value="25">Sevilla</option>
+                      <option value="26">Pakistan</option>
+                      <option value="27">Iraq</option>
+                      <option value="28">Palestine</option>
+                    </select>
+                  </div>
+                </div>
+              </section>
+
+              <!-- ============ LINE ITEMS ============ -->
+              <section class="eq-form-card">
+                <div class="eq-form-card-head">
+                  <h2 class="eq-form-card-title">Items Invoiced</h2>
+                  <button type="button" class="eq-btn eq-btn-outline eq-btn-sm" data-coming-soon="Add line item">
+                    <i class="icon-plus"></i>Add Row
+                  </button>
+                </div>
+                <div class="eq-line-table-scroll">
+                  <table class="eq-line-table">
+                    <colgroup>
+                      <col style="width:200px">
+                      <col style="width:86px">
+                      <col style="width:56px">
+                      <col style="width:76px">
+                      <col style="width:128px">
+                      <col style="width:82px">
+                      <col style="width:78px">
+                      <col style="width:70px">
+                      <col style="width:86px">
+                      <col style="width:38px">
+                    </colgroup>
+                    <thead>
+                      <tr>
+                        <th>Item</th>
+                        <th>UOM</th>
+                        <th class="num">Qty</th>
+                        <th class="num">Rate</th>
+                        <th>Discount</th>
+                        <th class="num">PreTax</th>
+                        <th>VAT</th>
+                        <th class="num">Tax</th>
+                        <th class="num">Amount</th>
+                        <th class="actions"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-label="Item" class="eq-item-cell">
+                          <select class="eq-line-select" name="Item">
+                            <option value="" selected></option>
+                            <option>Software AMC</option>
+                            <option>Software Development</option>
+                            <option>Software License</option>
+                            <option>Solution Integration</option>
+                            <option>Web Development</option>
+                            <option>Website AMC</option>
+                            <option>Web Hosting</option>
+                            <option>Web Tech Support</option>
+                            <option>SEO Services</option>
+                            <option>Go Digital Services</option>
+                            <option>Content Support</option>
+                          </select>
+                          <textarea rows="3" placeholder="Description"></textarea>
+                        </td>
+                        <td data-label="UOM">
+                          <select class="eq-line-select" name="UOM">
+                            <option value="0" selected>Select</option>
+                            <option value="1">Pcs</option>
+                            <option value="2">Kgs</option>
+                            <option value="3">Ltr</option>
+                            <option value="4">Hrs</option>
+                            <option value="5">CBM</option>
+                            <option value="6">User</option>
+                            <option value="7">Pson</option>
+                            <option value="8">Site</option>
+                          </select>
+                        </td>
+                        <td data-label="Qty"><input type="number" class="eq-line-input num" value="1"></td>
+                        <td data-label="Rate"><input type="number" class="eq-line-input num" value="0"></td>
+                        <td data-label="Discount">
+                          <div class="eq-discount-cell">
+                            <input type="number" class="eq-line-input num" value="0">
+                            <select class="eq-line-select" name="Rate">
+                              <option value="0" selected>Select</option>
+                              <option value="1">%</option>
+                              <option value="2">Amt</option>
+                            </select>
+                          </div>
+                        </td>
+                        <td data-label="PreTax"><input type="number" class="eq-line-input num" value="0" disabled></td>
+                        <td data-label="VAT">
+                          <select class="eq-line-select" name="VATCode">
+                            <option value="0">Select</option>
+                            <option value="1" selected>5%</option>
+                            <option value="2">0%</option>
+                            <option value="3">Exempt</option>
+                          </select>
+                        </td>
+                        <td data-label="Tax"><input type="number" class="eq-line-input num" value="0" disabled></td>
+                        <td data-label="Amount"><input type="number" class="eq-line-input num" value="0" disabled></td>
+                        <td data-label="" class="actions">
+                          <button type="button" class="eq-icon-btn" title="Remove line" data-coming-soon="Remove line item"><i class="icon-trash"></i></button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="eq-line-summary">
+                  <table>
+                    <thead><tr><th>Tax Type</th><th class="num">Pre Tax</th><th class="num">Tax</th><th class="num">Total</th></tr></thead>
+                    <tbody></tbody>
+                    <tfoot>
+                      <tr><td></td><td class="num mono">AED 0</td><td class="num mono">AED 0</td><td class="num mono">AED 0</td></tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </section>
+
+              <!-- ============ TERMS & CONDITIONS ============ -->
+              <section class="eq-form-card">
+                <h2 class="eq-form-card-title">Terms &amp; Conditions</h2>
+                <!-- The existing <simple-tiny> (TinyMCE) component is used here unchanged. -->
+                <div class="eq-editor-slot">
+                  <div class="eq-editor-slot-note">Existing rich-text editor (<code>&lt;simple-tiny&gt;</code>) renders here — unchanged</div>
+                  <div class="eq-editor-slot-body">
+                    <p>Payment is against invoice fully in advance.</p>
+                  </div>
+                </div>
+              </section>
+
+            </div>
+
+            <!-- ============ STICKY SUMMARY ============ -->
+            <aside class="eq-summary">
+              <div class="eq-summary-card">
+                <h2 class="eq-summary-title">Summary</h2>
+                <dl class="eq-summary-list">
+                  <div><dt>Subtotal</dt><dd class="mono">AED 0.00</dd></div>
+                  <div><dt>Discount</dt><dd class="mono">AED 0.00</dd></div>
+                  <div><dt>VAT</dt><dd class="mono">AED 0.00</dd></div>
+                </dl>
+                <div class="eq-summary-total">
+                  <span>Grand Total</span>
+                  <span class="mono">AED 0.00</span>
+                </div>
+
+                <!--
+                  New invoice: Save only. Print Invoice, Copy and Cancel Invoice are
+                  hidden until the invoice exists (*ngIf on TaxInvoiceId in the real
+                  template), which is why they don't appear on this screen.
+                -->
+                <div class="eq-summary-actions">
+                  <button type="button" class="eq-btn eq-btn-primary eq-btn-block" data-coming-soon="Save invoice">
+                    <i class="icon-check"></i>Save
+                  </button>
+                </div>
+              </div>
+            </aside>
+          </div>
+
+        </section>
+
+        <!-- Placeholder page (shared — reused for every not-yet-built screen) -->
+        <section class="eq-page" id="eq-page-placeholder" hidden>
+          <div class="eq-page-header">
+            <div>
+              <h1 id="eq-placeholder-h1">&nbsp;</h1>
+              <p>This screen hasn't been prototyped yet.</p>
+            </div>
+          </div>
+          <div class="eq-empty">
+            <div class="eq-empty-icon icon-doc" id="eq-placeholder-icon"></div>
+            <h2 id="eq-placeholder-title">&nbsp;</h2>
+            <p id="eq-placeholder-desc">&nbsp;</p>
+            <span class="eq-badge eq-badge-neutral" id="eq-placeholder-stage">Not yet prototyped</span>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <footer class="eq-footer">
+    <div><b>EmQube Invoice</b> — UI Prototype</div>
+    <div class="eq-footer-meta">Static mock data only · Not connected to the live application</div>
+  </footer>
+
+  <div class="eq-toast" id="eq-toast" role="status" aria-live="polite"></div>
+
+  <script src="js/prototype.js?v=5"></script>
+  <script src="js/create-invoice.js?v=2"></script>
+</body>
+</html>
