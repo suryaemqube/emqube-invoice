@@ -226,3 +226,191 @@
   // font-weight: 400;
 
 }
+
+/* ============================================================
+   Collapsible filter toolbar (search + facet panel + chips)
+   Source: UIPrototype/css/invoices-revised.css
+   ============================================================ */
+.eq-toolbar-collapse {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--eq-sp-4);
+  width: 100%;
+}
+
+.eq-toolbar-top {
+  display: flex;
+  align-items: center;
+  gap: var(--eq-sp-3);
+}
+.eq-toolbar-collapse .eq-toolbar-search { flex: 1 1 auto; }
+
+.eq-filter-toggle {
+  height: 36px;
+  padding: 0 14px;
+  flex-shrink: 0;
+  position: relative;
+}
+.eq-filter-toggle.is-active { border-color: var(--eq-primary); color: var(--eq-primary); }
+.eq-filter-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--eq-primary);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 1;
+}
+.eq-filter-toggle .icon-options { font-size: 15px; }
+
+.eq-toolbar-facets {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: var(--eq-sp-4);
+  border-top: 1px solid var(--eq-border);
+  padding-top: var(--eq-sp-4);
+}
+.eq-toolbar-field-grow { flex: 1 1 220px; min-width: 180px; }
+.eq-toolbar-field-xs { min-width: 120px; }
+.eq-toolbar-facets .eq-toolbar-clear { margin-left: 0; flex-shrink: 0; }
+
+.eq-toolbar-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--eq-sp-2);
+  align-items: center;
+  font-size: 12px;
+  color: var(--eq-ink-muted);
+}
+.eq-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--eq-primary-soft);
+  color: var(--eq-primary);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-weight: 600;
+  font-size: 11.5px;
+}
+.eq-filter-chip button {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  opacity: .7;
+}
+.eq-filter-chip button:hover { opacity: 1; }
+
+/* ============================================================
+   Reprioritised invoice-list columns
+   ============================================================ */
+.eq-table { min-width: 1020px; }
+.eq-table th.col-no       { width: 84px; }
+.eq-table th.col-status   { width: 120px; }
+.eq-table th.col-date     { width: 105px; white-space: nowrap; }
+.eq-table th.col-customer { width: 280px; }
+.eq-table th.col-money    { width: 96px; }
+.eq-table th.col-total    { width: 116px; }
+.eq-table th.col-exec     { width: 130px; }
+.eq-table th.col-actions  { width: 70px; }
+
+.eq-inv-no {
+  font-family: var(--eq-font-mono);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--eq-ink);
+}
+
+td.col-total-cell { font-weight: 700; color: var(--eq-ink); }
+
+/* status cell — pill + small status-tinted sub-line */
+.eq-status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+.eq-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.eq-status-pill .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.eq-status-paid .eq-status-pill { color: var(--eq-green); }
+.eq-status-paid .dot { background: var(--eq-green); }
+.eq-status-due .eq-status-pill { color: var(--eq-amber); }
+.eq-status-due .dot { background: var(--eq-amber); }
+.eq-status-cancelled .eq-status-pill { color: var(--eq-ink-faint); }
+.eq-status-cancelled .dot { background: var(--eq-ink-faint); }
+
+.eq-status-sub {
+  display: block;
+  font-size: 10.5px;
+  color: var(--eq-ink-faint);
+  white-space: nowrap;
+  line-height: 1;
+  margin-top: 3px;
+}
+.eq-status-paid .eq-status-sub { color: var(--eq-green); }
+.eq-status-due .eq-status-sub { color: var(--eq-amber); }
+
+/* customer / item merged cell */
+.eq-customer-link {
+  font-weight: 600;
+  color: var(--eq-ink);
+  text-decoration: underline;
+  display: inline-block;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+.eq-customer-link:hover { color: var(--eq-primary); text-decoration: underline; }
+
+/* item(s) under the customer name */
+.eq-item-list { list-style: none; margin: 4px 0 0; padding: 0; }
+.eq-item-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--eq-ink-muted);
+  padding: 1px 0;
+  max-width: 250px;
+}
+.eq-item-list li .eq-item-bullet { color: var(--eq-primary); flex-shrink: 0; }
+.eq-item-list li .eq-item-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.eq-item-list li + li { border-top: 1px dashed var(--eq-border); }
+
+/* sales exec — plain text with initial */
+td.col-exec {
+  color: var(--eq-ink-muted);
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+
+/* row states */
+.eq-table tbody tr.tr-due { background: #FFFCF7; }
+.eq-table tbody tr.tr-due:hover { background: #FFF7EC; }
+.eq-table tbody tr.tr-due { box-shadow: inset 3px 0 0 var(--eq-amber); }
+.eq-table tbody tr.tr-cancelled { opacity: .62; }
+.eq-table tbody tr.tr-cancelled .eq-inv-no { text-decoration: line-through; }

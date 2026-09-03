@@ -45,8 +45,8 @@ import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 export class EqPaginator {
   totalItems = input(0);
   page = input(1);
-  pageSize = input(100);
-  pageSizeOptions = input([50, 100, 150]);
+  pageSize = input(25);
+  pageSizeOptions = input([25, 50, 100]);
 
   pageChange = output<number>();
   pageSizeChange = output<number>();

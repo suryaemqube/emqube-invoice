@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, computed, signal, TemplateRef, ViewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbModal, NgbDateStruct, NgbInputDatepicker } from '@ng-bootstrap/ng-bootstrap';
 import { forkJoin } from 'rxjs';
@@ -27,6 +27,7 @@ const STORAGE_KEY = 'InvoiceFilters';
   selector: 'app-invoice-list',
   imports: [
     DecimalPipe,
+    NgClass,
     FormsModule,
     NgbInputDatepicker,
     EqTable,
@@ -60,10 +61,11 @@ export class InvoiceList implements OnInit {
   filterStatus = signal('');
   filterDivision = signal('');
   filterCustomer = signal('');
+  filtersOpen = signal(false);
 
   // pagination
   page = signal(1);
-  pageSize = signal(100);
+  pageSize = signal(25);
 
   // ui state
   loading = signal(true);
@@ -76,15 +78,15 @@ export class InvoiceList implements OnInit {
   paymentMaxDate: NgbDateStruct = this.toNgbDate(new Date());
 
   columns: EqColumn[] = [
-    { key: 'InvoiceNumber', header: 'Invoice No.', cssClass: 'eq-mono' },
-    { key: 'InvoiceDateString', header: 'Date' },
-    { key: 'CustomerName', header: 'Customer', cssClass: 'name', width: '200px' },
-    { key: 'PreTaxTotal', header: 'Pre Tax', align: 'right', cssClass: 'num' },
-    { key: 'InvoiceTotal', header: 'Total', align: 'right', cssClass: 'num' },
-    { key: 'ProductName', header: 'Product', width: '150px' },
-    { key: 'SExecutiveName', header: 'Sales Exec.' },
-    { key: 'PaymentRecdDateString', header: 'Payment Date' },
-    { key: 'actions', header: '', align: 'right', width: '100px' },
+    { key: 'InvoiceNumber', header: 'Invoice', cssClass: 'col-no mono' },
+    { key: 'status', header: 'Status', cssClass: 'col-status' },
+    { key: 'InvoiceDateString', header: 'Date', cssClass: 'col-date' },
+    { key: 'CustomerName', header: 'Customer / Products', cssClass: 'col-customer name' },
+    { key: 'PreTaxTotal', header: 'Pre-Tax', align: 'right', cssClass: 'col-money num' },
+    { key: 'TotalVAT', header: 'VAT', align: 'right', cssClass: 'col-money num' },
+    { key: 'InvoiceTotal', header: 'Total', align: 'right', cssClass: 'col-total num' },
+    { key: 'SExecutiveName', header: 'Sales Exec.', cssClass: 'col-exec' },
+    { key: 'actions', header: '', align: 'right', cssClass: 'col-actions' },
   ];
 
   // filtered + searched list
@@ -171,25 +173,40 @@ export class InvoiceList implements OnInit {
     return [
       {
         label: `Outstanding (YR ${year})`,
-        value: outstanding > 0 ? outstanding.toLocaleString('en-AE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—',
-        badge: dueCount > 0 ? { text: `${dueCount} Invoice${dueCount === 1 ? '' : 's'} Due`, tone: 'warning' } : undefined,
+        value: outstanding > 0 ? this.fmtMoney(outstanding) : '—',
+        currency: 'AED',
+        cssClass: 'eq-kpi-outstanding',
+        badge: { text: `${dueCount} Due`, tone: 'warning' },
+        note: dueCount > 0 ? 'Unpaid, receivable' : 'No outstanding invoices',
       },
       {
-        label: 'Invoiced this month',
-        value: invoicedMonth > 0 ? invoicedMonth.toLocaleString('en-AE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—',
-        badge: invoicedMonthCount > 0
-          ? { text: `${invoicedMonthCount} Invoice${invoicedMonthCount === 1 ? '' : '(s)'}`, tone: 'info' }
-          : undefined,
+        label: 'Invoiced (This Month)',
+        value: invoicedMonth > 0 ? this.fmtMoney(invoicedMonth) : '—',
+        currency: 'AED',
+        badge: { text: `${invoicedMonthCount} invoice${invoicedMonthCount === 1 ? '' : 's'}`, tone: 'info' },
+        note: 'Gross value billed this month',
       },
       {
-        label: 'Paid this month',
-        value: paidMonth > 0 ? paidMonth.toLocaleString('en-AE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—',
-        badge: paidCount > 0
-          ? { text: `${paidCount} Payment${paidCount === 1 ? '' : 's'} Recorded`, tone: 'success' }
-          : undefined,
+        label: 'Paid (This Month)',
+        value: paidMonth > 0 ? this.fmtMoney(paidMonth) : '—',
+        currency: 'AED',
+        badge: { text: `${paidCount} paid`, tone: 'success' },
+        note: 'Payments recorded this month',
+      },
+      {
+        label: 'Open / Unpaid',
+        value: String(dueCount),
+        valueIsCount: true,
+        cssClass: 'eq-kpi-due',
+        badge: { text: 'invoices', tone: 'neutral' },
+        note: `Unpaid for year ${year}`,
       },
     ];
   });
+
+  private fmtMoney(n: number): string {
+    return n.toLocaleString('en-AE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
 
   ngOnInit(): void {
     this.loadFilters();
@@ -222,6 +239,37 @@ export class InvoiceList implements OnInit {
   }
 
   onFilterChange(): void {
+    this.page.set(1);
+    this.saveFilters();
+  }
+
+  toggleFilters(): void {
+    this.filtersOpen.set(!this.filtersOpen());
+  }
+
+  activeFacetCount(): number {
+    let n = 0;
+    if (this.filterYear() !== 0) n++;
+    if (this.filterStatus()) n++;
+    if (this.filterDivision()) n++;
+    if (this.filterCustomer()) n++;
+    return n;
+  }
+
+  activeFilters(): { key: string; label: string; value: string }[] {
+    const chips: { key: string; label: string; value: string }[] = [];
+    if (this.filterYear() !== 0) chips.push({ key: 'year', label: 'Year', value: String(this.filterYear()) });
+    if (this.filterStatus()) chips.push({ key: 'status', label: 'Status', value: this.filterStatus() });
+    if (this.filterDivision()) chips.push({ key: 'division', label: 'Division', value: this.filterDivision() });
+    if (this.filterCustomer()) chips.push({ key: 'customer', label: 'Customer', value: this.filterCustomer() });
+    return chips;
+  }
+
+  removeFilter(key: string): void {
+    if (key === 'year') this.filterYear.set(0);
+    else if (key === 'status') this.filterStatus.set('');
+    else if (key === 'division') this.filterDivision.set('');
+    else if (key === 'customer') this.filterCustomer.set('');
     this.page.set(1);
     this.saveFilters();
   }
@@ -345,6 +393,19 @@ export class InvoiceList implements OnInit {
   }
 
   // --- helpers ---
+
+  status(row: InvoiceListModel): string {
+    return deriveStatus(row);
+  }
+
+  execName(row: InvoiceListModel): string {
+    const first = row.SExecutiveFirstName?.trim();
+    const last = row.SExecutiveLastName?.trim();
+    if (first && last) {
+      return `${first} ${last.charAt(0).toUpperCase()}.`;
+    }
+    return row.SExecutiveName?.trim() || first || '';
+  }
 
   divisionIcon(name: string): string {
     if (name === 'Web') return 'icon-globe';

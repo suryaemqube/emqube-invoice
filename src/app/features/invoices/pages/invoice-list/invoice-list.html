@@ -1,7 +1,7 @@
 <!-- Page Head -->
 <div class="eq-page-header">
   <div>
-    <h1>Invoice List</h1>
+    <h1>Invoices</h1>
  
   </div>
   <a class="eq-btn eq-btn-primary" routerLink="/createinvoice">
@@ -10,115 +10,180 @@
 </div>
 
 <!-- KPI Cards -->
-<div class="eq-kpi-grid">
+<div class="eq-kpi-grid eq-kpi-grid-improved">
   @for (kpi of kpis(); track kpi.label) {
-    <div class="eq-kpi">
+    <div class="eq-kpi" [ngClass]="kpi.cssClass">
       <div class="eq-kpi-label">{{ kpi.label }}</div>
-      <div class="eq-kpi-value">{{ kpi.value }}</div>
+      <div class="eq-kpi-value" [class.eq-kpi-value-count]="kpi.valueIsCount">
+        @if (kpi.currency) {
+          <span class="eq-kpi-currency">{{ kpi.currency }}</span>&nbsp;
+        }
+        {{ kpi.value }}
+      </div>
       @if (kpi.badge) {
         <div class="eq-kpi-delta">
           <eq-badge [tone]="kpi.badge.tone">{{ kpi.badge.text }}</eq-badge>
         </div>
       }
+      @if (kpi.note) {
+        <div class="eq-kpi-note">{{ kpi.note }}</div>
+      }
     </div>
   }
 </div>
 
-<!-- Toolbar -->
+<!-- Toolbar: search + collapsible filter panel + chips -->
 <eq-toolbar>
-  <div class="eq-toolbar-search">
-    <i class="icon-magnifier"></i>
-    <input
-      type="text"
-      placeholder="Invoice No., Date, Value, Tax, Product, Payment Date"
-      [(ngModel)]="filterQuery"
-      (ngModelChange)="onSearchChange()"
-    />
-  </div>
+  <div class="eq-toolbar-collapse">
 
-  <div class="eq-toolbar-field">
-    <label>Year</label>
-    <select [(ngModel)]="filterYear" (ngModelChange)="onFilterChange()">
-      <option [ngValue]="0">All Years</option>
-      @for (year of yearList(); track year) {
-        <option [ngValue]="year">{{ year }}</option>
-      }
-    </select>
-  </div>
+    <!-- Row 1: search (always visible) + filter toggle -->
+    <div class="eq-toolbar-top">
+      <div class="eq-toolbar-search">
+        <i class="icon-magnifier"></i>
+        <input
+          type="text"
+          placeholder="Invoice No., Customer, Product…"
+          [(ngModel)]="filterQuery"
+          (ngModelChange)="onSearchChange()"
+        />
+      </div>
+      <button
+        type="button"
+        class="eq-btn eq-btn-outline eq-filter-toggle"
+        [class.is-active]="activeFacetCount() > 0"
+        [attr.aria-expanded]="filtersOpen()"
+        (click)="toggleFilters()"
+        title="Show / hide filters"
+      >
+        <i [ngClass]="filtersOpen() ? 'icon-minus' : 'icon-options'"></i>
+        <span>Filters</span>
+        @if (activeFacetCount() > 0) {
+          <span class="eq-filter-count">{{ activeFacetCount() }}</span>
+        }
+      </button>
+    </div>
 
-  <div class="eq-toolbar-field">
-    <label>Status</label>
-    <select [(ngModel)]="filterStatus" (ngModelChange)="onFilterChange()">
-      <option value="">All Statuses</option>
-      <option value="paid">Paid</option>
-      <option value="due">Due</option>
-      <option value="cancelled">Cancelled</option>
-    </select>
-  </div>
+    <!-- Row 2: facet panel (collapsible) -->
+    @if (filtersOpen()) {
+      <div class="eq-toolbar-facets">
+        <div class="eq-toolbar-field">
+          <label>Year</label>
+          <select [(ngModel)]="filterYear" (ngModelChange)="onFilterChange()">
+            <option [ngValue]="0">All Years</option>
+            @for (year of yearList(); track year) {
+              <option [ngValue]="year">{{ year }}</option>
+            }
+          </select>
+        </div>
 
-  <div class="eq-toolbar-field">
-    <label>Division</label>
-    <select [(ngModel)]="filterDivision" (ngModelChange)="onFilterChange()">
-      <option value="">All Divisions</option>
-      @for (div of divisions(); track div.BusinessDivisionId) {
-        <option [value]="div.DivisionName">{{ div.DivisionName }}</option>
-      }
-    </select>
-  </div>
+        <div class="eq-toolbar-field">
+          <label>Status</label>
+          <select [(ngModel)]="filterStatus" (ngModelChange)="onFilterChange()">
+            <option value="">All Statuses</option>
+            <option value="paid">Paid</option>
+            <option value="due">Due</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
 
-  <div class="eq-toolbar-field">
-    <label>Customer</label>
-    <select [(ngModel)]="filterCustomer" (ngModelChange)="onFilterChange()">
-      <option value="">All Customers</option>
-      @for (cust of customers(); track cust.CustomerId) {
-        <option [value]="cust.CustomerName">{{ cust.CustomerName }}</option>
-      }
-    </select>
-  </div>
+        <div class="eq-toolbar-field eq-toolbar-field-xs">
+          <label>Division</label>
+          <select [(ngModel)]="filterDivision" (ngModelChange)="onFilterChange()">
+            <option value="">All Divisions</option>
+            @for (div of divisions(); track div.BusinessDivisionId) {
+              <option [value]="div.DivisionName">{{ div.DivisionName }}</option>
+            }
+          </select>
+        </div>
 
-  <button class="eq-btn eq-btn-outline eq-toolbar-clear" (click)="clearFilters()">
-    <i class="icon-close"></i> Clear Filter
-  </button>
+        <div class="eq-toolbar-field eq-toolbar-field-grow">
+          <label>Customer</label>
+          <select [(ngModel)]="filterCustomer" (ngModelChange)="onFilterChange()">
+            <option value="">All Customers</option>
+            @for (cust of customers(); track cust.CustomerId) {
+              <option [value]="cust.CustomerName">{{ cust.CustomerName }}</option>
+            }
+          </select>
+        </div>
+
+        <button class="eq-btn eq-btn-outline eq-toolbar-clear" (click)="clearFilters()">
+          <i class="icon-close"></i> Clear
+        </button>
+      </div>
+    }
+
+    <!-- Row 3: active-filter chips -->
+    @if (activeFilters().length > 0) {
+      <div class="eq-toolbar-chips">
+        <span>Active filters:</span>
+        @for (chip of activeFilters(); track chip.key) {
+          <span class="eq-filter-chip">
+            {{ chip.label }}: {{ chip.value }}
+            <button type="button" title="Remove {{ chip.label }} filter" (click)="removeFilter(chip.key)">&times;</button>
+          </span>
+        }
+      </div>
+    }
+  </div>
 </eq-toolbar>
 
 <!-- Table -->
 <eq-table [columns]="columns" [loading]="loading()">
   <ng-container eqTableBody>
     @for (row of pageSlice(); track row.TaxInvoiceId) {
-      <tr>
-        <td>
-          <span class="eq-mono">{{ row.InvoiceNumber }}</span>
-          @if (row.InvoiceTotal === 0 && row.TotalVAT === 0) {
-            <eq-badge tone="neutral" [compact]="true">Cancelled</eq-badge>
-          } @else if (row.PaymentRecdDateString) {
-            <eq-badge tone="success" [compact]="true">Paid</eq-badge>
-          } @else {
-            <eq-badge tone="warning" [compact]="true">Due</eq-badge>
+      <tr [class.tr-due]="status(row) === 'due'" [class.tr-cancelled]="status(row) === 'cancelled'">
+        <td class="col-no mono" data-label="Invoice">
+          <span class="eq-inv-no">{{ row.InvoiceNumber }}</span>
+        </td>
+
+        <td class="col-status" data-label="Status">
+          @switch (status(row)) {
+            @case ('paid') {
+              <div class="eq-status eq-status-paid">
+                <span class="eq-status-pill"><span class="dot"></span>Paid</span>
+                <span class="eq-status-sub">Paid on {{ row.PaymentRecdDateString }}</span>
+              </div>
+            }
+            @case ('due') {
+              <div class="eq-status eq-status-due">
+                <span class="eq-status-pill"><span class="dot"></span>Due</span>
+                <span class="eq-status-sub">{{ row.InvoiceDateString }}</span>
+              </div>
+            }
+            @case ('cancelled') {
+              <div class="eq-status eq-status-cancelled">
+                <span class="eq-status-pill"><span class="dot"></span>Cancelled</span>
+              </div>
+            }
           }
         </td>
-        <td>{{ row.InvoiceDateString }}</td>
 
-        <td class="name">
-          <a class="eq-link"
+        <td class="col-date" data-label="Date">{{ row.InvoiceDateString }}</td>
+
+        <td class="col-customer name wrap" data-label="Customer / Products">
+          <a class="eq-link eq-customer-link"
              [routerLink]="['/createinvoice', row.TaxInvoiceId]"
              [queryParams]="{ editable: row.IsEditable === 1 ? 1 : 0 }">{{ row.CustomerName }}</a>
+          <ul class="eq-item-list">
+            <li>
+              <span class="eq-item-bullet">•</span>
+              <span class="eq-item-text">
+                @if (divisionIcon(row.DivisionName)) {
+                  <i [class]="divisionIconClass(row.DivisionName)" [title]="row.DivisionName"></i>
+                }
+                {{ row.ProductName }}
+              </span>
+            </li>
+          </ul>
         </td>
 
-        <td class="num">{{ row.CurrencySymbol }} {{ row.PreTaxTotal | number:'1.2-2' }}</td>
-        <td class="num">{{ row.CurrencySymbol }} {{ row.InvoiceTotal | number:'1.2-2' }}</td>
-        <td>
-          @if (divisionIcon(row.DivisionName)) {
-            <i [class]="divisionIconClass(row.DivisionName)" [title]="row.DivisionName"></i>
-          }
-          {{ row.ProductName }}
-        </td>
-        <td>{{ row.SExecutiveName }}</td>
-        <td>{{ row.PaymentRecdDateString }}</td>
-        <td>
+        <td class="col-money num" data-label="Pre-Tax">{{ row.CurrencySymbol }} {{ row.PreTaxTotal | number:'1.2-2' }}</td>
+        <td class="col-money num" data-label="VAT">{{ row.CurrencySymbol }} {{ row.TotalVAT | number:'1.2-2' }}</td>
+        <td class="col-total num col-total-cell" data-label="Total">{{ row.CurrencySymbol }} {{ row.InvoiceTotal | number:'1.2-2' }}</td>
+        <td class="col-exec" data-label="Sales Exec.">{{ execName(row) }}</td>
+
+        <td class="col-actions actions" data-label="">
           <div class="eq-row-actions">
-            <!-- <button type="button" class="eq-icon-btn" title="Edit Invoice" (click)="editInvoice(row)">
-              <i class="icon-pencil"></i>
-            </button> -->
             @if (showRecordPayment(row)) {
               <button type="button" class="eq-icon-btn" title="Record Payment" (click)="recordPayment(row)">
                 <i class="icon-credit-card"></i>

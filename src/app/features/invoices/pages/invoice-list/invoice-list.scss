@@ -29,3 +29,53 @@
   padding: var(--eq-sp-7) var(--eq-sp-5) !important;
 }
 
+/* ============================================================
+   KPI / summary cards — revised 4-card layout
+   ============================================================ */
+.eq-kpi-grid-improved {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.eq-kpi-outstanding {
+  border-top: 3px solid var(--eq-amber);
+}
+.eq-kpi-outstanding .eq-kpi-value {
+  font-size: 28px;
+}
+
+.eq-kpi-due {
+  border-top: 3px solid var(--eq-info);
+}
+
+.eq-kpi-currency {
+  font-family: var(--eq-font-sans);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--eq-ink-faint);
+}
+
+.eq-kpi-value-count {
+  font-family: var(--eq-font-sans);
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.eq-kpi-note {
+  margin-top: var(--eq-sp-2);
+  font-size: 11.5px;
+  color: var(--eq-ink-faint);
+}
+
+@media (max-width: 991px) {
+  .eq-kpi-grid-improved { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 700px) {
+  .eq-kpi-grid-improved { grid-template-columns: 1fr; }
+}
+
+/* Toolbar (search + collapsible filter panel + chips), table column
+   reprioritisation, status cell, customer/item cell, row states, and the
+   mobile stacked-card treatment now live in the shared src/styles/_table.scss —
+   they are generic table/toolbar styles (prototype : 'invoices-revised.css'). */
+

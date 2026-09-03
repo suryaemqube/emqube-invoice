@@ -72,7 +72,11 @@ export function deriveStatus(row: InvoiceListModel): InvoiceStatus {
 export interface KpiCard {
   label: string;
   value: string;
+  currency?: string;
+  cssClass?: string;
+  valueIsCount?: boolean;
   badge?: { text: string; tone: 'success' | 'warning' | 'info' | 'danger' | 'neutral' };
+  note?: string;
 }
 
 export interface InvoiceMessage {
