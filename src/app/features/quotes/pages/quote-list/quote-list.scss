@@ -1,7 +1,12 @@
 /*
-  Quote List — column stability fixes.
-  .eq-table uses table-layout:auto, so column widths are recomputed from each
-  page's visible rows. A nowrap date cell keeps the date column from being
-  squeezed (and wrapping "10-01-2025" into 3 lines) when pages have different content.
+  Quote List — mirrors the revised Invoice List layout (see _table.scss):
+  collapsible filter toolbar, Type badge column, merged Customer / Products,
+  bolded Total, sales-exec "First L." formatting.
+  Column widths / toolbar / chips / row actions all come from shared _table.scss.
+  This file only guards against the date cell wrapping ("DD-MM-YYYY").
 */
-.eq-table td.eq-nowrap { white-space: nowrap; }
+
+/* keep the date cell from wrapping into multiple lines */
+.eq-table td.col-date {
+  white-space: nowrap;
+}

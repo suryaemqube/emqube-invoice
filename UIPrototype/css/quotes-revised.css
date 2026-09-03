@@ -1,0 +1,43 @@
+/*
+  EmQube Invoice — Quote / Proforma List REVISED layout styles
+  ============================================================
+  Builds on tokens.css + prototype.css + invoices.css + invoices-revised.css.
+  The quotes page REUSES the invoice-list toolbar / table / row-action /
+  col-* styles almost unchanged, so this file only adds the bits specific to
+  quotes:
+
+    1. Document-TYPE badge (Proforma / Quote). This is a document type, NOT a
+       status — quote lists carry no confirmed accepted/rejected/converted
+       status (KNOWN-ISSUES.md), so it is shown as a neutral-type pill reusing
+       the app's soft badge palette: Proforma (type 2) in green, Quote in amber.
+    2. The KPI summary-card block is intentionally absent (no KPIs on quotes).
+*/
+
+/* ---------- document type badge ---------- */
+.eq-type-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+/* Proforma (type 2) — green, mirrors the app's success badge */
+.eq-type-proforma {
+  background: var(--eq-green-soft);
+  color: var(--eq-green);
+}
+
+/* Quote — amber, mirrors the app's warning badge */
+.eq-type-quote {
+  background: var(--eq-amber-soft);
+  color: var(--eq-amber);
+}
+
+/* ensure the Type column matches the Status column width it replaces */
+.col-status {
+  width: 130px;
+}

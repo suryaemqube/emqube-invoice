@@ -407,6 +407,13 @@ export class InvoiceList implements OnInit {
     return row.SExecutiveName?.trim() || first || '';
   }
 
+  productList(row: InvoiceListModel): string[] {
+    return (row.ProductName ?? '')
+      .split(',')
+      .map((p) => p.trim())
+      .filter(Boolean);
+  }
+
   divisionIcon(name: string): string {
     if (name === 'Web') return 'icon-globe';
     if (name === 'Software') return 'icon-layers';

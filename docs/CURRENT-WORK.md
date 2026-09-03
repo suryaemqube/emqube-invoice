@@ -82,6 +82,21 @@ One page serves every master table defined in the DB `MetaData`/`MetaDataDetail`
 - **Columns:** Quote/Proforma Number (mono, with the type appended as `<small> - Proforma</small>` — the separate Type column was removed for a tighter view), Date (`eq-nowrap`), Customer (link → `/createquote/:id`), Value, Tax (both `CurrencySymbol`-prefixed, 2dp), Division (plain text — old list has no division icon here), Product, Sales Executive, action dropdown.
 - **Row actions:** Edit Quote → `/createquote/:id`, Copy Quote → `/createquote/:id?copy=1` (the create-quote page will interpret it, mirroring the old `invoiceIdcopy` localStorage flag), Print Quote → `Invoice/GenerateQuote` then opens `/Documents/Quote/{file}` using the runtime `ConfigService.fileBaseUrl`.
 
+### Quote List REVISION (2026-09-03) — redesigned to mirror the revised Invoice List
+
+The quote list was rebuilt to share the same list UX as the revised invoice list, per the user decision **"we don't need KPI cards — suggest changes for filters and table only."** Prototype first reviewed at `UIPrototype/quotes-revised.html` (the `UIPrototype/` invoice list redesign was the template). Changes in `src/app/features/quotes/pages/quote-list/`:
+
+- **No KPI cards** — everything from the quote list comes from the table + filters only (quotes have no payment/outstanding semantics).
+- **Collapsible filter panel**: toolbar is now the shared `eq-toolbar-collapse` — Row 1 search + a **Filters** toggle button (with an active-count badge + `icon-options`/`icon-minus` glyph), Row 2 the facet panel (hidden until toggled, `filtersOpen` signal), Row 3 removable **filter chips** (`activeFacetCount()` / `activeFilters()` / `removeFilter(key)` / `toggleFilters()`, mirroring `invoice-list.ts`). Facets are **Year / Type / Division / Customer** (no Status — quotes carry no confirmed accepted/rejected/converted status, per `KNOWN-ISSUES.md`).
+- **Reprioritised columns** match the invoice list: Quote / Proforma → **Type** → Date → **Customer / Products** → Pre-Tax → VAT → Total → Sales Exec. → actions. `col-*` cssClass widths all come from shared `_table.scss`.
+- **Type column** replaces Status: a `EqBadge` (success=Proforma / warning=Quote) sits in the `col-status`-width cell — the quote list distinguishes rows only by document **Type** (`QuotetypeText`), never a status.
+- **Merged Customer / Products cell**: customer name is a link → `/createquote/:id` with the bulleted `ProductName` beneath it (`eq-customer-link` + `eq-item-list`, same as invoices).
+- **Pre-Tax** computed as `InvoiceTotal - TotalVAT` (the quote API model has no `PreTaxTotal`); Total bold (`col-total-cell`); Sales Exec. rendered `First L.` via new `execName()`.
+- **Row actions**: Copy (`icon-docs`) + Print (`icon-printer`) (`copyQuote()` / `printQuote()` unchanged); the customer link is the edit affordance.
+- **Pagination default now 25** (was 100) — matches the shared `EqPaginator` default of 25 and the invoice list.
+- Reduced `quote-list.scss` to just a `td.col-date { white-space: nowrap }` guard (the old `.eq-nowrap` date-wrap fix is folded into the shared `col-date` column).
+- **Multi-product bullets (2026-09-03):** the backend returns `ProductName` as a single comma-joined string; both the quote and invoice lists now split it via a `productList()` helper and render **one bullet per product** with the existing `.eq-item-list`/`.eq-item-bullet` pattern (previously shown as one comma-separated line).
+
 ### Create / Edit Invoice built (`src/app/features/invoices/pages/create-invoice/`)
 
 - **Model:** `models/invoice.model.ts` — added `InvoiceFormModel`, `InvoiceLineItem` (+ all master-data types: `CurrencyModel`, `PaymentTermModel`, `ParameterModel`, `AccountLedgerModel`, `UOMModel`, `VATCodeModel`, `StateModel`, `ProductModel`, `CustomerDetail`, `QuoteOption`, `QuoteDetailsModel`, `QuoteModel`, wrapper `R*List` types), `emptyInvoiceForm()`, `emptyLineItem()`

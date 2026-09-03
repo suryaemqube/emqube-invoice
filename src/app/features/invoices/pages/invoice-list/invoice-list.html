@@ -165,15 +165,17 @@
              [routerLink]="['/createinvoice', row.TaxInvoiceId]"
              [queryParams]="{ editable: row.IsEditable === 1 ? 1 : 0 }">{{ row.CustomerName }}</a>
           <ul class="eq-item-list">
-            <li>
-              <span class="eq-item-bullet">•</span>
-              <span class="eq-item-text">
-                @if (divisionIcon(row.DivisionName)) {
-                  <i [class]="divisionIconClass(row.DivisionName)" [title]="row.DivisionName"></i>
-                }
-                {{ row.ProductName }}
-              </span>
-            </li>
+            @for (item of productList(row); track $index) {
+              <li>
+                <span class="eq-item-bullet">•</span>
+                <span class="eq-item-text">
+                  @if (divisionIcon(row.DivisionName)) {
+                    <i [class]="divisionIconClass(row.DivisionName)" [title]="row.DivisionName"></i>
+                  }
+                  {{ item }}
+                </span>
+              </li>
+            }
           </ul>
         </td>
 

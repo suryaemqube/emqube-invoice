@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, computed, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { InvoiceService } from '../../../invoices/services/invoice.service';
@@ -17,6 +17,7 @@ const STORAGE_KEY = 'QuoteFilters';
   selector: 'app-quote-list',
   imports: [
     DecimalPipe,
+    NgClass,
     FormsModule,
     EqTable,
     EqPaginator,
@@ -41,6 +42,7 @@ export class QuoteList implements OnInit {
   filterDivision = signal('');
   filterCustomer = signal('');
   filterType = signal('');
+  filtersOpen = signal(false);
 
   divisionOptions = computed(() =>
     [...new Set(this.allQuotes().map((r) => r.DivisionName).filter(Boolean))].sort(),
@@ -53,20 +55,20 @@ export class QuoteList implements OnInit {
   );
 
   page = signal(1);
-  pageSize = signal(100);
+  pageSize = signal(25);
 
   loading = signal(true);
 
   columns: EqColumn[] = [
-    { key: 'QuoteNumber', header: 'Quote/Proforma\nNumber', cssClass: 'eq-mono' },
-    { key: 'QuoteDateString', header: 'Date', width: '90px' },
-    { key: 'CustomerName', header: 'Customer', cssClass: 'name', width: '200px' },
-    { key: 'InvoiceTotal', header: 'Value', align: 'right', cssClass: 'num' },
-    { key: 'TotalVAT', header: 'Tax', align: 'right', cssClass: 'num' },
-    { key: 'DivisionName', header: 'Division' },
-    { key: 'ProductName', header: 'Product', width: '150px' },
-    { key: 'SExecutiveName', header: 'Sales Executive' },
-    { key: 'actions', header: '', align: 'right', width: '100px' },
+    { key: 'QuoteNumber', header: 'Quote / Proforma', cssClass: 'col-no mono' },
+    { key: 'type', header: 'Type', cssClass: 'col-status' },
+    { key: 'QuoteDateString', header: 'Date', cssClass: 'col-date' },
+    { key: 'CustomerName', header: 'Customer / Products', cssClass: 'col-customer name' },
+    { key: 'preTax', header: 'Pre-Tax', align: 'right', cssClass: 'col-money num' },
+    { key: 'TotalVAT', header: 'VAT', align: 'right', cssClass: 'col-money num' },
+    { key: 'InvoiceTotal', header: 'Total', align: 'right', cssClass: 'col-total num' },
+    { key: 'SExecutiveName', header: 'Sales Exec.', cssClass: 'col-exec' },
+    { key: 'actions', header: '', align: 'right', cssClass: 'col-actions' },
   ];
 
   filteredList = computed(() => {
@@ -134,6 +136,37 @@ export class QuoteList implements OnInit {
     this.saveFilters();
   }
 
+  toggleFilters(): void {
+    this.filtersOpen.set(!this.filtersOpen());
+  }
+
+  activeFacetCount(): number {
+    let n = 0;
+    if (this.filterYear() !== 0) n++;
+    if (this.filterType()) n++;
+    if (this.filterDivision()) n++;
+    if (this.filterCustomer()) n++;
+    return n;
+  }
+
+  activeFilters(): { key: string; label: string; value: string }[] {
+    const chips: { key: string; label: string; value: string }[] = [];
+    if (this.filterYear() !== 0) chips.push({ key: 'year', label: 'Year', value: String(this.filterYear()) });
+    if (this.filterType()) chips.push({ key: 'type', label: 'Type', value: this.filterType() });
+    if (this.filterDivision()) chips.push({ key: 'division', label: 'Division', value: this.filterDivision() });
+    if (this.filterCustomer()) chips.push({ key: 'customer', label: 'Customer', value: this.filterCustomer() });
+    return chips;
+  }
+
+  removeFilter(key: string): void {
+    if (key === 'year') this.filterYear.set(0);
+    else if (key === 'type') this.filterType.set('');
+    else if (key === 'division') this.filterDivision.set('');
+    else if (key === 'customer') this.filterCustomer.set('');
+    this.page.set(1);
+    this.saveFilters();
+  }
+
   clearFilters(): void {
     this.filterQuery.set('');
     this.filterYear.set(0);
@@ -177,6 +210,26 @@ export class QuoteList implements OnInit {
 
   editQuote(row: QuoteListModel): void {
     this.router.navigate(['/createquote', row.TaxInvoiceId]);
+  }
+
+  execName(row: QuoteListModel): string {
+    const first = row.SExecutiveFirstName?.trim();
+    const last = row.SExecutiveLastName?.trim();
+    if (first && last) {
+      return `${first} ${last.charAt(0).toUpperCase()}.`;
+    }
+    return row.SExecutiveName?.trim() || first || '';
+  }
+
+  preTax(row: QuoteListModel): number {
+    return (row.InvoiceTotal ?? 0) - (row.TotalVAT ?? 0);
+  }
+
+  productList(row: QuoteListModel): string[] {
+    return (row.ProductName ?? '')
+      .split(',')
+      .map((p) => p.trim())
+      .filter(Boolean);
   }
 
   copyQuote(row: QuoteListModel): void {

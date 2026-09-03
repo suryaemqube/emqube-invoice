@@ -139,7 +139,7 @@
   padding: var(--eq-sp-3) var(--eq-sp-4);
   border-bottom: 1px solid var(--eq-border);
   color: var(--eq-ink);
-  vertical-align: middle;
+  vertical-align: top;
 }
 .eq-table tbody tr:last-child td { border-bottom: none; }
 .eq-table tbody tr:hover { background: var(--eq-surface-alt); }
