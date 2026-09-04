@@ -41,6 +41,9 @@
             "polyfills": [
               "zone.js",
               "@angular/localize/init"
+            ],
+            "allowedCommonJsDependencies": [
+              "powerbi-client"
             ]
           },
           "configurations": {

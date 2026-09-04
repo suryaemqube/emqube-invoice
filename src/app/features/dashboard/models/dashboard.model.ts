@@ -1,0 +1,25 @@
+export interface ReportTab {
+  MenuId: number;
+  Name: string;
+  MenuURL: string;
+}
+
+export interface ReportTabListResponse {
+  MenuList: ReportTab[];
+}
+
+export interface BIAccessToken {
+  token_type: string;
+  scope: string;
+  expires_in: string;
+  ext_expires_in: string;
+  expires_on: string;
+  not_before: string;
+  resource: string;
+  access_token: string;
+  refresh_token: string;
+}
+
+export interface BIAccessTokenResponse {
+  AccessToken: BIAccessToken;
+}

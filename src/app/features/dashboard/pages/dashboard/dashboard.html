@@ -1,12 +1,46 @@
 <div class="eq-page-header">
   <div>
     <h1>Dashboard</h1>
-    <p>Welcome to EmQube Invoice</p>
   </div>
 </div>
 
-<div class="eq-empty">
-  <div class="eq-empty-icon"><i class="icon-speedometer"></i></div>
-  <h2>Dashboard</h2>
-  <p>Dashboard content will be built in a later phase.</p>
-</div>
+@if (loading()) {
+  <div class="eq-loading">
+    <div class="eq-loading-spinner"></div>
+    <p>Loading reports...</p>
+  </div>
+}
+
+@if (error()) {
+  <div class="eq-empty">
+    <div class="eq-empty-icon"><i class="icon-warning"></i></div>
+    <h2>Error</h2>
+    <p>{{ error() }}</p>
+  </div>
+}
+
+@if (!loading() && !error() && reportTabs().length === 0) {
+  <div class="eq-empty">
+    <div class="eq-empty-icon"><i class="icon-speedometer"></i></div>
+    <h2>No Reports</h2>
+    <p>No Power BI reports are configured for your account.</p>
+  </div>
+}
+
+@if (reportTabs().length > 0) {
+  <div class="eq-dashboard">
+    <div class="eq-dashboard-tabs">
+      @for (tab of reportTabs(); track tab.MenuId) {
+        <button
+          class="eq-dashboard-tab"
+          [class.active]="tab.MenuId === activeTabId()"
+          (click)="onTabClick(tab)"
+        >
+          {{ tab.Name }}
+        </button>
+      }
+    </div>
+
+    <div id="biReportTabContent" class="eq-dashboard-report"></div>
+  </div>
+}
